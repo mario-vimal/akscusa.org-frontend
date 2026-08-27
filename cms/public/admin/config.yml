@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+
+backend:
+  name: github
+  # Deliberately not a real repository. The GitHub backend commits to whatever
+  # this names, including from a local dev server, so the live site is never the
+  # default. Set CMS_REPO to publish from a deployment, or to point a local dev
+  # server at your own fork. See "Backend repository" in README.md.
+  repo: OWNER/REPOSITORY
+  branch: main
+  # Sveltia uses the commit message as the pull request title. The defaults are
+  # `Create/Update/Delete {{collection}} “{{slug}}”`; these name the CMS as the
+  # source so the change is recognisable in the pull request list.
+  commit_messages:
+    create: "Add {{collection}}: {{slug}}"
+    update: "Update {{collection}}: {{slug}}"
+    delete: "Remove {{collection}}: {{slug}}"
+    uploadMedia: "Add media: {{path}}"
+    deleteMedia: "Remove media: {{path}}"
+  # Land each entry as a single commit instead of one per intermediate save.
+  squash_merges: true
+
+# Route every change through a pull request rather than committing straight to
+# `branch` above. Saving an entry opens a branch and a draft pull request, and
+# nothing reaches `main` until the entry is published from the CMS or the pull
+# request is merged.
+publish_mode: editorial_workflow
+
+# `cms/public/` is the Astro public directory, so uploads here are published at
+# `/media/`. Sveltia requires this even when a cloud media library is added.
+media_folder: /cms/public/media
+public_folder: /media
+
+# Only repeating, structured records belong here. Static page copy stays in
+# `app/content/pages/` and is edited in Git, not through the CMS.
+collections:
+  - name: book-readings
+    label: Book Readings
+    label_singular: Book Reading
+    icon: menu_book
+    description: Scheduled and past readings, newest first.
+    folder: cms/content/book-readings
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    sortable_fields: [date, title]
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Date and time, widget: datetime }
+      - { name: location, label: Location, widget: string }
+      - name: book
+        label: Book
+        widget: object
+        fields:
+          - { name: title, label: Title, widget: string }
+          - { name: author, label: Author, widget: string }
+      - name: participants
+        label: Participants
+        widget: list
+        required: false
+        field: { name: name, label: Name, widget: string }
+      - {
+          name: registrationUrl,
+          label: Registration URL,
+          widget: string,
+          required: false,
+        }
+      - { name: summary, label: Summary, widget: text }
+      - { name: body, label: Details, widget: markdown, required: false }

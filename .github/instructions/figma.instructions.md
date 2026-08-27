@@ -1,5 +1,5 @@
 ---
-applyTo: "src/**/*.{astro,css,ts,tsx}"
+applyTo: "app/**/*.{astro,css,ts,tsx}"
 ---
 
 # Figma implementation
@@ -9,12 +9,12 @@ applyTo: "src/**/*.{astro,css,ts,tsx}"
 - Capture the target file, page, frame, and node identifiers in the task or pull
   request so the design input is reproducible.
 - Map reusable colors, typography, spacing, radii, and shadows to Tailwind theme
-  tokens in `src/styles/global.css`; do not scatter unexplained arbitrary values
+  tokens in `app/styles/global.css`; do not scatter unexplained arbitrary values
   through components.
 - Prefer semantic HTML and accessible native controls. Match visual hierarchy
   without sacrificing keyboard navigation, focus visibility, text resizing, or
   reduced-motion preferences.
-- Reuse existing layouts and components before creating new ones. Keep content
-  data separate from presentation when it will eventually come from WordPress.
+- Reuse existing layouts and components before creating new ones. Keep
+  Sveltia-managed Markdown content separate from presentation.
 - Compare the implementation at the frame's defined viewport sizes and document
   intentional deviations from the source design.

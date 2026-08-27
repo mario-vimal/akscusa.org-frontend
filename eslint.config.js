@@ -10,7 +10,7 @@ export default defineConfig(
   tseslint.configs.recommended,
   astro.configs.recommended,
   {
-    files: ["scripts/**/*.mjs"],
+    files: ["*.mjs", "*.js", "scripts/**/*.mjs"],
     languageOptions: {
       globals: globals.node,
     },

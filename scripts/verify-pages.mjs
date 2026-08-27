@@ -15,6 +15,8 @@ const routes = new Map([
   ["/conferences/", "Conferences"],
   ["/organization/", "Organization"],
   ["/donate/", "Donate"],
+  ["/admin/", "AKSC USA Content Manager"],
+  ["/admin/config.yml", `repo: ${process.env.CMS_REPO ?? "OWNER/REPOSITORY"}`],
 ]);
 
 async function findAvailablePort() {

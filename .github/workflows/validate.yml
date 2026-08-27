@@ -1,0 +1,41 @@
+name: Validate
+
+# Cloudflare Pages' Git integration builds and deploys previews itself, so this
+# workflow only validates. Draft pull requests are skipped: the CMS opens one
+# for every entry it saves, and those run here once the entry is moved out of
+# Draft and the pull request is marked ready for review.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: validate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    env:
+      # Non-secret, so a repository variable rather than a secret. The build
+      # bakes it into dist/admin/config.yml, so it belongs on the job that
+      # builds the site.
+      CMS_REPO: ${{ vars.CMS_REPO }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate project
+        run: npm run validate

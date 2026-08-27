@@ -1,4 +1,6 @@
 ---
+import appleTouchIcon from "../assets/brand/apple-touch-icon.png";
+import favicon from "../assets/brand/favicon.png";
 import "../styles/global.css";
 
 interface Props {
@@ -22,8 +24,8 @@ const canonicalUrl = Astro.site
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href={favicon.src} />
+    <link rel="apple-touch-icon" href={appleTouchIcon.src} />
     <title>{documentTitle}</title>
   </head>
   <body>
