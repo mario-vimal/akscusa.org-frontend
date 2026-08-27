@@ -1,0 +1,119 @@
+---
+import ResponsiveImage from "../../../components/ui/ResponsiveImage.astro";
+import { topicLabel, type EditorialTopic } from "../../editorial/taxonomy";
+import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "../covers";
+
+interface Props {
+  href: string;
+  title: string;
+  subtitle?: string;
+  authors: string;
+  summary: string;
+  isbn: string;
+  publisher?: string;
+  sessions: number;
+  topics?: readonly EditorialTopic[];
+}
+
+const {
+  href,
+  title,
+  subtitle,
+  authors,
+  summary,
+  isbn,
+  publisher,
+  sessions,
+  topics = [],
+} = Astro.props;
+
+const cover = coverForIsbn(isbn);
+
+const sessionLabel =
+  sessions === 0
+    ? "Not yet scheduled"
+    : `${sessions} ${sessions === 1 ? "session" : "sessions"}`;
+---
+
+<article
+  class="group relative flex h-full flex-col rounded-3xl border border-ambedkar-900/10 bg-white p-6 transition hover:border-ambedkar-900/25 hover:shadow-soft sm:p-8"
+>
+  <div class="flex gap-5">
+    {
+      cover ? (
+        <ResponsiveImage
+          class="w-20 shrink-0 self-start rounded-lg border border-ambedkar-900/10 shadow-sm sm:w-24"
+          src={cover}
+          alt={COVER_ALT}
+          sizes="(min-width: 640px) 6rem, 5rem"
+          widths={COVER_WIDTHS}
+        />
+      ) : (
+        <div
+          class="flex w-20 shrink-0 items-center justify-center self-start rounded-lg border border-dashed border-ambedkar-900/20 bg-ambedkar-50 px-2 py-8 text-center text-xs font-semibold text-ambedkar-800/70 sm:w-24"
+          aria-hidden="true"
+        >
+          No cover
+        </div>
+      )
+    }
+
+    <div class="min-w-0">
+      <p
+        class="text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase"
+      >
+        {authors}
+      </p>
+      <h2
+        class="mt-2 text-xl font-semibold tracking-tight text-balance text-ambedkar-950"
+      >
+        <a
+          class="after:absolute after:inset-0 focus-visible:outline-none"
+          href={href}
+        >
+          {title}
+        </a>
+      </h2>
+      {subtitle && <p class="mt-1 text-sm text-ambedkar-900/60">{subtitle}</p>}
+      <span
+        class:list={[
+          "mt-3 inline-block rounded-full px-2.5 py-1 text-xs font-bold tracking-wide uppercase",
+          sessions > 0
+            ? "bg-ambedkar-900/10 text-ambedkar-900"
+            : "bg-accent-300 text-ambedkar-950",
+        ]}
+      >
+        {sessionLabel}
+      </span>
+    </div>
+  </div>
+
+  <p class="mt-5 leading-7 text-ambedkar-900/75">{summary}</p>
+
+  <ul class="mt-4 space-y-1 text-sm text-ambedkar-900/65">
+    <li class="break-words">ISBN {isbn}</li>
+    {publisher && <li>{publisher}</li>}
+  </ul>
+
+  <div class="mt-auto pt-6">
+    {
+      topics.length > 0 && (
+        <ul class="flex flex-wrap gap-2">
+          {topics.map((topic) => (
+            <li class="rounded-full bg-ambedkar-50 px-2.5 py-1 text-xs font-semibold text-ambedkar-800">
+              {topicLabel(topic)}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <p
+      class="mt-4 text-sm font-semibold text-ambedkar-700 group-hover:text-ambedkar-900"
+      aria-hidden="true"
+    >
+      Read more <span class="inline-block transition group-hover:translate-x-1"
+        >&rarr;</span
+      >
+    </p>
+  </div>
+</article>

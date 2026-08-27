@@ -1,0 +1,21 @@
+---
+import type { GetStaticPaths } from "astro";
+
+import BookDetail from "../../features/books/components/BookDetail.astro";
+import { loadBooksWithReadings } from "../../features/books/queries/books";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export const getStaticPaths = (async () => {
+  const entries = await loadBooksWithReadings();
+  return entries.map((entry) => ({
+    params: { slug: entry.book.id },
+    props: { entry },
+  }));
+}) satisfies GetStaticPaths;
+
+const { entry } = Astro.props;
+---
+
+<SiteLayout title={entry.book.data.title} description={entry.book.data.summary}>
+  <BookDetail entry={entry} />
+</SiteLayout>

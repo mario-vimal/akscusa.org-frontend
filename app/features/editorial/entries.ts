@@ -1,12 +1,16 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
 /**
- * The four collections that share the editorial base schema. They are listed,
+ * The five collections that share the editorial base schema. They are listed,
  * sorted, and linked by the same code, so a change to one section's chrome
- * lands on all four.
+ * lands on all five.
  */
 export type EditorialCollection =
-  "articles" | "pressReleases" | "interventions" | "conferences";
+  | "articles"
+  | "pressReleases"
+  | "interventions"
+  | "conferences"
+  | "bookReadings";
 
 export type EditorialEntry<
   C extends EditorialCollection = EditorialCollection,
@@ -60,6 +64,15 @@ export const editorialSections = {
       "Programmes, speakers, and resolutions from the AKSC annual conference, held every year since 2018.",
     empty: "No conferences have been published yet.",
   },
+  bookReadings: {
+    path: "/book-readings",
+    label: "Book Readings",
+    eyebrow: "Reading and Discussions",
+    title: "Book Readings",
+    description:
+      "AKSC reads together. Every few weeks the circle works through a book, a reading list, or an academic paper, and discusses it in the open.",
+    empty: "No readings have been published yet.",
+  },
 } as const satisfies Record<EditorialCollection, SectionDefinition>;
 
 /**
@@ -97,6 +110,28 @@ const monthFormatter = new Intl.DateTimeFormat("en-US", {
 
 export const formatDate = (date: Date) => dayFormatter.format(date);
 export const formatMonth = (date: Date) => monthFormatter.format(date);
+
+// A reading is scheduled at a time of day, not just on a date, and the circle
+// keeps Pacific time wherever members join from.
+const pacificDayFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "long",
+  timeZone: "America/Los_Angeles",
+});
+
+const pacificTimeFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+  timeZoneName: "short",
+  timeZone: "America/Los_Angeles",
+});
+
+export const formatPacificDate = (date: Date) =>
+  pacificDayFormatter.format(date);
+export const formatPacificTime = (date: Date) =>
+  pacificTimeFormatter.format(date);
 
 /** ISO date without the time part, for a `<time datetime>` attribute. */
 export const isoDate = (date: Date) => date.toISOString().slice(0, 10);

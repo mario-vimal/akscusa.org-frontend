@@ -18,6 +18,11 @@ interface Props {
   /** Shown in place of the list when nothing has been published yet. */
   empty?: string;
   isEmpty?: boolean;
+  /**
+   * Whether to wrap the default slot in the shared card grid. Set false when a
+   * section renders its own body, such as the book readings table.
+   */
+  list?: boolean;
 }
 
 const {
@@ -29,12 +34,13 @@ const {
   filtersLabel = "Filter",
   empty,
   isEmpty = false,
+  list = true,
 } = Astro.props;
 ---
 
 <section class="relative isolate overflow-x-clip">
   <div
-    class="absolute inset-x-0 top-0 -z-10 h-[28rem] bg-[radial-gradient(circle_at_top_right,rgba(240,184,63,0.2),transparent_48%),radial-gradient(circle_at_top_left,rgba(31,98,170,0.18),transparent_42%)]"
+    class="absolute inset-x-0 top-0 -z-10 h-[28rem] bg-[radial-gradient(circle_at_top_right,rgba(127,224,210,0.2),transparent_48%),radial-gradient(circle_at_top_left,rgba(31,98,170,0.18),transparent_42%)]"
     aria-hidden="true"
   >
   </div>
@@ -86,15 +92,21 @@ const {
       )
     }
 
+    <!-- Standing context a section may need above its entries, such as how
+      the reading circle meets. Most indexes leave this empty. -->
+    <slot name="intro" />
+
     {
       isEmpty ? (
         <p class="mt-12 max-w-2xl rounded-2xl border border-ambedkar-900/10 bg-white px-6 py-8 text-ambedkar-900/75">
           {empty}
         </p>
-      ) : (
+      ) : list ? (
         <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <slot />
         </ul>
+      ) : (
+        <slot />
       )
     }
   </Container>

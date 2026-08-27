@@ -15,9 +15,31 @@
   --color-ambedkar-800: #193f6e;
   --color-ambedkar-900: #19375c;
   --color-ambedkar-950: #10233e;
-  --color-saffron-300: #f7ca68;
-  --color-saffron-400: #f0b83f;
-  --color-cream: #f8f9fc;
+  /*
+   * Accent scale. Deliberately teal rather than the saffron this replaced:
+   * saffron is the colour of Hindutva, which AKSC campaigns against, so it read
+   * as a contradiction on a site that carries an intervention titled "Stop
+   * Saffronisation of Indian History in California Textbooks". Teal sits beside
+   * the Ambedkar blue rather than fighting it, and every pairing below is
+   * contrast-checked: 300 carries dark text on it and light text on dark blue,
+   * 400 is the hover step, and 600 covers the focus ring and decorative marks.
+   */
+  --color-accent-300: #7fe0d2;
+  --color-accent-400: #38c3b4;
+  --color-accent-600: #0d8f88;
+  /*
+   * Alert scale, reserved for urgency and care: the emergency banner on the
+   * helpline and the content note on the testimonies. It is deliberately kept
+   * scarce, because a red that appears everywhere stops meaning anything.
+   *
+   * Crimson rather than a warm vermillion, so it never drifts back toward the
+   * saffron this palette avoids.
+   */
+  --color-alert-50: #fce4ea;
+  --color-alert-600: #c8103c;
+  --color-alert-950: #4a0a1c;
+  /* Page surface: a blue-tinted paper, so white cards separate from it. */
+  --color-mist: #eff4fa;
   --shadow-soft: 0 24px 80px -40px rgb(16 35 62 / 45%);
 }
 
@@ -29,19 +51,24 @@
   body {
     min-width: 20rem;
     min-height: 100vh;
-    background: var(--color-cream);
+    background: var(--color-mist);
     color: var(--color-ambedkar-950);
     font-family: var(--font-sans);
     text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    background: var(--color-saffron-300);
+    background: var(--color-accent-300);
     color: var(--color-ambedkar-950);
   }
 
+  /*
+   * accent-600 is the one step that clears 3:1 against the page surface, white
+   * cards, and the dark blue sections alike, so one ring works everywhere. The
+   * saffron ring it replaces sat at 1.7:1 on the page background.
+   */
   :focus-visible {
-    outline: 3px solid var(--color-saffron-400);
+    outline: 3px solid var(--color-accent-600);
     outline-offset: 3px;
   }
 }

@@ -29,7 +29,7 @@ const { hero } = Astro.props;
     class="flex min-h-[38rem] items-end py-16 sm:py-24 lg:min-h-[44rem]"
   >
     <div class="max-w-4xl">
-      <p class="text-sm font-bold tracking-[0.2em] text-saffron-300 uppercase">
+      <p class="text-sm font-bold tracking-[0.2em] text-accent-300 uppercase">
         {hero.eyebrow}
       </p>
       <h1
@@ -42,7 +42,7 @@ const { hero } = Astro.props;
       </p>
       <div class="mt-9 flex flex-col gap-3 sm:flex-row">
         <a
-          class="rounded-full bg-saffron-300 px-6 py-3 text-center font-bold text-ambedkar-950 transition hover:bg-saffron-400"
+          class="rounded-full bg-accent-300 px-6 py-3 text-center font-bold text-ambedkar-950 transition hover:bg-accent-400"
           href={hero.primaryAction.href}
         >
           {hero.primaryAction.label}

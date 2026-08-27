@@ -19,6 +19,7 @@
     "test:watch": "vitest",
     "generate-types": "wrangler types",
     "verify:pages": "node scripts/verify-pages.mjs",
+    "fetch:covers": "node scripts/fetch-book-covers.mjs",
     "deploy:pages": "wrangler pages deploy dist",
     "validate": "npm run check && npm run lint && npm run format:check && npm run test && npm run build && npm run verify:pages"
   },
@@ -44,6 +45,7 @@
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "sharp": "^0.35.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.68.0",
     "vitest": "^4.1.11",

@@ -1,11 +1,19 @@
 ---
+import { getEntry } from "astro:content";
+
 import BookReadingsOverview from "../../features/book-readings/components/BookReadingsOverview.astro";
+import { editorialSections } from "../../features/editorial/entries";
 import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const section = editorialSections.bookReadings;
+
+const page = await getEntry("pages", "book-readings");
+
+if (!page || page.data.pageType !== "book-readings") {
+  throw new Error("Book readings content is missing or invalid.");
+}
 ---
 
-<SiteLayout
-  title="Book Readings"
-  description="Upcoming book readings and an archive of literary gatherings from AKSC USA."
->
-  <BookReadingsOverview />
+<SiteLayout title={section.title} description={section.description}>
+  <BookReadingsOverview {...page.data} />
 </SiteLayout>

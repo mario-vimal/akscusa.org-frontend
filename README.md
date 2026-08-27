@@ -86,7 +86,7 @@ temporary working document; delete it once both sites are retired.
 
 ## Editorial collections
 
-Four CMS collections share one base shape, defined once in
+Five CMS collections share one base shape, defined once in
 `app/content.config.ts` and reused by each: `title`, `date`, `summary`,
 `topics`, `heroImage`, `sourceUrl`, `featured`, and `draft`. Each then adds only
 the fields its own kind of entry needs.
@@ -97,6 +97,7 @@ the fields its own kind of entry needs.
 | `pressReleases` | `cms/content/press-releases` | `/press-releases` | `dateline`, `issuedBy`, `contactEmail`, `attachments`            |
 | `interventions` | `cms/content/interventions`  | `/interventions`  | `kind`, `status`, `concludedDate`, `outcome`, `resources`        |
 | `conferences`   | `cms/content/conferences`    | `/conferences`    | `edition`, `endDate`, `location`, `format`, `theme`, `resources` |
+| `bookReadings`  | `cms/content/book-readings`  | `/book-readings`  | `location`, `isbn`, `participants`, `registrationUrl`            |
 
 `app/features/editorial/taxonomy.ts` is the single source of truth for every
 controlled vocabulary: shared `topics`, article categories, intervention kinds
@@ -105,17 +106,58 @@ into Zod enums and the pages render their labels. The CMS cannot import
 TypeScript, so `cms/public/admin/config.yml` repeats the options in YAML and
 `scripts/cms/config.test.ts` fails if the two drift apart.
 
-`topics` is shared across all four collections, so an article, a statement, and
+`topics` is shared across all five collections, so an article, a statement, and
 a campaign about the same subject stay relatable without duplicating an entry.
 
 Each section has an index at its route and an entry page at
-`<route>/<slug>/`. Articles are also browsable by category at
+`<route>/<slug>/`. Book readings are listed as a sortable table rather than
+cards, since the archive grows steadily. Articles are also browsable by category at
 `/blog/category/<category>/` and interventions by kind at
 `/interventions/kind/<kind>/`; only terms that have entries get a page.
 `app/features/editorial/` holds the shared list, card, and entry components, so
-a change to one section's chrome lands on all four.
+a change to one section's chrome lands on all five.
 
 Entries marked `draft` are visible in `npm run dev` and left out of the build.
+
+### Books, linked by ISBN
+
+`books` is the one collection outside that base shape, because a book has no
+publication date of its own here and never appears in a dated index. It lives in
+`cms/content/books` and is served at `/books/` and `/books/<slug>/`.
+
+One book usually carries several readings, so the metadata is stored once and
+referenced. A reading names the edition it worked through in its `isbn` field,
+the CMS offers that as a relation to the books collection, and
+`app/features/books/queries/books.ts` resolves it at build time. Two checks keep
+the link honest and fail the build rather than degrading quietly:
+
+- an ISBN-13 must pass its check digit, so a typo cannot slip through
+  (`app/features/books/isbn.ts`);
+- a reading may not reference an ISBN that no book entry claims, and no two
+  books may claim the same ISBN.
+
+A book page lists every session that read it, and `/book-readings/` renders a
+sortable, searchable table whose Book column links back to the book. A reading
+whose book is only a draft renders without the book rather than failing the
+build, so drafting a book cannot take the site down.
+
+ISBNs are printed as bare digits. Where an ISBN-13 breaks into its registration
+group and registrant depends on the ISBN range tables rather than fixed offsets,
+so the site does not invent hyphenation; the table search accepts an ISBN typed
+either way.
+
+Cover art is fetched by ISBN and committed, so Astro optimizes it at build time
+instead of the page depending on a third party at runtime:
+
+```
+npm run fetch:covers          # fetch any cover not already stored
+node scripts/fetch-book-covers.mjs --force   # refetch everything
+```
+
+Covers land in `app/features/books/assets/covers/<isbn>.jpg`, are trimmed of the
+flat padding Open Library adds to some images, and are matched to a book by
+filename. A book with no cover file renders without one, so nothing breaks when
+Open Library has nothing for an ISBN.
 
 `cms/content/` is in `.prettierignore`. Sveltia writes those files when an
 editor saves, and it does not format them the way Prettier would, so checking
@@ -135,6 +177,7 @@ them would fail every pull request the CMS opens.
 | `npm test`               | Run Vitest once                               |
 | `npm run generate-types` | Generate Cloudflare runtime binding types     |
 | `npm run verify:pages`   | Smoke-test `dist` through Wrangler Pages      |
+| `npm run fetch:covers`   | Fetch missing book covers from Open Library   |
 | `npm run deploy:pages`   | Deploy `dist` with the Pages command          |
 | `npm run validate`       | Run all checks, build, and Pages verification |
 

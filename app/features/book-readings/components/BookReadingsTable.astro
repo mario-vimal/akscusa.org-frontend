@@ -1,0 +1,270 @@
+---
+import type { BookReadingRow } from "../presenters";
+
+interface Props {
+  rows: readonly BookReadingRow[];
+}
+
+const { rows } = Astro.props;
+
+// Columns the reader can sort by. `key` names the row property the client
+// script compares; which direction each starts in is decided by `nextSortState`.
+const columns = [
+  { key: "date", label: "Date" },
+  { key: "title", label: "Reading" },
+  { key: "book", label: "Book" },
+] as const;
+---
+
+<div class="mt-12">
+  <div
+    class="rounded-3xl border border-ambedkar-900/10 bg-white p-5 sm:p-6"
+    data-readings-controls
+    hidden
+  >
+    <div role="search" class="max-w-xl">
+      <label
+        class="block text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase"
+        for="reading-search"
+      >
+        Search readings
+      </label>
+      <input
+        class="mt-2 w-full rounded-full border border-ambedkar-900/20 bg-mist px-5 py-3 text-ambedkar-950 placeholder:text-ambedkar-900/45 focus-visible:border-ambedkar-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ambedkar-700"
+        id="reading-search"
+        type="search"
+        autocomplete="off"
+        aria-describedby="reading-search-hint"
+        placeholder="Try a book, an author, a topic, or a year"
+        data-readings-search
+      />
+      <p class="mt-2 text-sm text-ambedkar-900/60" id="reading-search-hint">
+        Matches the title, book, author, location, topics, and date of every
+        reading. Sort the table by selecting a column heading.
+      </p>
+    </div>
+  </div>
+
+  <p
+    class="mt-4 text-sm font-semibold text-ambedkar-700"
+    data-readings-status
+    role="status"
+    aria-live="polite"
+  >
+  </p>
+
+  <div
+    class="mt-4 overflow-x-auto rounded-3xl border border-ambedkar-900/10 bg-white"
+    tabindex="0"
+    role="region"
+    aria-labelledby="readings-table-caption"
+  >
+    <table class="w-full min-w-[44rem] border-collapse text-left">
+      <caption
+        class="px-6 pt-6 text-left text-sm text-ambedkar-900/60"
+        id="readings-table-caption"
+      >
+        Every reading the circle has held, newest first.
+      </caption>
+      <thead>
+        <tr class="border-b border-ambedkar-900/12">
+          {
+            columns.map((column) => (
+              <th
+                class="px-6 py-4 text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase"
+                scope="col"
+                data-readings-column={column.key}
+                aria-sort={column.key === "date" ? "descending" : "none"}
+              >
+                {column.label}
+              </th>
+            ))
+          }
+          <th
+            class="hidden px-6 py-4 text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase lg:table-cell"
+            scope="col"
+          >
+            Where
+          </th>
+        </tr>
+      </thead>
+      <tbody data-readings-body>
+        {
+          rows.map((row) => (
+            <tr
+              class="border-b border-ambedkar-900/8 last:border-0 hover:bg-ambedkar-50/60"
+              data-readings-row
+              data-search={row.search}
+              data-date={row.dateKey}
+              data-title={row.titleKey}
+              data-book={row.bookKey}
+            >
+              <td class="px-6 py-5 align-top whitespace-nowrap">
+                <time
+                  class="text-sm text-ambedkar-900/75"
+                  datetime={row.dateTime}
+                >
+                  {row.dateLabel}
+                </time>
+                {row.upcoming && (
+                  <span class="mt-2 block w-fit rounded-full bg-accent-300 px-2.5 py-1 text-xs font-bold tracking-wide text-ambedkar-950 uppercase">
+                    Upcoming
+                  </span>
+                )}
+              </td>
+              <td class="px-6 py-5 align-top">
+                <a
+                  class="font-semibold text-ambedkar-800 underline decoration-ambedkar-900/25 underline-offset-4 hover:text-ambedkar-950 hover:decoration-ambedkar-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ambedkar-700"
+                  href={row.href}
+                >
+                  {row.title}
+                </a>
+              </td>
+              <td class="px-6 py-5 align-top text-ambedkar-900/75">
+                {row.book ? (
+                  <>
+                    <a
+                      class="font-medium text-ambedkar-800 underline decoration-ambedkar-900/25 underline-offset-4 hover:text-ambedkar-950 hover:decoration-ambedkar-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ambedkar-700"
+                      href={row.book.href}
+                    >
+                      <cite class="not-italic">{row.book.title}</cite>
+                    </a>
+                    <span class="mt-1 block text-sm text-ambedkar-900/60">
+                      {row.book.authors}
+                    </span>
+                  </>
+                ) : row.readsArticles ? (
+                  <span class="text-sm text-ambedkar-900/55">
+                    Articles and papers
+                  </span>
+                ) : (
+                  <span class="text-sm text-ambedkar-900/55" aria-hidden="true">
+                    &mdash;
+                  </span>
+                )}
+              </td>
+              <td class="hidden px-6 py-5 align-top text-sm text-ambedkar-900/70 lg:table-cell">
+                {row.location}
+              </td>
+            </tr>
+          ))
+        }
+        <tr data-readings-empty hidden>
+          <td class="px-6 py-8 text-ambedkar-900/75" colspan="4">
+            No readings match that search.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  import {
+    matchesSearch,
+    nextSortState,
+    resultLabel,
+    searchTerms,
+    sortRows,
+    type SortKey,
+    type SortState,
+  } from "../table";
+
+  const controls = document.querySelector<HTMLElement>(
+    "[data-readings-controls]",
+  );
+  const body = document.querySelector<HTMLTableSectionElement>(
+    "[data-readings-body]",
+  );
+  const search = document.querySelector<HTMLInputElement>(
+    "[data-readings-search]",
+  );
+  const status = document.querySelector<HTMLElement>("[data-readings-status]");
+  const emptyRow = document.querySelector<HTMLTableRowElement>(
+    "[data-readings-empty]",
+  );
+
+  if (controls && body && search && status && emptyRow) {
+    const entries = Array.from(
+      body.querySelectorAll<HTMLTableRowElement>("[data-readings-row]"),
+    ).map((element) => ({
+      element,
+      date: element.dataset.date ?? "",
+      title: element.dataset.title ?? "",
+      book: element.dataset.book ?? "",
+      search: element.dataset.search ?? "",
+    }));
+
+    const headers = Array.from(
+      document.querySelectorAll<HTMLTableCellElement>("[data-readings-column]"),
+    );
+
+    // Sorting and searching only work once this script runs, so the controls
+    // stay hidden until then rather than sitting inert for a reader without JS.
+    controls.hidden = false;
+
+    let sort: SortState = { key: "date", ascending: false };
+    const repaints: (() => void)[] = [];
+
+    const apply = () => {
+      const terms = searchTerms(search.value);
+
+      let visible = 0;
+      for (const entry of entries) {
+        const matches = matchesSearch(entry.search, terms);
+        entry.element.hidden = !matches;
+        if (matches) visible += 1;
+      }
+
+      emptyRow.hidden = visible > 0;
+      status.textContent = resultLabel(visible, entries.length);
+
+      for (const entry of sortRows(entries, sort)) {
+        body.appendChild(entry.element);
+      }
+      body.appendChild(emptyRow);
+
+      for (const repaint of repaints) repaint();
+    };
+
+    for (const header of headers) {
+      const key = header.dataset.readingsColumn as SortKey | undefined;
+      if (!key) continue;
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className =
+        "-mx-2 flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase transition hover:text-ambedkar-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ambedkar-700";
+      button.textContent = header.textContent?.trim() ?? "";
+
+      const arrow = document.createElement("span");
+      arrow.setAttribute("aria-hidden", "true");
+      button.appendChild(arrow);
+
+      repaints.push(() => {
+        const active = sort.key === key;
+        header.setAttribute(
+          "aria-sort",
+          active ? (sort.ascending ? "ascending" : "descending") : "none",
+        );
+        arrow.textContent = active
+          ? sort.ascending
+            ? "\u2191"
+            : "\u2193"
+          : "\u2195";
+        arrow.className = active ? "text-ambedkar-900" : "text-ambedkar-900/35";
+      });
+
+      button.addEventListener("click", () => {
+        sort = nextSortState(sort, key);
+        apply();
+      });
+
+      header.textContent = "";
+      header.appendChild(button);
+    }
+
+    search.addEventListener("input", apply);
+    apply();
+  }
+</script>

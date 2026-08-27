@@ -48,12 +48,12 @@ const { path, label } = editorialSections[section];
 const badgeClasses =
   badge?.tone === "muted"
     ? "bg-ambedkar-900/10 text-ambedkar-900"
-    : "bg-saffron-300 text-ambedkar-950";
+    : "bg-accent-300 text-ambedkar-950";
 ---
 
 <article class="relative isolate overflow-x-clip">
   <div
-    class="absolute inset-x-0 top-0 -z-10 h-[24rem] bg-[radial-gradient(circle_at_top_right,rgba(240,184,63,0.18),transparent_50%),radial-gradient(circle_at_top_left,rgba(31,98,170,0.16),transparent_45%)]"
+    class="absolute inset-x-0 top-0 -z-10 h-[24rem] bg-[radial-gradient(circle_at_top_right,rgba(127,224,210,0.18),transparent_50%),radial-gradient(circle_at_top_left,rgba(31,98,170,0.16),transparent_45%)]"
     aria-hidden="true"
   >
   </div>
@@ -119,8 +119,8 @@ const badgeClasses =
 
     {
       callout && (
-        <div class="mt-8 max-w-3xl rounded-3xl bg-ambedkar-950 px-6 py-6 text-cream sm:px-8">
-          <p class="text-xs font-bold tracking-[0.16em] text-saffron-300 uppercase">
+        <div class="mt-8 max-w-3xl rounded-3xl bg-ambedkar-950 px-6 py-6 text-mist sm:px-8">
+          <p class="text-xs font-bold tracking-[0.16em] text-accent-300 uppercase">
             {callout.heading}
           </p>
           <p class="mt-3 leading-7">{callout.text}</p>
@@ -187,7 +187,7 @@ const badgeClasses =
 
     {
       sourceUrl && (
-        <p class="mt-10 max-w-3xl text-sm text-ambedkar-900/60">
+        <p class="mt-10 max-w-3xl text-sm break-words text-ambedkar-900/60">
           Originally published at{" "}
           <a
             class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"

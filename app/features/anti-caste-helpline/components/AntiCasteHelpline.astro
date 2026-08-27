@@ -27,15 +27,24 @@ const {
 ---
 
 <section
-  class="border-b border-red-950/10 bg-red-50 text-red-950"
+  class="border-b border-alert-950/10 bg-alert-50 text-alert-950"
   aria-label="Emergency information"
 >
-  <Container class="py-3 text-center text-sm leading-6 font-semibold">
-    {emergencyDanger}{" "}
-    <a class="underline decoration-2 underline-offset-2" href="tel:911">911</a>. {
-      emergencyCrisis
-    }{" "}
-    <a class="underline decoration-2 underline-offset-2" href="tel:988">988</a>.
+  <Container
+    class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 py-3 text-center text-sm leading-6 font-semibold"
+  >
+    <span
+      class="rounded-full bg-alert-600 px-2.5 py-1 text-xs font-bold tracking-wide text-white uppercase"
+    >
+      Emergency
+    </span>
+    <span>
+      {emergencyDanger}{" "}
+      <a class="underline decoration-2 underline-offset-2" href="tel:911">911</a
+      >. {emergencyCrisis}{" "}
+      <a class="underline decoration-2 underline-offset-2" href="tel:988">988</a
+      >.
+    </span>
   </Container>
 </section>
 
@@ -72,7 +81,7 @@ const {
             supportQuestions.map((question) => (
               <li class="flex gap-3">
                 <span
-                  class="mt-3 size-2 shrink-0 rounded-full bg-saffron-400"
+                  class="mt-3 size-2 shrink-0 rounded-full bg-accent-600"
                   aria-hidden="true"
                 />
                 <span>{question}</span>
@@ -90,13 +99,13 @@ const {
           </h2>
           <div class="mt-5 flex flex-col gap-3">
             <a
-              class="w-fit text-xl font-semibold text-saffron-300 underline decoration-2 underline-offset-4 sm:text-2xl"
+              class="w-fit text-xl font-semibold text-accent-300 underline decoration-2 underline-offset-4 sm:text-2xl"
               href={phone.href}
             >
               {phone.display}
             </a>
             <a
-              class="w-fit text-lg font-semibold break-all text-saffron-300 underline decoration-2 underline-offset-4 sm:text-xl"
+              class="w-fit text-lg font-semibold break-all text-accent-300 underline decoration-2 underline-offset-4 sm:text-xl"
               href={`mailto:${email}`}
             >
               {email}

@@ -29,7 +29,7 @@ const {
 
 <section class="relative isolate overflow-x-clip">
   <div
-    class="absolute inset-x-0 top-0 -z-10 h-[34rem] bg-[radial-gradient(circle_at_top_right,rgba(240,184,63,0.2),transparent_48%),radial-gradient(circle_at_top_left,rgba(31,98,170,0.18),transparent_42%)]"
+    class="absolute inset-x-0 top-0 -z-10 h-[34rem] bg-[radial-gradient(circle_at_top_right,rgba(127,224,210,0.2),transparent_48%),radial-gradient(circle_at_top_left,rgba(31,98,170,0.18),transparent_42%)]"
     aria-hidden="true"
   >
   </div>
@@ -52,7 +52,7 @@ const {
         {intro}
       </p>
       <p
-        class="mt-7 max-w-3xl rounded-2xl border border-ambedkar-900/10 bg-white/75 px-5 py-4 text-sm leading-6 text-ambedkar-900/70 shadow-soft"
+        class="mt-7 max-w-3xl rounded-2xl border border-l-4 border-ambedkar-900/10 border-l-alert-600 bg-white/75 px-5 py-4 text-sm leading-6 text-ambedkar-900/70 shadow-soft"
       >
         {contentNote}
       </p>
@@ -122,7 +122,7 @@ const {
     <div
       class="mt-16 rounded-3xl bg-ambedkar-950 px-6 py-8 text-white sm:px-10 sm:py-10 lg:ml-[19.5rem]"
     >
-      <p class="text-sm font-bold tracking-[0.16em] text-saffron-300 uppercase">
+      <p class="text-sm font-bold tracking-[0.16em] text-accent-300 uppercase">
         Add your voice
       </p>
       <h2 class="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -130,7 +130,7 @@ const {
       </h2>
       <div class="mt-6 flex flex-col gap-3 sm:flex-row">
         <a
-          class="rounded-full bg-saffron-300 px-5 py-3 text-center font-semibold text-ambedkar-950 transition hover:bg-saffron-400"
+          class="rounded-full bg-accent-300 px-5 py-3 text-center font-semibold text-ambedkar-950 transition hover:bg-accent-400"
           href={shareUrl}
         >
           Share your testimony
@@ -205,7 +205,7 @@ const {
   :global(.testimonies-content h3) {
     margin-top: 3rem;
     scroll-margin-top: 7rem;
-    border-left: 0.25rem solid var(--color-saffron-400);
+    border-left: 0.25rem solid var(--color-accent-600);
     padding-left: 1rem;
     font-size: 1.375rem;
     line-height: 1.3;

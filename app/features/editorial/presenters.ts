@@ -18,12 +18,12 @@ import {
   interventionStatusLabel,
 } from "./taxonomy";
 
-interface Badge {
+export interface Badge {
   label: string;
   tone?: "accent" | "muted";
 }
 
-interface Detail {
+export interface Detail {
   term: string;
   description: string;
   href?: string;

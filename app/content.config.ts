@@ -2,6 +2,7 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
+import { isValidIsbn13, normalizeIsbn } from "./features/books/isbn";
 import {
   articleCategoryIds,
   conferenceFormatIds,
@@ -83,6 +84,33 @@ const testimoniesPageSchema = z.object({
   solidarityUrl: z.url(),
 });
 
+// The book readings index takes its heading and description from
+// `editorialSections`, like the other editorial indexes. Only the standing
+// arrangement and the reading strands live here, because they are one-off copy
+// that organisers change without a developer.
+const bookReadingsPageSchema = z.object({
+  pageType: z.literal("book-readings"),
+  practicalitiesHeading: z.string(),
+  practicalities: z
+    .array(
+      z.object({
+        term: z.string(),
+        description: z.string(),
+      }),
+    )
+    .min(1),
+  strandsHeading: z.string(),
+  strands: z
+    .array(
+      z.object({
+        title: z.string(),
+        description: z.string(),
+        note: z.string().optional(),
+      }),
+    )
+    .min(1),
+});
+
 const pages = defineCollection({
   loader: glob({
     base: "./app/content/pages",
@@ -92,6 +120,7 @@ const pages = defineCollection({
     homePageSchema,
     helplinePageSchema,
     testimoniesPageSchema,
+    bookReadingsPageSchema,
   ]),
 });
 
@@ -102,25 +131,6 @@ const optionalUrl = z
   .union([z.url(), z.literal("")])
   .optional()
   .transform((value) => value || undefined);
-
-const bookReadings = defineCollection({
-  loader: glob({
-    base: "./cms/content/book-readings",
-    pattern: "**/*.md",
-  }),
-  schema: z.object({
-    title: z.string(),
-    date: z.coerce.date(),
-    location: z.string(),
-    book: z.object({
-      title: z.string(),
-      author: z.string(),
-    }),
-    participants: z.array(z.string()).default([]),
-    registrationUrl: optionalUrl,
-    summary: z.string(),
-  }),
-});
 
 // Editorial records share one shape so the blog, press releases, interventions,
 // and conferences can be listed, sorted, and cross-referenced by the same code.
@@ -151,6 +161,69 @@ const editorialBase = {
 const linkSchema = z.object({
   label: z.string(),
   url: z.string(),
+});
+
+// ISBN-13 is the join key between a reading and a book, so it is normalized
+// and checked here rather than trusted. An invalid ISBN fails the build.
+const isbn13 = z
+  .string()
+  .transform(normalizeIsbn)
+  .refine(
+    isValidIsbn13,
+    "Must be a valid ISBN-13, with a correct check digit.",
+  );
+
+// Books are their own records because one book carries several readings. They
+// are not editorial entries: a book has no publication date of its own on this
+// site and never appears in a dated index.
+const books = defineCollection({
+  loader: glob({
+    base: "./cms/content/books",
+    pattern: "**/*.md",
+  }),
+  schema: z.object({
+    title: z.string(),
+    subtitle: z.string().optional(),
+    authors: z.array(z.string()).min(1),
+    /** Identifies the edition the circle read, and links readings to it. */
+    isbn: isbn13,
+    publisher: z.string().optional(),
+    /** Year of this edition, which for a reprint is not the year written. */
+    publishedYear: z.number().int().optional(),
+    /** Year the text first appeared, kept for posthumous works. */
+    firstPublishedYear: z.number().int().optional(),
+    summary: z.string(),
+    topics: z.array(z.enum(editorialTopicIds)).default([]),
+    resources: z.array(linkSchema).default([]),
+    draft: z.boolean().default(false),
+  }),
+});
+
+// A reading session is a repeating record: sessions share one shape, new ones
+// are scheduled regularly, and organisers add them without a developer. The
+// standing arrangement around them is one-off copy and stays in app/content.
+const bookReadings = defineCollection({
+  loader: glob({
+    base: "./cms/content/book-readings",
+    pattern: "**/*.md",
+  }),
+  schema: z.object({
+    ...editorialBase,
+    /** Where the session met, or how to join it when it is held online. */
+    location: z.string(),
+    /**
+     * The book the session worked through, referenced by ISBN. Left unset for
+     * a session built on a set of articles or papers rather than one book.
+     */
+    isbn: z
+      .union([isbn13, z.literal("")])
+      .optional()
+      .transform((value) => value || undefined),
+    participants: z.array(z.string()).default([]),
+    registrationUrl: optionalUrl,
+    /** Anything else read for the session, such as a linked PDF. */
+    resources: z.array(linkSchema).default([]),
+  }),
 });
 
 const articles = defineCollection({
@@ -229,6 +302,7 @@ const conferences = defineCollection({
 
 export const collections = {
   pages,
+  books,
   bookReadings,
   articles,
   pressReleases,
