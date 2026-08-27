@@ -15,6 +15,11 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    env:
+      # Non-secret configuration, so a repository variable rather than a secret.
+      # The build bakes this into dist/admin/config.yml, so it has to be set
+      # here, where the site is built, not on the deploy job.
+      CMS_REPO: ${{ vars.CMS_REPO }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

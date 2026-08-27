@@ -4,4 +4,12 @@
   "compatibility_flags": ["global_fetch_strictly_public"],
   "name": "akscusa-org-frontend",
   "pages_build_output_dir": "./dist",
+  // Add the D1 binding after `wrangler d1 create akscusa-customer-orders`.
+  // "d1_databases": [
+  //   {
+  //     "binding": "ORDERS_DB",
+  //     "database_name": "akscusa-customer-orders",
+  //     "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+  //   },
+  // ],
 }

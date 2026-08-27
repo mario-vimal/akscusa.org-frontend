@@ -77,7 +77,7 @@ const testimoniesPageSchema = z.object({
 
 const pages = defineCollection({
   loader: glob({
-    base: "./src/content/pages",
+    base: "./app/content/pages",
     pattern: "**/*.md",
   }),
   schema: z.discriminatedUnion("pageType", [
@@ -87,4 +87,24 @@ const pages = defineCollection({
   ]),
 });
 
-export const collections = { pages };
+// Structured records edited through the CMS, unlike the static copy above.
+const bookReadings = defineCollection({
+  loader: glob({
+    base: "./cms/content/book-readings",
+    pattern: "**/*.md",
+  }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    location: z.string(),
+    book: z.object({
+      title: z.string(),
+      author: z.string(),
+    }),
+    participants: z.array(z.string()).default([]),
+    registrationUrl: z.url().optional(),
+    summary: z.string(),
+  }),
+});
+
+export const collections = { pages, bookReadings };

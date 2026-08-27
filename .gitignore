@@ -27,6 +27,7 @@ pnpm-debug.log*
 
 # test output
 coverage/
+.tmp-cms-routing/
 
 # Cloudflare local state
 .wrangler/

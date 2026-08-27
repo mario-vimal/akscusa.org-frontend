@@ -1,90 +1,84 @@
 # AKSC USA frontend
 
-Astro frontend for [akscusa.org](https://akscusa.org), styled with Tailwind
-CSS, backed by WordPress through WPGraphQL, and deployed to Cloudflare Pages.
+Astro site for [akscusa.org](https://akscusa.org), styled with Tailwind CSS,
+edited through Sveltia CMS, and deployed to Cloudflare Pages. Media goes to
+Cloudflare R2; customer orders will go to Cloudflare D1.
 
-The project starts with static site generation. The Cloudflare adapter
-dependency is installed but remains disabled until selected routes move to
-server rendering.
+Output is static. The Cloudflare adapter is installed but stays disabled until
+some routes need server rendering.
 
 ## Requirements
 
 - Node.js 24 LTS (see `.nvmrc`)
 - npm 11 or newer
-- A WordPress site with WPGraphQL when CMS-backed routes are introduced
 
 ## Local setup
 
 ```sh
 npm install
-cp .env.example .env
 npm run dev
 ```
 
-`PUBLIC_WORDPRESS_GRAPHQL_URL` is public by design because requests may be made
-during either static builds or client-side development. Never put WordPress
-credentials in a `PUBLIC_` variable.
+Site at `http://localhost:4321`, CMS at `http://localhost:4321/admin/`.
 
 ## Project structure
 
 ```text
-src/
-├── assets/            # Shared brand and cross-feature source images
-├── components/
-│   ├── navigation/  # Shared desktop and mobile navigation
-│   └── ui/          # Reusable presentational components
-├── config/          # Navigation and other site-wide configuration
-├── content/         # Validated Markdown for repository-managed pages
-├── features/        # Components and future queries owned by each section
+app/                 # Code and one-off page copy, maintained in Git
+├── assets/          # Brand and cross-feature source images
+├── components/      # `navigation/` and reusable `ui/`
+├── config/          # Navigation and site-wide configuration
+├── content/pages/   # Copy for one-off pages, edited by developers
+├── content.config.ts  # Schemas for both content sources
+├── features/        # Components owned by each section
 ├── layouts/         # Base document and shared site chrome
-├── lib/             # WordPress and infrastructure clients
-└── pages/           # File-based routes composed from feature components
+└── pages/           # File-based routes
+cms/                 # Everything the CMS owns
+├── content/         # Structured records, read by Astro, never served
+└── public/          # Astro `publicDir`, served verbatim
+    ├── admin/       # Sveltia CMS application and content model
+    └── media/       # CMS uploads, published at `/media/`
+scripts/             # Build tooling, never shipped
+└── cms/             # Backend repository and dev routing for `/admin/`
 ```
 
-Feature directories use lowercase kebab-case. Keep section-specific components
-and WPGraphQL queries with their feature; move code into `components/ui` only
-when it is genuinely shared. `SiteLayout.astro` owns the site header and footer,
-while `config/navigation.ts` is the single source of truth for navbar links.
-All UI work is mobile-first and must be verified at small, medium, and desktop
-viewports.
+`cms/content/` holds repeating, structured records that benefit from a form and
+a nontechnical editor. One-off page copy stays in `app/content/pages/` and is
+reviewed like code. A test fails if a CMS collection points into `app/`.
+
+Only `cms/public/` is the `publicDir`, so the Sveltia admin is served as a
+static file while editorial Markdown stays build input. Build tooling belongs in
+`scripts/`, never in `cms/`, where everything is published.
+
+Feature directories use lowercase kebab-case; keep section-specific components
+with their feature. `config/navigation.ts` is the single source of truth for
+navbar links. All UI is mobile-first and verified at small, medium, and desktop
+widths.
 
 ## Visual system
 
-The shared theme in `src/styles/global.css` uses Ambedkar blue as the primary
-brand scale, saffron as an accent, and the self-hosted Cabin variable font.
-Components consume named Tailwind tokens rather than defining one-off colors or
-font families.
+`app/styles/global.css` defines Ambedkar blue as the primary scale, saffron as
+an accent, and the self-hosted Cabin variable font. Use named Tailwind tokens
+rather than one-off colors or font families.
 
 ## Images
 
-- Put section-specific source images in
-  `src/features/<feature>/assets/`.
-- Put reusable logos and brand artwork in `src/assets/brand/`; put other
-  genuinely shared images in `src/assets/shared/`.
-- Keep editorial images managed by WordPress in its media library and load them
-  through WPGraphQL.
-- Render imported images with `ResponsiveImage.astro` or Astro's image
-  components to generate dimensions, responsive `srcset` values, and optimized
-  output.
-- Use lowercase kebab-case filenames and write useful alt text.
-- Use `public/` only for files that require a stable, unprocessed URL.
+- Section images: `app/features/<feature>/assets/`.
+- Brand artwork: `app/assets/brand/`; other shared images: `app/assets/shared/`.
+- Editorial media lives in R2; store its public URL in CMS content.
+- Render imports through `ResponsiveImage.astro` or Astro's image components so
+  dimensions, `srcset`, and optimized formats are generated.
+- Lowercase kebab-case filenames and useful alt text.
 
 ## Markdown content
 
-Repository-managed editorial pages live in `src/content/pages/`. Their
-frontmatter is validated by `src/content.config.ts`, so missing required fields
-fail the build instead of producing incomplete pages.
+One-off page copy lives in `app/content/pages/<feature>/index.md`, validated by
+`app/content.config.ts` so missing fields fail the build. Contributors edit copy,
+calls to action, and image descriptions without touching layouts. Structured
+records live in `cms/content/` and are edited in the CMS instead.
 
-Home and Anti-Caste Helpline copy live in their matching
-`src/content/pages/<feature>/index.md` files. Content mirrors the route/feature
-hierarchy, using `index.md` for each Markdown-managed section's main page.
-Contributors can edit copy, calls to action, contact details, and image
-descriptions without changing Astro layouts. WordPress remains the source for
-content that needs its editorial workflow or frequent publishing.
-
-When migrating existing AKSC pages, preserve their original copy closely.
-Substantive assurances, qualifications, and calls to action must not be
-paraphrased or omitted without explicit approval.
+When migrating existing AKSC pages, preserve the original copy. Do not
+paraphrase or drop substantive assurances or calls to action without approval.
 
 ## Commands
 
@@ -103,50 +97,122 @@ paraphrased or omitted without explicit approval.
 | `npm run deploy:pages`   | Deploy `dist` with the Pages command          |
 | `npm run validate`       | Run all checks, build, and Pages verification |
 
-## WordPress
+## Sveltia CMS
 
-The typed client in `src/lib/wordpress.ts` validates the configured endpoint,
-HTTP status, and GraphQL response before returning data. Keep query documents
-and their response types near the feature that consumes them.
+Served at `/admin/` from `cms/public/admin/`. Collections cover the records in
+`cms/content/`, each validated against a schema in `app/content.config.ts`.
 
-Static builds are the initial rendering policy. To introduce hybrid rendering,
-change Astro's output to `server`, enable the installed Cloudflare adapter in
-`astro.config.mjs`, and explicitly prerender routes that should remain static
-with `export const prerender = true`.
+The GitHub backend supports token sign-in immediately. Before giving
+nontechnical editors access, deploy
+[Sveltia CMS Authenticator](https://github.com/sveltia/sveltia-cms-auth) and set
+its URL as `backend.base_url`.
+
+### Review workflow
+
+`publish_mode: editorial_workflow` keeps editors off `main`. Saving an entry
+creates branch `cms/<collection>/<slug>` and opens a draft pull request, titled
+from `backend.commit_messages`. Entries carry a label per stage:
+
+| Stage     | Label                         |
+| --------- | ----------------------------- |
+| Draft     | `sveltia-cms/draft`           |
+| In Review | `sveltia-cms/pending_review`  |
+| Ready     | `sveltia-cms/pending_publish` |
+
+Publishing merges and deletes the branch; discarding closes it. Deleting a
+published entry also goes through a pull request. `squash_merges: true` collapses
+intermediate saves into one commit.
+
+Add `publish: false` to a collection to stop editors merging their own work.
+Branch protection on `main` enforces this at the Git level.
+
+### Backend repository
+
+`cms/public/admin/config.yml` ships the placeholder `OWNER/REPOSITORY`. The
+backend commits to whatever that names, from a local dev server just as readily
+as from the deployed site, so keeping it inert means local testing cannot reach
+the live site. A test enforces it.
+
+`CMS_REPO` names the real repository. It applies to `astro build` and the dev
+server, and is read from the shell and `.env`.
+
+- Cloudflare Pages: set it in the build command under Settings > Build.
+
+  ```sh
+  CMS_REPO=akscsfba/akscusa.org-frontend npm run build
+  ```
+
+- GitHub Actions previews: `gh variable set CMS_REPO --body <owner>/<repo>`.
+
+Locally, prefer **Work with Local Repository** on the sign-in screen: it writes
+to your working copy only and needs no repository setting, but requires a
+Chromium-based browser. To test GitHub sign-in, point `CMS_REPO` at your fork:
+
+```sh
+cp .env.example .env
+```
+
+### R2 media
+
+1. Create the `akscusa-media` bucket and attach `media.akscusa.org` as its
+   public custom domain.
+2. Create a bucket-scoped token with **Object Read & Write**.
+3. Add `media_libraries` to `cms/public/admin/config.yml`. Never commit the
+   Secret Access Key; Sveltia asks each editor for it, and a test fails if one
+   is committed.
+
+   ```yaml
+   media_libraries:
+     cloudflare_r2:
+       access_key_id: your-access-key-id
+       account_id: your-cloudflare-account-id
+       bucket: akscusa-media
+       public_url: https://media.akscusa.org
+   ```
+
+4. Allow the production and preview origins in the bucket's CORS policy for
+   `GET`, `PUT`, and `HEAD`.
+
+## Customer orders
+
+Cloudflare D1 is the system of record. The order flow is not implemented, so no
+schema or binding is created speculatively. When work starts:
+
+1. `npx wrangler d1 create akscusa-customer-orders`.
+2. Uncomment and complete the `ORDERS_DB` binding in `wrangler.jsonc`.
+3. Add versioned SQL migrations before any order routes.
+4. Move those routes to Cloudflare server rendering, keeping editorial pages
+   prerendered.
+
+Order writes must run server-side. Never put customer details, payment
+credentials, or order records in Markdown, R2, client bundles, or logs.
 
 ## Cloudflare Pages
 
-Production deployment uses Cloudflare Pages' native Git integration:
+Production uses Pages' native Git integration:
 
-1. Connect `mario-vimal/akscusa.org-frontend` in the Cloudflare dashboard.
-2. Set the production branch to `main`.
-3. Use `npm run build` as the build command and `dist` as the output directory.
-4. Leave the deploy command empty for native Pages Git integration. If the
-   selected Cloudflare build flow requires one, use `npm run deploy:pages`.
-   Never use `wrangler deploy`, which targets Workers rather than Pages.
-5. Set `NODE_VERSION` to `24.20.0`.
-6. Add `PUBLIC_WORDPRESS_GRAPHQL_URL` when CMS-backed pages are enabled.
+1. Connect the repository and set the production branch to `main`.
+2. Build command `CMS_REPO=<owner>/<repo> npm run build`, output directory
+   `dist`.
+3. Leave the deploy command empty. If your build flow requires one, use
+   `npm run deploy:pages`; never `wrangler deploy`, which targets Workers.
+4. Set `NODE_VERSION` to `24.20.0`.
 
-When using `npm run deploy:pages`, create a custom Cloudflare API token with
-**Account → Cloudflare Pages → Edit** permission and scope its account resources
-to the account that owns the Pages project. Set that token as
-`CLOUDFLARE_API_TOKEN` for both production and preview environments. A user's
-account role does not add permissions to an otherwise under-scoped API token.
+If a newly added variable seems missing, the deployment may have reused a cached
+build; clear the build cache under Settings > Build and retry.
 
-Pull requests from branches in this repository deploy previews through
-`.github/workflows/cloudflare-preview.yml`. Configure these GitHub settings:
+For `npm run deploy:pages`, create an API token with **Account > Cloudflare
+Pages > Edit**, scoped to the account owning the project, and set it as
+`CLOUDFLARE_API_TOKEN`. A user's account role does not widen an under-scoped
+token.
 
-- Secret: `CLOUDFLARE_API_TOKEN`
-- Secret: `CLOUDFLARE_ACCOUNT_ID`
-- Variable: `CLOUDFLARE_PROJECT_NAME` (for example,
-  `akscusa-org-frontend`)
-
-Fork pull requests run validation but skip deployment so Cloudflare credentials
-are never exposed to untrusted code.
+Pull requests deploy previews through `.github/workflows/cloudflare-preview.yml`,
+which needs secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`, plus the
+variable `CLOUDFLARE_PROJECT_NAME`. Fork pull requests run validation but skip
+deployment, so credentials are never exposed to untrusted code.
 
 ## Figma
 
-Figma MCP configuration is intentionally deferred. Repository guidance for
-implementing supplied Figma designs lives in
+Figma MCP setup is deferred. Guidance for implementing supplied designs lives in
 `.github/instructions/figma.instructions.md`. Add the Figma Dev Mode MCP server
-with Copilot CLI's `/mcp add` flow when the team is ready to authenticate it.
+with Copilot CLI's `/mcp add` flow when ready.
