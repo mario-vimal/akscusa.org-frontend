@@ -8,6 +8,7 @@ import {
   articleCategories,
   conferenceFormats,
   editorialTopics,
+  generalBodyPaperKinds,
   interventionKinds,
   interventionStatuses,
   type TaxonomyTerm,
@@ -165,6 +166,23 @@ describe("Sveltia CMS taxonomy options", () => {
 
   it("offers every conference format", () => {
     expectMatches("conferences", "format", conferenceFormats);
+  });
+
+  // `kind` sits inside the `papers` list rather than at the top level, so the
+  // nested field is looked up directly instead of through `selectOptions`.
+  it("offers every General Body paper kind", () => {
+    const papers = collection("general-body-meetings").fields?.find(
+      (field) => field.name === "papers",
+    );
+    const kind = papers?.fields?.find((field) => field.name === "kind");
+
+    expect(kind?.widget).toBe("select");
+    expect(kind?.options ?? []).toEqual(
+      generalBodyPaperKinds.map((term) => ({
+        label: term.label,
+        value: term.id,
+      })),
+    );
   });
 
   // A summary is what the index cards and the meta description are built from,

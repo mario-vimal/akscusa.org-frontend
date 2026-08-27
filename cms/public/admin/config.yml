@@ -460,3 +460,75 @@ collections:
       - { name: featured, label: Featured, widget: boolean, default: false }
       - { name: draft, label: Draft, widget: boolean, default: false }
       - { name: body, label: Details, widget: markdown, required: false }
+
+  - name: general-body-meetings
+    label: General Body Meetings
+    label_singular: General Body Meeting
+    icon: gavel
+    description: >-
+      One record per annual General Body meeting, holding the papers it
+      published. A meeting always submits a report, and adopts resolutions only
+      when there are any. Upload each PDF here; it is committed with the entry.
+    folder: cms/content/general-body-meetings
+    create: true
+    slug: "{{fields.edition}}-general-body-meeting-{{year}}"
+    # Uploads land beside the ones already committed, and are stored on the
+    # entry as the `/media/general-body/...` path the site serves.
+    media_folder: /cms/public/media/general-body
+    public_folder: /media/general-body
+    sortable_fields: [edition, date]
+    summary: "General Body {{fields.edition}} — {{year}}"
+    view_filters:
+      - { label: Drafts, field: draft, pattern: true }
+    fields:
+      - name: edition
+        label: Which meeting
+        widget: number
+        value_type: int
+        min: 1
+        hint: "Counting from the first in 2017. The page titles itself from this, for example 6 becomes “6th General Body Meeting”."
+      - name: date
+        label: Date
+        widget: datetime
+        time_format: false
+      - name: datePrecision
+        label: Date precision
+        widget: select
+        default: day
+        options:
+          - { label: Exact day, value: day }
+          - { label: Month only, value: month }
+        hint: "Choose month only when the record names a month but no day, so the page does not print a day that was never recorded."
+      - name: location
+        label: Location
+        widget: string
+        hint: "Where it was held, or “Online” for a meeting held virtually."
+      - name: papers
+        label: Papers
+        widget: list
+        label_singular: Paper
+        summary: "{{fields.kind}}"
+        fields:
+          - name: kind
+            label: Kind
+            widget: select
+            options:
+              - { label: Report, value: report }
+              - { label: Resolutions, value: resolutions }
+          - name: file
+            label: PDF
+            widget: file
+            hint: "Upload the PDF itself. It is committed to the repository and served from the site, so it keeps working once the old WordPress host is retired."
+          - name: pageCount
+            label: Pages
+            widget: number
+            required: false
+            value_type: int
+            min: 1
+            hint: "Shown beside the link so a reader knows the size of the download before opening it."
+      - name: sourceUrl
+        label: Original URL
+        widget: string
+        required: false
+        hint: "Where these papers were first published, kept so migrated copy is traceable."
+      - { name: draft, label: Draft, widget: boolean, default: false }

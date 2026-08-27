@@ -6,6 +6,9 @@ format: "in-person"
 location: "20589 Homestead Rd, Cupertino, CA 95014"
 summary: "The fourth annual conference met in Cupertino on 19 August 2023, in the middle of the campaign for California SB 403."
 registrationUrl: "https://bit.ly/aksc2023conf"
+resources:
+  - label: "AKSC Conference Report – 2023 (PDF, 2 pages)"
+    url: "/media/conferences/aksc-conference-report-2023.pdf"
 topics:
   - "caste-discrimination"
   - "solidarity"

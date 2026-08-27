@@ -165,6 +165,23 @@ export const interventionStatuses = [
   },
 ] as const satisfies readonly TaxonomyTerm[];
 
+/**
+ * The papers a General Body meeting publishes. A meeting always submits a
+ * report; it adopts resolutions only when there are any to adopt.
+ */
+export const generalBodyPaperKinds = [
+  {
+    id: "report",
+    label: "Report",
+    description: "The account of the year's work submitted to the meeting.",
+  },
+  {
+    id: "resolutions",
+    label: "Resolutions",
+    description: "Resolutions put to, and adopted at, the meeting.",
+  },
+] as const satisfies readonly TaxonomyTerm[];
+
 /** How a conference was held, so attendees know what to expect. */
 export const conferenceFormats = [
   {
@@ -191,6 +208,7 @@ export type ArticleCategory = Ids<typeof articleCategories>;
 export type InterventionKind = Ids<typeof interventionKinds>;
 export type InterventionStatus = Ids<typeof interventionStatuses>;
 export type ConferenceFormat = Ids<typeof conferenceFormats>;
+export type GeneralBodyPaperKind = Ids<typeof generalBodyPaperKinds>;
 
 /**
  * Zod's `enum` needs a non-empty tuple of literals, which `.map()` cannot
@@ -204,6 +222,7 @@ export const articleCategoryIds = idsOf(articleCategories);
 export const interventionKindIds = idsOf(interventionKinds);
 export const interventionStatusIds = idsOf(interventionStatuses);
 export const conferenceFormatIds = idsOf(conferenceFormats);
+export const generalBodyPaperKindIds = idsOf(generalBodyPaperKinds);
 
 const labelLookup = (terms: readonly TaxonomyTerm[]) =>
   new Map(terms.map((term) => [term.id, term.label]));
@@ -213,6 +232,7 @@ const categoryLabels = labelLookup(articleCategories);
 const kindLabels = labelLookup(interventionKinds);
 const statusLabels = labelLookup(interventionStatuses);
 const formatLabels = labelLookup(conferenceFormats);
+const generalBodyPaperKindLabels = labelLookup(generalBodyPaperKinds);
 
 export const topicLabel = (id: EditorialTopic) => topicLabels.get(id) ?? id;
 export const articleCategoryLabel = (id: ArticleCategory) =>
@@ -223,3 +243,5 @@ export const interventionStatusLabel = (id: InterventionStatus) =>
   statusLabels.get(id) ?? id;
 export const conferenceFormatLabel = (id: ConferenceFormat) =>
   formatLabels.get(id) ?? id;
+export const generalBodyPaperKindLabel = (id: GeneralBodyPaperKind) =>
+  generalBodyPaperKindLabels.get(id) ?? id;

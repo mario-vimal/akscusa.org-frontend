@@ -1,0 +1,105 @@
+---
+import Container from "../../../components/ui/Container.astro";
+import { socialLinks } from "../../../config/social";
+
+interface Channel {
+  title: string;
+  description: string;
+  actionLabel: string;
+  actionHref: string;
+  note?: string;
+}
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+  intro: string;
+  channels: readonly Channel[];
+  socialHeading: string;
+  socialIntro: string;
+}
+
+const { eyebrow, title, intro, channels, socialHeading, socialIntro } =
+  Astro.props;
+---
+
+<section class="relative isolate overflow-x-clip">
+  <div
+    class="absolute inset-x-0 top-0 -z-10 h-[28rem] bg-[radial-gradient(circle_at_top_right,rgba(127,224,210,0.2),transparent_48%),radial-gradient(circle_at_top_left,rgba(31,98,170,0.18),transparent_42%)]"
+    aria-hidden="true"
+  >
+  </div>
+
+  <Container class="pt-14 pb-20 sm:pt-20 sm:pb-28">
+    <header class="max-w-3xl">
+      <p
+        class="text-sm font-bold tracking-[0.18em] text-ambedkar-700 uppercase"
+      >
+        {eyebrow}
+      </p>
+      <h1
+        class="mt-4 text-4xl leading-[1.05] font-semibold tracking-[-0.045em] text-balance text-ambedkar-950 sm:text-6xl"
+      >
+        {title}
+      </h1>
+      <p class="mt-6 text-lg leading-8 text-ambedkar-900/75 sm:text-xl">
+        {intro}
+      </p>
+    </header>
+
+    <ul class="mt-12 grid gap-6 lg:grid-cols-2">
+      {
+        channels.map((channel) => (
+          <li class="flex flex-col rounded-3xl border border-ambedkar-900/10 bg-white p-6 sm:p-8">
+            <h2 class="text-xl font-semibold tracking-tight text-ambedkar-950">
+              {channel.title}
+            </h2>
+            <p class="mt-3 leading-7 text-ambedkar-900/75">
+              {channel.description}
+            </p>
+
+            {channel.note && (
+              <p class="mt-4 rounded-2xl bg-alert-50 px-4 py-3 text-sm leading-6 font-semibold text-alert-950">
+                {channel.note}
+              </p>
+            )}
+
+            <p class="mt-auto pt-6">
+              <a
+                class="inline-block rounded-full bg-ambedkar-700 px-5 py-3 font-semibold text-white transition hover:bg-ambedkar-900"
+                href={channel.actionHref}
+              >
+                {channel.actionLabel}
+              </a>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <section
+      class="mt-14 rounded-3xl border border-ambedkar-900/10 bg-mist p-6 sm:p-8"
+    >
+      <h2 class="text-xl font-semibold tracking-tight text-ambedkar-950">
+        {socialHeading}
+      </h2>
+      <p class="mt-3 leading-7 text-ambedkar-900/75">{socialIntro}</p>
+      <ul class="mt-5 flex flex-wrap gap-2">
+        {
+          socialLinks.map((item) => (
+            <li>
+              <a
+                class="inline-flex rounded-full border border-ambedkar-900/20 bg-white px-4 py-2 text-sm font-semibold text-ambedkar-800 transition hover:border-ambedkar-900/40 hover:text-ambedkar-950"
+                href={item.href}
+                rel="me"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </Container>
+</section>

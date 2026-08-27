@@ -29,6 +29,8 @@ const routes = new Map([
   ["/conferences/", "Conferences"],
   ["/conferences/aksc-6th-annual-conference-2025/", "Forging Indian Diasporic"],
   ["/organization/", "Organization"],
+  ["/organization/general-body/", "6th General Body Meeting"],
+  ["/contact/", "Best way to reach us"],
   ["/donate/", "Donate"],
   ["/admin/", "AKSC USA Content Manager"],
   ["/admin/config.yml", `repo: ${process.env.CMS_REPO ?? "OWNER/REPOSITORY"}`],

@@ -1,0 +1,16 @@
+---
+import { getEntry } from "astro:content";
+
+import ContactOverview from "../../features/contact/components/ContactOverview.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const page = await getEntry("pages", "contact");
+
+if (!page || page.data.pageType !== "contact") {
+  throw new Error("Contact content is missing or invalid.");
+}
+---
+
+<SiteLayout title={page.data.title} description={page.data.description}>
+  <ContactOverview {...page.data} />
+</SiteLayout>

@@ -13,6 +13,12 @@ export const socialLinks = [
     href: "https://www.facebook.com/p/Ambedkar-King-Study-Circle-California-100079668349387/",
   },
   {
+    // A second Facebook presence, carried over from the WordPress contact page.
+    // The page publishes announcements; the group is where members talk.
+    label: "Facebook Group",
+    href: "https://www.facebook.com/groups/1249573841788059",
+  },
+  {
     label: "X",
     href: "https://x.com/akscsfba?lang=en",
   },

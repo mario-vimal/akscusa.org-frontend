@@ -2,7 +2,11 @@
 import { Image } from "astro:assets";
 
 import logo from "../../assets/brand/aksc-logo.webp";
-import { donateNavigation, primaryNavigation } from "../../config/navigation";
+import {
+  donateNavigation,
+  primaryNavigation,
+  secondaryNavigation,
+} from "../../config/navigation";
 import { socialLinks } from "../../config/social";
 import Container from "../ui/Container.astro";
 ---
@@ -57,6 +61,18 @@ import Container from "../ui/Container.astro";
             {donateNavigation.label}
           </a>
         </li>
+        {
+          secondaryNavigation.map((item) => (
+            <li>
+              <a
+                class="text-white/75 transition hover:text-white"
+                href={item.href}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
 
