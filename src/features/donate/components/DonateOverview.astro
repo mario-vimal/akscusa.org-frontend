@@ -1,0 +1,28 @@
+---
+import SectionLanding from "../../../components/ui/SectionLanding.astro";
+
+const contentAreas = [
+  {
+    title: "Ways to give",
+    description:
+      "Offer clear one-time and recurring contribution options through a trusted payment provider.",
+  },
+  {
+    title: "What support enables",
+    description:
+      "Show how contributions sustain programs, publications, gatherings, and community access.",
+  },
+  {
+    title: "Stewardship",
+    description:
+      "Provide nonprofit, receipt, privacy, and contact information before a donor commits.",
+  },
+];
+---
+
+<SectionLanding
+  eyebrow="Support the mission"
+  title="Donate"
+  description="Help AKSC USA sustain programs, gatherings, and resources for the communities we serve."
+  items={contentAreas}
+/>

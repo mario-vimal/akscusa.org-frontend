@@ -1,0 +1,47 @@
+@import "@fontsource-variable/cabin";
+@import "tailwindcss";
+
+@theme {
+  --font-sans:
+    "Cabin Variable", Cabin, "Segoe UI", Helvetica, Arial, sans-serif;
+  --color-ambedkar-50: #f2f7fd;
+  --color-ambedkar-100: #e4eef9;
+  --color-ambedkar-200: #c5dbf2;
+  --color-ambedkar-300: #94bde5;
+  --color-ambedkar-400: #5d99d4;
+  --color-ambedkar-500: #3679be;
+  --color-ambedkar-600: #1f62aa;
+  --color-ambedkar-700: #194e8a;
+  --color-ambedkar-800: #193f6e;
+  --color-ambedkar-900: #19375c;
+  --color-ambedkar-950: #10233e;
+  --color-saffron-300: #f7ca68;
+  --color-saffron-400: #f0b83f;
+  --color-cream: #f8f9fc;
+  --shadow-soft: 0 24px 80px -40px rgb(16 35 62 / 45%);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-width: 20rem;
+    min-height: 100vh;
+    background: var(--color-cream);
+    color: var(--color-ambedkar-950);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-saffron-300);
+    color: var(--color-ambedkar-950);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-saffron-400);
+    outline-offset: 3px;
+  }
+}

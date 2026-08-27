@@ -1,0 +1,28 @@
+---
+import SectionLanding from "../../../components/ui/SectionLanding.astro";
+
+const contentAreas = [
+  {
+    title: "Upcoming readings",
+    description:
+      "Feature scheduled readings with dates, locations, participants, and registration details.",
+  },
+  {
+    title: "Reading archive",
+    description:
+      "Preserve recordings, transcripts, and highlights from previous community events.",
+  },
+  {
+    title: "Featured publications",
+    description:
+      "Connect each reading with relevant books, authors, and supporting material.",
+  },
+];
+---
+
+<SectionLanding
+  eyebrow="Programs"
+  title="Book Readings"
+  description="Discover upcoming literary gatherings and revisit readings from across the AKSC USA community."
+  items={contentAreas}
+/>

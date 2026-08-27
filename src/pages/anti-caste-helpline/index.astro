@@ -1,0 +1,23 @@
+---
+import { getEntry, render } from "astro:content";
+
+import AntiCasteHelpline from "../../features/anti-caste-helpline/components/AntiCasteHelpline.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const helpline = await getEntry("pages", "anti-caste-helpline");
+
+if (!helpline || helpline.data.pageType !== "helpline") {
+  throw new Error("Anti-Caste Helpline content is missing or invalid.");
+}
+
+const { Content } = await render(helpline);
+---
+
+<SiteLayout
+  title={`${helpline.data.title} | AKSC USA`}
+  description={helpline.data.description}
+>
+  <AntiCasteHelpline {...helpline.data}>
+    <Content />
+  </AntiCasteHelpline>
+</SiteLayout>

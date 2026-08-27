@@ -1,0 +1,59 @@
+---
+import Container from "../../../components/ui/Container.astro";
+import ResponsiveImage from "../../../components/ui/ResponsiveImage.astro";
+import organizeHero from "../assets/organize-hero.webp";
+import type { HomePageData } from "../content";
+
+interface Props {
+  hero: HomePageData["hero"];
+}
+
+const { hero } = Astro.props;
+---
+
+<section class="relative isolate min-h-[38rem] overflow-hidden bg-ambedkar-950">
+  <ResponsiveImage
+    src={organizeHero}
+    alt={hero.imageAlt}
+    class="absolute inset-0 -z-20 size-full object-cover"
+    loading="eager"
+    sizes="100vw"
+    widths={[640, 960, 1280, 1500]}
+  />
+  <div
+    class="absolute inset-0 -z-10 bg-gradient-to-r from-ambedkar-950 via-ambedkar-950/85 to-ambedkar-900/25"
+    aria-hidden="true"
+  >
+  </div>
+  <Container
+    class="flex min-h-[38rem] items-end py-16 sm:py-24 lg:min-h-[44rem]"
+  >
+    <div class="max-w-4xl">
+      <p class="text-sm font-bold tracking-[0.2em] text-saffron-300 uppercase">
+        {hero.eyebrow}
+      </p>
+      <h1
+        class="mt-5 text-5xl leading-[0.94] font-bold tracking-[-0.05em] text-balance text-white sm:text-7xl lg:text-8xl"
+      >
+        {hero.title}
+      </h1>
+      <p class="mt-7 max-w-2xl text-lg leading-8 text-white/82 sm:text-xl">
+        {hero.description}
+      </p>
+      <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+        <a
+          class="rounded-full bg-saffron-300 px-6 py-3 text-center font-bold text-ambedkar-950 transition hover:bg-saffron-400"
+          href={hero.primaryAction.href}
+        >
+          {hero.primaryAction.label}
+        </a>
+        <a
+          class="rounded-full border border-white/40 bg-white/10 px-6 py-3 text-center font-bold text-white transition hover:bg-white hover:text-ambedkar-950"
+          href={hero.secondaryAction.href}
+        >
+          {hero.secondaryAction.label}
+        </a>
+      </div>
+    </div>
+  </Container>
+</section>

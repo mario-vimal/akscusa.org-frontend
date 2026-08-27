@@ -1,0 +1,25 @@
+---
+import { getEntry } from "astro:content";
+
+import HomeCallToAction from "../features/home/components/HomeCallToAction.astro";
+import HomeHero from "../features/home/components/HomeHero.astro";
+import HomeQuotes from "../features/home/components/HomeQuotes.astro";
+import HomeStatements from "../features/home/components/HomeStatements.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
+
+const home = await getEntry("pages", "home");
+
+if (!home || home.data.pageType !== "home") {
+  throw new Error("Home content is missing or invalid.");
+}
+---
+
+<SiteLayout
+  title={`${home.data.title} | AKSC USA`}
+  description={home.data.description}
+>
+  <HomeHero hero={home.data.hero} />
+  <HomeStatements statements={home.data.statements} />
+  <HomeQuotes quotes={home.data.quotes} />
+  <HomeCallToAction closing={home.data.closing} />
+</SiteLayout>

@@ -1,0 +1,25 @@
+---
+import { donateNavigation, primaryNavigation } from "../../config/navigation";
+import NavLink from "./NavLink.astro";
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+---
+
+<nav class="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
+  <ul class="flex items-center gap-1">
+    {
+      primaryNavigation.map((item) => (
+        <li>
+          <NavLink {...item} currentPath={currentPath} />
+        </li>
+      ))
+    }
+  </ul>
+  <div class="ml-3">
+    <NavLink {...donateNavigation} currentPath={currentPath} variant="action" />
+  </div>
+</nav>

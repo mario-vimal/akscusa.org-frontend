@@ -1,0 +1,33 @@
+---
+import Container from "../../../components/ui/Container.astro";
+import type { HomePageData } from "../content";
+
+interface Props {
+  statements: HomePageData["statements"];
+}
+
+const { statements } = Astro.props;
+---
+
+<section class="bg-ambedkar-600 text-white" aria-labelledby="commitments-title">
+  <Container class="py-16 sm:py-20">
+    <h2 id="commitments-title" class="sr-only">Our commitments</h2>
+    <div
+      class="grid gap-px overflow-hidden rounded-3xl bg-white/20 md:grid-cols-2"
+    >
+      {
+        statements.map((statement, index) => (
+          <p
+            class:list={[
+              "flex min-h-44 items-end bg-ambedkar-700 p-7 text-2xl leading-tight font-semibold tracking-[-0.02em] text-balance sm:p-9 sm:text-3xl",
+              index % 3 === 1 && "bg-ambedkar-800",
+              index % 3 === 2 && "bg-ambedkar-900",
+            ]}
+          >
+            {statement}
+          </p>
+        ))
+      }
+    </div>
+  </Container>
+</section>

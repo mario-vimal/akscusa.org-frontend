@@ -1,0 +1,44 @@
+---
+import Container from "../../../components/ui/Container.astro";
+import type { HomePageData } from "../content";
+
+interface Props {
+  closing: HomePageData["closing"];
+}
+
+const { closing } = Astro.props;
+---
+
+<section class="bg-saffron-300 text-ambedkar-950">
+  <Container
+    class="grid gap-8 py-16 sm:py-20 lg:grid-cols-[1fr_auto] lg:items-end"
+  >
+    <div class="max-w-3xl">
+      <p class="text-sm font-bold tracking-[0.18em] uppercase">
+        {closing.eyebrow}
+      </p>
+      <h2
+        class="mt-3 text-4xl font-bold tracking-[-0.04em] text-balance sm:text-6xl"
+      >
+        {closing.title}
+      </h2>
+      <p class="mt-5 max-w-2xl text-lg leading-8 text-ambedkar-950/75">
+        {closing.description}
+      </p>
+    </div>
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <a
+        class="rounded-full bg-ambedkar-950 px-6 py-3 text-center font-bold text-white transition hover:bg-ambedkar-700"
+        href={closing.primaryAction.href}
+      >
+        {closing.primaryAction.label}
+      </a>
+      <a
+        class="rounded-full border border-ambedkar-950/30 px-6 py-3 text-center font-bold transition hover:bg-white/55"
+        href={closing.secondaryAction.href}
+      >
+        {closing.secondaryAction.label}
+      </a>
+    </div>
+  </Container>
+</section>

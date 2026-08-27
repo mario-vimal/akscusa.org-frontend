@@ -1,0 +1,48 @@
+{
+  "name": "akscusa.org-frontend",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=24.0.0 <27"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check": "npm run generate-types && astro check",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "generate-types": "wrangler types",
+    "validate": "npm run check && npm run lint && npm run format:check && npm run test && npm run build"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^14.2.5",
+    "@fontsource-variable/cabin": "^5.3.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.2.8",
+    "tailwindcss": "^4.3.3",
+    "wrangler": "^4.126.0"
+  },
+  "allowScripts": {
+    "esbuild": true,
+    "workerd@1.20260825.1": true
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.4.0",
+    "eslint": "^10.9.1",
+    "eslint-plugin-astro": "^3.1.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.68.0",
+    "vitest": "^4.1.11"
+  }
+}

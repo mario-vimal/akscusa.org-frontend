@@ -1,0 +1,39 @@
+---
+import { Image } from "astro:assets";
+
+import logo from "../../assets/brand/aksc-logo.webp";
+import Container from "../ui/Container.astro";
+import DesktopNav from "./DesktopNav.astro";
+import MobileNav from "./MobileNav.astro";
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+const isHome = currentPath === "/";
+---
+
+<header
+  class="sticky top-0 z-40 border-b border-ambedkar-900/10 bg-white/95 backdrop-blur"
+>
+  <Container class="flex items-center justify-between py-2">
+    <a
+      class="inline-flex rounded-xl"
+      href="/"
+      aria-label="AKSC USA home"
+      aria-current={isHome ? "page" : undefined}
+    >
+      <Image
+        src={logo}
+        alt=""
+        width={112}
+        format="webp"
+        quality={90}
+        class="size-14 object-contain"
+      />
+    </a>
+    <DesktopNav currentPath={currentPath} />
+    <MobileNav currentPath={currentPath} />
+  </Container>
+</header>

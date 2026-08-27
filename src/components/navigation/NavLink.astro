@@ -1,0 +1,37 @@
+---
+import type { NavigationItem } from "../../config/navigation";
+
+interface Props extends NavigationItem {
+  currentPath: string;
+  variant?: "default" | "action" | "mobile";
+}
+
+const { currentPath, href, label, variant = "default" } = Astro.props;
+const normalizedPath =
+  currentPath === "/" ? currentPath : currentPath.replace(/\/+$/, "");
+const isActive =
+  href === "/"
+    ? normalizedPath === href
+    : normalizedPath === href || normalizedPath.startsWith(`${href}/`);
+
+const variantClasses = {
+  default:
+    "rounded-md px-3 py-2 text-sm font-semibold text-ambedkar-900/75 transition hover:bg-white hover:text-ambedkar-950",
+  action:
+    "block rounded-full bg-ambedkar-900 px-5 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-ambedkar-700",
+  mobile:
+    "block rounded-lg px-4 py-3 text-base font-semibold text-ambedkar-900 transition hover:bg-ambedkar-50",
+};
+---
+
+<a
+  class:list={[
+    variantClasses[variant],
+    isActive && variant !== "action" && "bg-white text-ambedkar-950",
+    isActive && variant === "action" && "bg-ambedkar-700",
+  ]}
+  href={href}
+  aria-current={isActive ? "page" : undefined}
+>
+  {label}
+</a>

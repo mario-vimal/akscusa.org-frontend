@@ -1,0 +1,41 @@
+---
+import { donateNavigation, primaryNavigation } from "../../config/navigation";
+import NavLink from "./NavLink.astro";
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+---
+
+<details class="group relative lg:hidden">
+  <summary
+    class="cursor-pointer list-none rounded-full border border-ambedkar-900/15 px-4 py-2 text-sm font-semibold text-ambedkar-900 marker:content-none"
+  >
+    <span class="group-open:hidden">Menu</span>
+    <span class="hidden group-open:inline">Close</span>
+  </summary>
+
+  <nav
+    class="absolute top-[calc(100%+0.75rem)] right-0 w-72 rounded-2xl border border-ambedkar-900/10 bg-cream p-3 shadow-soft"
+    aria-label="Mobile navigation"
+  >
+    <ul class="space-y-1">
+      {
+        primaryNavigation.map((item) => (
+          <li>
+            <NavLink {...item} currentPath={currentPath} variant="mobile" />
+          </li>
+        ))
+      }
+      <li class="pt-2">
+        <NavLink
+          {...donateNavigation}
+          currentPath={currentPath}
+          variant="action"
+        />
+      </li>
+    </ul>
+  </nav>
+</details>

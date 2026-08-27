@@ -1,0 +1,28 @@
+---
+import SectionLanding from "../../../components/ui/SectionLanding.astro";
+
+const contentAreas = [
+  {
+    title: "Current conference",
+    description:
+      "Present the theme, location, dates, registration details, and important attendee updates.",
+  },
+  {
+    title: "Program",
+    description:
+      "Organize sessions, speakers, schedules, and practical information in one clear itinerary.",
+  },
+  {
+    title: "Conference archive",
+    description:
+      "Keep past programs, proceedings, galleries, and recordings accessible over time.",
+  },
+];
+---
+
+<SectionLanding
+  eyebrow="Gatherings"
+  title="Conferences"
+  description="Find conference programs, speakers, registration information, and resources from past gatherings."
+  items={contentAreas}
+/>

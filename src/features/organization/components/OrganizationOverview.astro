@@ -1,0 +1,28 @@
+---
+import SectionLanding from "../../../components/ui/SectionLanding.astro";
+
+const contentAreas = [
+  {
+    title: "Mission and history",
+    description:
+      "Explain the organization’s purpose, values, milestones, and connection to the community.",
+  },
+  {
+    title: "Leadership",
+    description:
+      "Introduce board members, committees, and the people responsible for major initiatives.",
+  },
+  {
+    title: "Chapters and membership",
+    description:
+      "Help visitors find local chapters, understand membership, and become involved.",
+  },
+];
+---
+
+<SectionLanding
+  eyebrow="About AKSC USA"
+  title="Organization"
+  description="Learn about our mission, leadership, history, chapters, and opportunities to participate."
+  items={contentAreas}
+/>
