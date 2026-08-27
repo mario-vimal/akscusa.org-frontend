@@ -40,17 +40,19 @@ const {
 </section>
 
 <section aria-labelledby="helpline-title">
-  <Container class="py-8 sm:py-12">
+  <div class="mx-auto w-full max-w-[85rem] px-4 pt-8 sm:px-6 sm:pt-12 lg:px-8">
     <ResponsiveImage
       src={helplineBanner}
       alt={bannerAlt}
       class="w-full rounded-2xl border border-ambedkar-900/10 shadow-soft"
       loading="eager"
-      sizes="(min-width: 1152px) 1152px, calc(100vw - 3rem)"
+      sizes="(min-width: 1360px) 1296px, calc(100vw - 2rem)"
     />
+  </div>
 
+  <Container class="pt-12 pb-8 sm:pb-12">
     <div
-      class="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)] lg:items-start"
+      class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)] lg:items-start"
     >
       <div>
         <p

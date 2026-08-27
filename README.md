@@ -99,7 +99,9 @@ paraphrased or omitted without explicit approval.
 | `npm run format:check`   | Verify formatting                             |
 | `npm test`               | Run Vitest once                               |
 | `npm run generate-types` | Generate Cloudflare runtime binding types     |
-| `npm run validate`       | Run all checks, tests, and a production build |
+| `npm run verify:pages`   | Smoke-test `dist` through Wrangler Pages      |
+| `npm run deploy:pages`   | Deploy `dist` with the Pages command          |
+| `npm run validate`       | Run all checks, build, and Pages verification |
 
 ## WordPress
 
@@ -119,8 +121,17 @@ Production deployment uses Cloudflare Pages' native Git integration:
 1. Connect `mario-vimal/akscusa.org-frontend` in the Cloudflare dashboard.
 2. Set the production branch to `main`.
 3. Use `npm run build` as the build command and `dist` as the output directory.
-4. Set `NODE_VERSION` to `24.20.0`.
-5. Add `PUBLIC_WORDPRESS_GRAPHQL_URL` when CMS-backed pages are enabled.
+4. Leave the deploy command empty for native Pages Git integration. If the
+   selected Cloudflare build flow requires one, use `npm run deploy:pages`.
+   Never use `wrangler deploy`, which targets Workers rather than Pages.
+5. Set `NODE_VERSION` to `24.20.0`.
+6. Add `PUBLIC_WORDPRESS_GRAPHQL_URL` when CMS-backed pages are enabled.
+
+When using `npm run deploy:pages`, create a custom Cloudflare API token with
+**Account → Cloudflare Pages → Edit** permission and scope its account resources
+to the account that owns the Pages project. Set that token as
+`CLOUDFLARE_API_TOKEN` for both production and preview environments. A user's
+account role does not add permissions to an otherwise under-scoped API token.
 
 Pull requests from branches in this repository deploy previews through
 `.github/workflows/cloudflare-preview.yml`. Configure these GitHub settings:
