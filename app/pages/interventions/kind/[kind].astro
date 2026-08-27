@@ -1,0 +1,67 @@
+---
+import type { GetStaticPaths } from "astro";
+
+import EditorialIndex from "../../../features/editorial/components/EditorialIndex.astro";
+import EntryCard from "../../../features/editorial/components/EntryCard.astro";
+import {
+  editorialSections,
+  entryHref,
+  loadEditorialEntries,
+} from "../../../features/editorial/entries";
+import {
+  interventionBadge,
+  interventionEyebrow,
+  interventionFilters,
+  interventionMeta,
+} from "../../../features/editorial/presenters";
+import { interventionKinds } from "../../../features/editorial/taxonomy";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+
+export const getStaticPaths = (async () => {
+  const interventions = await loadEditorialEntries("interventions");
+
+  return interventionKinds
+    .map((kind) => ({
+      kind,
+      interventions: interventions.filter(
+        (intervention) => intervention.data.kind === kind.id,
+      ),
+    }))
+    .filter((group) => group.interventions.length > 0)
+    .map((group) => ({
+      params: { kind: group.kind.id },
+      props: { ...group, allInterventions: interventions },
+    }));
+}) satisfies GetStaticPaths;
+
+const { kind, interventions, allInterventions } = Astro.props;
+const section = editorialSections.interventions;
+const title = `${kind.label} — ${section.title}`;
+---
+
+<SiteLayout title={title} description={kind.description}>
+  <EditorialIndex
+    eyebrow={section.eyebrow}
+    title={kind.label}
+    description={kind.description}
+    count={`${interventions.length} ${interventions.length === 1 ? "intervention" : "interventions"}`}
+    filters={interventionFilters(allInterventions, kind.id)}
+    filtersLabel="Filter interventions by kind"
+  >
+    {
+      interventions.map((intervention) => (
+        <li>
+          <EntryCard
+            href={entryHref("interventions", intervention.id)}
+            title={intervention.data.title}
+            summary={intervention.data.summary}
+            eyebrow={interventionEyebrow(intervention)}
+            badge={interventionBadge(intervention)}
+            meta={interventionMeta(intervention)}
+            topics={intervention.data.topics}
+          />
+        </li>
+      ))
+    }
+  </EditorialIndex>
+</SiteLayout>

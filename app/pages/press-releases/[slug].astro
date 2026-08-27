@@ -1,0 +1,36 @@
+---
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+
+import EntryLayout from "../../features/editorial/components/EntryLayout.astro";
+import { loadEditorialEntries } from "../../features/editorial/entries";
+import { pressReleaseDetails } from "../../features/editorial/presenters";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export const getStaticPaths = (async () => {
+  const releases = await loadEditorialEntries("pressReleases");
+  return releases.map((release) => ({
+    params: { slug: release.id },
+    props: { release },
+  }));
+}) satisfies GetStaticPaths;
+
+const { release } = Astro.props;
+const { Content } = await render(release);
+---
+
+<SiteLayout title={release.data.title} description={release.data.summary}>
+  <EntryLayout
+    section="pressReleases"
+    title={release.data.title}
+    summary={release.data.summary}
+    badge={{ label: "For immediate release" }}
+    details={pressReleaseDetails(release)}
+    links={{ heading: "Attachments", items: release.data.attachments }}
+    topics={release.data.topics}
+    heroImage={release.data.heroImage}
+    sourceUrl={release.data.sourceUrl}
+  >
+    <Content />
+  </EntryLayout>
+</SiteLayout>

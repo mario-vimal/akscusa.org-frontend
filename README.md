@@ -80,6 +80,43 @@ records live in `cms/content/` and are edited in the CMS instead.
 When migrating existing AKSC pages, preserve the original copy. Do not
 paraphrase or drop substantive assurances or calls to action without approval.
 
+## Editorial collections
+
+Four CMS collections share one base shape, defined once in
+`app/content.config.ts` and reused by each: `title`, `date`, `summary`,
+`topics`, `heroImage`, `sourceUrl`, `featured`, and `draft`. Each then adds only
+the fields its own kind of entry needs.
+
+| Collection      | Folder                       | Route             | Adds                                                             |
+| --------------- | ---------------------------- | ----------------- | ---------------------------------------------------------------- |
+| `articles`      | `cms/content/articles`       | `/blog`           | `category`, `authors`                                            |
+| `pressReleases` | `cms/content/press-releases` | `/press-releases` | `dateline`, `issuedBy`, `contactEmail`, `attachments`            |
+| `interventions` | `cms/content/interventions`  | `/interventions`  | `kind`, `status`, `concludedDate`, `outcome`, `resources`        |
+| `conferences`   | `cms/content/conferences`    | `/conferences`    | `edition`, `endDate`, `location`, `format`, `theme`, `resources` |
+
+`app/features/editorial/taxonomy.ts` is the single source of truth for every
+controlled vocabulary: shared `topics`, article categories, intervention kinds
+and statuses, and conference formats. `app/content.config.ts` turns those lists
+into Zod enums and the pages render their labels. The CMS cannot import
+TypeScript, so `cms/public/admin/config.yml` repeats the options in YAML and
+`scripts/cms/config.test.ts` fails if the two drift apart.
+
+`topics` is shared across all four collections, so an article, a statement, and
+a campaign about the same subject stay relatable without duplicating an entry.
+
+Each section has an index at its route and an entry page at
+`<route>/<slug>/`. Articles are also browsable by category at
+`/blog/category/<category>/` and interventions by kind at
+`/interventions/kind/<kind>/`; only terms that have entries get a page.
+`app/features/editorial/` holds the shared list, card, and entry components, so
+a change to one section's chrome lands on all four.
+
+Entries marked `draft` are visible in `npm run dev` and left out of the build.
+
+`cms/content/` is in `.prettierignore`. Sveltia writes those files when an
+editor saves, and it does not format them the way Prettier would, so checking
+them would fail every pull request the CMS opens.
+
 ## Commands
 
 | Command                  | Purpose                                       |

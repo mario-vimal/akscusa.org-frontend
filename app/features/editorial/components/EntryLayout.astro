@@ -1,0 +1,203 @@
+---
+import Container from "../../../components/ui/Container.astro";
+import { editorialSections, type EditorialCollection } from "../entries";
+import { topicLabel, type EditorialTopic } from "../taxonomy";
+import ProseContent from "./ProseContent.astro";
+
+interface Detail {
+  term: string;
+  description: string;
+  /** Turns the description into a link, used for contacts and registration. */
+  href?: string;
+}
+
+interface LinkItem {
+  label: string;
+  url: string;
+}
+
+interface Props {
+  section: EditorialCollection;
+  title: string;
+  summary: string;
+  badge?: { label: string; tone?: "accent" | "muted" };
+  details?: readonly Detail[];
+  /** Set apart from the body, used for an intervention's outcome. */
+  callout?: { heading: string; text: string };
+  links?: { heading: string; items: readonly LinkItem[] };
+  topics?: readonly EditorialTopic[];
+  heroImage?: { src: string; alt: string };
+  sourceUrl?: string;
+}
+
+const {
+  section,
+  title,
+  summary,
+  badge,
+  details = [],
+  callout,
+  links,
+  topics = [],
+  heroImage,
+  sourceUrl,
+} = Astro.props;
+
+const { path, label } = editorialSections[section];
+
+const badgeClasses =
+  badge?.tone === "muted"
+    ? "bg-ambedkar-900/10 text-ambedkar-900"
+    : "bg-saffron-300 text-ambedkar-950";
+---
+
+<article class="relative isolate overflow-x-clip">
+  <div
+    class="absolute inset-x-0 top-0 -z-10 h-[24rem] bg-[radial-gradient(circle_at_top_right,rgba(240,184,63,0.18),transparent_50%),radial-gradient(circle_at_top_left,rgba(31,98,170,0.16),transparent_45%)]"
+    aria-hidden="true"
+  >
+  </div>
+
+  <Container class="pt-10 pb-20 sm:pt-14 sm:pb-28">
+    <a
+      class="inline-flex items-center gap-2 rounded-full border border-ambedkar-900/15 bg-white px-4 py-2 text-sm font-semibold text-ambedkar-800 transition hover:border-ambedkar-900/40 hover:text-ambedkar-950"
+      href={`${path}/`}
+    >
+      <span aria-hidden="true">&larr;</span>
+      Back to {label}
+    </a>
+
+    <header class="mt-8 max-w-3xl">
+      {
+        badge && (
+          <span
+            class:list={[
+              "inline-block rounded-full px-3 py-1 text-xs font-bold tracking-wide uppercase",
+              badgeClasses,
+            ]}
+          >
+            {badge.label}
+          </span>
+        )
+      }
+      <h1
+        class:list={[
+          "text-3xl leading-[1.1] font-semibold tracking-[-0.04em] text-balance text-ambedkar-950 sm:text-5xl",
+          badge ? "mt-4" : "",
+        ]}
+      >
+        {title}
+      </h1>
+      <p class="mt-6 text-lg leading-8 text-ambedkar-900/75">{summary}</p>
+    </header>
+
+    {
+      details.length > 0 && (
+        <dl class="mt-10 grid max-w-3xl gap-x-8 gap-y-4 rounded-3xl border border-ambedkar-900/10 bg-white p-6 sm:grid-cols-2 sm:p-8">
+          {details.map((detail) => (
+            <div>
+              <dt class="text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase">
+                {detail.term}
+              </dt>
+              <dd class="mt-1 leading-7 text-ambedkar-900/80">
+                {detail.href ? (
+                  <a
+                    class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                    href={detail.href}
+                  >
+                    {detail.description}
+                  </a>
+                ) : (
+                  detail.description
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )
+    }
+
+    {
+      callout && (
+        <div class="mt-8 max-w-3xl rounded-3xl bg-ambedkar-950 px-6 py-6 text-cream sm:px-8">
+          <p class="text-xs font-bold tracking-[0.16em] text-saffron-300 uppercase">
+            {callout.heading}
+          </p>
+          <p class="mt-3 leading-7">{callout.text}</p>
+        </div>
+      )
+    }
+
+    {
+      heroImage && (
+        <img
+          class="mt-10 w-full max-w-3xl rounded-3xl border border-ambedkar-900/10"
+          src={heroImage.src}
+          alt={heroImage.alt}
+          loading="eager"
+          decoding="async"
+        />
+      )
+    }
+
+    <div class="mt-12">
+      <ProseContent>
+        <slot />
+      </ProseContent>
+    </div>
+
+    {
+      links && links.items.length > 0 && (
+        <section class="mt-12 max-w-3xl rounded-3xl border border-ambedkar-900/10 bg-white p-6 sm:p-8">
+          <h2 class="text-lg font-semibold tracking-tight text-ambedkar-950">
+            {links.heading}
+          </h2>
+          <ul class="mt-4 space-y-3">
+            {links.items.map((item) => (
+              <li>
+                <a
+                  class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                  href={item.url}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      topics.length > 0 && (
+        <section class="mt-12 max-w-3xl">
+          <h2 class="text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase">
+            Topics
+          </h2>
+          <ul class="mt-3 flex flex-wrap gap-2">
+            {topics.map((topic) => (
+              <li class="rounded-full bg-ambedkar-50 px-3 py-1.5 text-sm font-semibold text-ambedkar-800">
+                {topicLabel(topic)}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    {
+      sourceUrl && (
+        <p class="mt-10 max-w-3xl text-sm text-ambedkar-900/60">
+          Originally published at{" "}
+          <a
+            class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+            href={sourceUrl}
+          >
+            {sourceUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+          </a>
+          .
+        </p>
+      )
+    }
+  </Container>
+</article>

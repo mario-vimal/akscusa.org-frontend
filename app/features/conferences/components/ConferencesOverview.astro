@@ -1,28 +1,42 @@
 ---
-import SectionLanding from "../../../components/ui/SectionLanding.astro";
+import EditorialIndex from "../../editorial/components/EditorialIndex.astro";
+import EntryCard from "../../editorial/components/EntryCard.astro";
+import {
+  editorialSections,
+  entryHref,
+  formatDateRange,
+  loadEditorialEntries,
+} from "../../editorial/entries";
+import { conferenceBadge, conferenceMeta } from "../../editorial/presenters";
 
-const contentAreas = [
-  {
-    title: "Current conference",
-    description:
-      "Present the theme, location, dates, registration details, and important attendee updates.",
-  },
-  {
-    title: "Program",
-    description:
-      "Organize sessions, speakers, schedules, and practical information in one clear itinerary.",
-  },
-  {
-    title: "Conference archive",
-    description:
-      "Keep past programs, proceedings, galleries, and recordings accessible over time.",
-  },
-];
+const section = editorialSections.conferences;
+const conferences = await loadEditorialEntries("conferences");
 ---
 
-<SectionLanding
-  eyebrow="Gatherings"
-  title="Conferences"
-  description="Find conference programs, speakers, registration information, and resources from past gatherings."
-  items={contentAreas}
-/>
+<EditorialIndex
+  eyebrow={section.eyebrow}
+  title={section.title}
+  description={section.description}
+  count={`${conferences.length} ${conferences.length === 1 ? "conference" : "conferences"}`}
+  empty={section.empty}
+  isEmpty={conferences.length === 0}
+>
+  {
+    conferences.map((conference) => (
+      <li>
+        <EntryCard
+          href={entryHref("conferences", conference.id)}
+          title={conference.data.title}
+          summary={conference.data.summary}
+          eyebrow={formatDateRange(
+            conference.data.date,
+            conference.data.endDate,
+          )}
+          badge={conferenceBadge(conference)}
+          meta={conferenceMeta(conference)}
+          topics={conference.data.topics}
+        />
+      </li>
+    ))
+  }
+</EditorialIndex>

@@ -1,0 +1,48 @@
+---
+import EditorialIndex from "../../features/editorial/components/EditorialIndex.astro";
+import EntryCard from "../../features/editorial/components/EntryCard.astro";
+import {
+  editorialSections,
+  entryHref,
+  loadEditorialEntries,
+} from "../../features/editorial/entries";
+import {
+  interventionBadge,
+  interventionEyebrow,
+  interventionFilters,
+  interventionMeta,
+} from "../../features/editorial/presenters";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const section = editorialSections.interventions;
+const interventions = await loadEditorialEntries("interventions");
+---
+
+<SiteLayout title={section.title} description={section.description}>
+  <EditorialIndex
+    eyebrow={section.eyebrow}
+    title={section.title}
+    description={section.description}
+    count={`${interventions.length} ${interventions.length === 1 ? "intervention" : "interventions"}`}
+    filters={interventionFilters(interventions)}
+    filtersLabel="Filter interventions by kind"
+    empty={section.empty}
+    isEmpty={interventions.length === 0}
+  >
+    {
+      interventions.map((intervention) => (
+        <li>
+          <EntryCard
+            href={entryHref("interventions", intervention.id)}
+            title={intervention.data.title}
+            summary={intervention.data.summary}
+            eyebrow={interventionEyebrow(intervention)}
+            badge={interventionBadge(intervention)}
+            meta={interventionMeta(intervention)}
+            topics={intervention.data.topics}
+          />
+        </li>
+      ))
+    }
+  </EditorialIndex>
+</SiteLayout>

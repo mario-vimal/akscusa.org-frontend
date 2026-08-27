@@ -1,0 +1,45 @@
+---
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+
+import EntryLayout from "../../features/editorial/components/EntryLayout.astro";
+import { loadEditorialEntries } from "../../features/editorial/entries";
+import {
+  interventionBadge,
+  interventionDetails,
+} from "../../features/editorial/presenters";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export const getStaticPaths = (async () => {
+  const interventions = await loadEditorialEntries("interventions");
+  return interventions.map((intervention) => ({
+    params: { slug: intervention.id },
+    props: { intervention },
+  }));
+}) satisfies GetStaticPaths;
+
+const { intervention } = Astro.props;
+const { Content } = await render(intervention);
+
+const outcome = intervention.data.outcome;
+---
+
+<SiteLayout
+  title={intervention.data.title}
+  description={intervention.data.summary}
+>
+  <EntryLayout
+    section="interventions"
+    title={intervention.data.title}
+    summary={intervention.data.summary}
+    badge={interventionBadge(intervention)}
+    details={interventionDetails(intervention)}
+    callout={outcome ? { heading: "Outcome", text: outcome } : undefined}
+    links={{ heading: "Resources", items: intervention.data.resources }}
+    topics={intervention.data.topics}
+    heroImage={intervention.data.heroImage}
+    sourceUrl={intervention.data.sourceUrl}
+  >
+    <Content />
+  </EntryLayout>
+</SiteLayout>

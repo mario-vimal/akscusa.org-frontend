@@ -4,7 +4,22 @@ import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 
+import {
+  articleCategories,
+  conferenceFormats,
+  editorialTopics,
+  interventionKinds,
+  interventionStatuses,
+  type TaxonomyTerm,
+} from "../../app/features/editorial/taxonomy";
 import { CMS_REPO_PLACEHOLDER } from "./repo";
+
+interface CmsField {
+  name: string;
+  widget?: string;
+  options?: Array<{ label: string; value: string }>;
+  fields?: CmsField[];
+}
 
 interface CmsConfig {
   backend: {
@@ -20,6 +35,7 @@ interface CmsConfig {
     name: string;
     folder?: string;
     files?: Array<{ file: string }>;
+    fields?: CmsField[];
   }>;
 }
 
@@ -92,5 +108,73 @@ describe("Sveltia CMS configuration", () => {
       "https://unpkg.com/@sveltia/cms@0.201.1/dist/sveltia-cms.js",
     );
     expect(configSource).not.toMatch(/^\s*secret_access_key:/m);
+  });
+});
+
+// The CMS cannot import TypeScript, so its option lists are written out in
+// YAML. An option the Zod schemas reject would let an editor save an entry that
+// then fails the build, so the two are compared here instead.
+describe("Sveltia CMS taxonomy options", () => {
+  const collection = (name: string) => {
+    const found = config.collections.find((entry) => entry.name === name);
+    expect(found, `collection "${name}" is missing`).toBeDefined();
+    return found!;
+  };
+
+  const selectOptions = (collectionName: string, fieldName: string) => {
+    const field = collection(collectionName).fields?.find(
+      (entry) => entry.name === fieldName,
+    );
+    expect(
+      field,
+      `field "${fieldName}" is missing from "${collectionName}"`,
+    ).toBeDefined();
+    expect(field!.widget).toBe("select");
+    return field!.options ?? [];
+  };
+
+  const expectMatches = (
+    collectionName: string,
+    fieldName: string,
+    terms: readonly TaxonomyTerm[],
+  ) => {
+    expect(selectOptions(collectionName, fieldName)).toEqual(
+      terms.map((term) => ({ label: term.label, value: term.id })),
+    );
+  };
+
+  const editorialCollections = [
+    "articles",
+    "press-releases",
+    "interventions",
+    "conferences",
+  ];
+
+  it.each(editorialCollections)("offers every topic in %s", (name) => {
+    expectMatches(name, "topics", editorialTopics);
+  });
+
+  it("offers every article category", () => {
+    expectMatches("articles", "category", articleCategories);
+  });
+
+  it("offers every intervention kind and status", () => {
+    expectMatches("interventions", "kind", interventionKinds);
+    expectMatches("interventions", "status", interventionStatuses);
+  });
+
+  it("offers every conference format", () => {
+    expectMatches("conferences", "format", conferenceFormats);
+  });
+
+  // A summary is what the index cards and the meta description are built from,
+  // so an entry saved without one would publish an empty card.
+  it.each(editorialCollections)("requires a summary in %s", (name) => {
+    const summary = collection(name).fields?.find(
+      (field) => field.name === "summary",
+    );
+
+    expect(summary).toBeDefined();
+    expect(summary).not.toHaveProperty("required", false);
   });
 });

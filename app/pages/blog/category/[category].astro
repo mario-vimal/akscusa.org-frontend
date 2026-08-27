@@ -1,0 +1,66 @@
+---
+import type { GetStaticPaths } from "astro";
+
+import EditorialIndex from "../../../features/editorial/components/EditorialIndex.astro";
+import EntryCard from "../../../features/editorial/components/EntryCard.astro";
+import {
+  editorialSections,
+  entryHref,
+  formatDate,
+  loadEditorialEntries,
+} from "../../../features/editorial/entries";
+import {
+  articleFilters,
+  articleMeta,
+} from "../../../features/editorial/presenters";
+import { articleCategories } from "../../../features/editorial/taxonomy";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+
+export const getStaticPaths = (async () => {
+  const articles = await loadEditorialEntries("articles");
+
+  return articleCategories
+    .map((category) => ({
+      category,
+      articles: articles.filter(
+        (article) => article.data.category === category.id,
+      ),
+    }))
+    .filter((group) => group.articles.length > 0)
+    .map((group) => ({
+      params: { category: group.category.id },
+      props: { ...group, allArticles: articles },
+    }));
+}) satisfies GetStaticPaths;
+
+const { category, articles, allArticles } = Astro.props;
+const section = editorialSections.articles;
+const title = `${category.label} — ${section.title}`;
+---
+
+<SiteLayout title={title} description={category.description}>
+  <EditorialIndex
+    eyebrow={section.eyebrow}
+    title={category.label}
+    description={category.description}
+    count={`${articles.length} ${articles.length === 1 ? "article" : "articles"}`}
+    filters={articleFilters(allArticles, category.id)}
+    filtersLabel="Filter articles by category"
+  >
+    {
+      articles.map((article) => (
+        <li>
+          <EntryCard
+            href={entryHref("articles", article.id)}
+            title={article.data.title}
+            summary={article.data.summary}
+            eyebrow={formatDate(article.data.date)}
+            badge={{ label: category.label }}
+            meta={articleMeta(article)}
+            topics={article.data.topics}
+          />
+        </li>
+      ))
+    }
+  </EditorialIndex>
+</SiteLayout>

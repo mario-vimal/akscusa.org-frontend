@@ -1,0 +1,48 @@
+---
+import EditorialIndex from "../../features/editorial/components/EditorialIndex.astro";
+import EntryCard from "../../features/editorial/components/EntryCard.astro";
+import {
+  editorialSections,
+  entryHref,
+  formatDate,
+  loadEditorialEntries,
+} from "../../features/editorial/entries";
+import {
+  articleFilters,
+  articleMeta,
+} from "../../features/editorial/presenters";
+import { articleCategoryLabel } from "../../features/editorial/taxonomy";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const section = editorialSections.articles;
+const articles = await loadEditorialEntries("articles");
+---
+
+<SiteLayout title={section.title} description={section.description}>
+  <EditorialIndex
+    eyebrow={section.eyebrow}
+    title={section.title}
+    description={section.description}
+    count={`${articles.length} ${articles.length === 1 ? "article" : "articles"}`}
+    filters={articleFilters(articles)}
+    filtersLabel="Filter articles by category"
+    empty={section.empty}
+    isEmpty={articles.length === 0}
+  >
+    {
+      articles.map((article) => (
+        <li>
+          <EntryCard
+            href={entryHref("articles", article.id)}
+            title={article.data.title}
+            summary={article.data.summary}
+            eyebrow={formatDate(article.data.date)}
+            badge={{ label: articleCategoryLabel(article.data.category) }}
+            meta={articleMeta(article)}
+            topics={article.data.topics}
+          />
+        </li>
+      ))
+    }
+  </EditorialIndex>
+</SiteLayout>

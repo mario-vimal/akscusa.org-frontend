@@ -1,0 +1,36 @@
+---
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+
+import EntryLayout from "../../features/editorial/components/EntryLayout.astro";
+import { loadEditorialEntries } from "../../features/editorial/entries";
+import { articleDetails } from "../../features/editorial/presenters";
+import { articleCategoryLabel } from "../../features/editorial/taxonomy";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export const getStaticPaths = (async () => {
+  const articles = await loadEditorialEntries("articles");
+  return articles.map((article) => ({
+    params: { slug: article.id },
+    props: { article },
+  }));
+}) satisfies GetStaticPaths;
+
+const { article } = Astro.props;
+const { Content } = await render(article);
+---
+
+<SiteLayout title={article.data.title} description={article.data.summary}>
+  <EntryLayout
+    section="articles"
+    title={article.data.title}
+    summary={article.data.summary}
+    badge={{ label: articleCategoryLabel(article.data.category) }}
+    details={articleDetails(article)}
+    topics={article.data.topics}
+    heroImage={article.data.heroImage}
+    sourceUrl={article.data.sourceUrl}
+  >
+    <Content />
+  </EntryLayout>
+</SiteLayout>

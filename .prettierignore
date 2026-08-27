@@ -1,3 +1,8 @@
+# Sveltia writes the files in `cms/content/` when an editor saves an entry, and
+# it does not format them the way Prettier would. Reformatting them here would
+# make every entry the CMS opens a pull request for fail `format:check`.
+cms/content
+
 .astro
 dist
 node_modules

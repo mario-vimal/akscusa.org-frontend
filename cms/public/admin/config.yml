@@ -33,7 +33,304 @@ public_folder: /media
 
 # Only repeating, structured records belong here. Static page copy stays in
 # `app/content/pages/` and is edited in Git, not through the CMS.
+#
+# The four editorial collections below (Blog, Press Releases, Interventions,
+# Conferences) share a common set of fields — title, date, summary, topics,
+# hero image, source URL, featured, draft — and each adds only what its own kind
+# of entry needs. Their option lists mirror `app/features/editorial/taxonomy.ts`,
+# and `scripts/cms/config.test.ts` fails if the two drift apart.
 collections:
+  - name: articles
+    label: Blog
+    label_singular: Article
+    icon: article
+    description: Essays and analysis, newest first.
+    folder: cms/content/articles
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [date, title, category]
+    view_filters:
+      - { label: Featured, field: featured, pattern: true }
+      - { label: Drafts, field: draft, pattern: true }
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Publication date, widget: datetime }
+      - name: category
+        label: Category
+        widget: select
+        options:
+          - { label: Ambedkarite Thought, value: ambedkarite-thought }
+          - { label: Caste in the USA, value: caste-in-the-usa }
+          - { label: History and Movements, value: history-and-movements }
+          - { label: Culture and Society, value: culture-and-society }
+          - { label: Books and Media, value: books-and-media }
+      - name: summary
+        label: Summary
+        widget: text
+        hint: One or two sentences shown on the blog index and in search results.
+      - name: authors
+        label: Authors
+        widget: list
+        required: false
+        fields:
+          - { name: name, label: Name, widget: string }
+          - { name: role, label: Role, widget: string, required: false }
+      - name: topics
+        label: Topics
+        widget: select
+        multiple: true
+        required: false
+        options: &editorial_topics
+          - { label: Caste discrimination, value: caste-discrimination }
+          - { label: Dr. Ambedkar, value: ambedkar }
+          - { label: Periyar, value: periyar }
+          - { label: Legislation, value: legislation }
+          - { label: Litigation, value: litigation }
+          - { label: Workplace, value: workplace }
+          - { label: Higher education, value: higher-education }
+          - { label: Solidarity, value: solidarity }
+          - { label: History, value: history }
+          - { label: Religion and culture, value: religion-and-culture }
+          - { label: Hindutva, value: hindutva }
+          - { label: Civil rights, value: civil-rights }
+      - name: heroImage
+        label: Hero image
+        widget: object
+        required: false
+        collapsed: true
+        fields: &hero_image_fields
+          - {
+              name: src,
+              label: Image URL,
+              widget: string,
+              hint: Full URL of an image on the media host.,
+            }
+          - {
+              name: alt,
+              label: Alternative text,
+              widget: string,
+              hint: Describe the image. Leave empty only if it is decorative.,
+            }
+      - {
+          name: sourceUrl,
+          label: Original URL,
+          widget: string,
+          required: false,
+          hint: Where this was first published,
+          if it is being republished here.,
+        }
+      - { name: featured, label: Featured, widget: boolean, default: false }
+      - { name: draft, label: Draft, widget: boolean, default: false }
+      - { name: body, label: Article, widget: markdown }
+
+  - name: press-releases
+    label: Press Releases
+    label_singular: Press Release
+    icon: campaign
+    description: Public statements issued by AKSC, newest first.
+    folder: cms/content/press-releases
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [date, title]
+    view_filters:
+      - { label: Featured, field: featured, pattern: true }
+      - { label: Drafts, field: draft, pattern: true }
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Release date, widget: datetime }
+      - name: dateline
+        label: Dateline
+        widget: string
+        required: false
+        hint: Place of issue, such as “San Jose, California”.
+      - name: issuedBy
+        label: Issued by
+        widget: list
+        field: { name: organization, label: Organization, widget: string }
+        default: [Ambedkar King Study Circle]
+        hint: Every organization the statement is issued in the name of.
+      - name: summary
+        label: Summary
+        widget: text
+        hint: One or two sentences shown on the press release index.
+      - name: contactEmail
+        label: Press contact email
+        widget: string
+        required: false
+      - name: topics
+        label: Topics
+        widget: select
+        multiple: true
+        required: false
+        options: *editorial_topics
+      - name: attachments
+        label: Attachments
+        widget: list
+        required: false
+        fields: &link_fields
+          - { name: label, label: Label, widget: string }
+          - { name: url, label: URL, widget: string }
+      - name: heroImage
+        label: Hero image
+        widget: object
+        required: false
+        collapsed: true
+        fields: *hero_image_fields
+      - {
+          name: sourceUrl,
+          label: Original URL,
+          widget: string,
+          required: false,
+        }
+      - { name: featured, label: Featured, widget: boolean, default: false }
+      - { name: draft, label: Draft, widget: boolean, default: false }
+      - { name: body, label: Statement, widget: markdown }
+
+  - name: interventions
+    label: Interventions
+    label_singular: Intervention
+    icon: gavel
+    description: Campaigns, legal work, and public education, newest first.
+    folder: cms/content/interventions
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [date, title, status]
+    view_filters:
+      - { label: Ongoing, field: status, pattern: ongoing }
+      - { label: Concluded, field: status, pattern: concluded }
+      - { label: Drafts, field: draft, pattern: true }
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Start date, widget: datetime }
+      - name: kind
+        label: Kind
+        widget: select
+        options:
+          - { label: Legislative, value: legislative }
+          - { label: Legal, value: legal }
+          - { label: Campaign, value: campaign }
+          - { label: Education, value: education }
+          - { label: Testimony, value: testimony }
+      - name: status
+        label: Status
+        widget: select
+        default: ongoing
+        options:
+          - { label: Ongoing, value: ongoing }
+          - { label: Concluded, value: concluded }
+      - name: concludedDate
+        label: Concluded on
+        widget: datetime
+        required: false
+        hint: Fill this in once the status is set to concluded.
+      - name: summary
+        label: Summary
+        widget: text
+        hint: One or two sentences shown on the interventions index.
+      - name: outcome
+        label: Outcome
+        widget: text
+        required: false
+        hint: What the intervention achieved. Shown on concluded entries.
+      - name: topics
+        label: Topics
+        widget: select
+        multiple: true
+        required: false
+        options: *editorial_topics
+      - name: resources
+        label: Resources
+        widget: list
+        required: false
+        fields: *link_fields
+      - name: heroImage
+        label: Hero image
+        widget: object
+        required: false
+        collapsed: true
+        fields: *hero_image_fields
+      - {
+          name: sourceUrl,
+          label: Original URL,
+          widget: string,
+          required: false,
+        }
+      - { name: featured, label: Featured, widget: boolean, default: false }
+      - { name: draft, label: Draft, widget: boolean, default: false }
+      - { name: body, label: Details, widget: markdown }
+
+  - name: conferences
+    label: Conferences
+    label_singular: Conference
+    icon: groups
+    description: Annual conferences, newest first.
+    folder: cms/content/conferences
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [date, title, edition]
+    view_filters:
+      - { label: Featured, field: featured, pattern: true }
+      - { label: Drafts, field: draft, pattern: true }
+    fields:
+      - { name: title, label: Title, widget: string }
+      - { name: date, label: Start date, widget: datetime }
+      - name: endDate
+        label: End date
+        widget: datetime
+        required: false
+        hint: Only needed for a conference that runs over more than one day.
+      - name: edition
+        label: Edition
+        widget: number
+        required: false
+        value_type: int
+        min: 1
+        hint: Which annual conference this is, counting from the first in 2018.
+      - name: format
+        label: Format
+        widget: select
+        default: in-person
+        options:
+          - { label: In person, value: in-person }
+          - { label: Online, value: online }
+          - { label: Hybrid, value: hybrid }
+      - { name: location, label: Location, widget: string, required: false }
+      - { name: theme, label: Theme, widget: string, required: false }
+      - name: summary
+        label: Summary
+        widget: text
+        hint: One or two sentences shown on the conferences index.
+      - name: registrationUrl
+        label: Registration URL
+        widget: string
+        required: false
+      - name: topics
+        label: Topics
+        widget: select
+        multiple: true
+        required: false
+        options: *editorial_topics
+      - name: resources
+        label: Resources
+        widget: list
+        required: false
+        fields: *link_fields
+      - name: heroImage
+        label: Hero image
+        widget: object
+        required: false
+        collapsed: true
+        fields: *hero_image_fields
+      - {
+          name: sourceUrl,
+          label: Original URL,
+          widget: string,
+          required: false,
+        }
+      - { name: featured, label: Featured, widget: boolean, default: false }
+      - { name: draft, label: Draft, widget: boolean, default: false }
+      - { name: body, label: Programme, widget: markdown }
+
   - name: book-readings
     label: Book Readings
     label_singular: Book Reading

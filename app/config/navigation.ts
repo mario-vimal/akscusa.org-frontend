@@ -9,8 +9,20 @@ export const primaryNavigation = [
     href: "/anti-caste-helpline",
   },
   {
+    label: "Interventions",
+    href: "/interventions",
+  },
+  {
     label: "Testimonies",
     href: "/testimonies-of-practice-of-caste-in-the-usa",
+  },
+  {
+    label: "Blog",
+    href: "/blog",
+  },
+  {
+    label: "Press Releases",
+    href: "/press-releases",
   },
   {
     label: "Book Readings",

@@ -1,0 +1,101 @@
+---
+import Container from "../../../components/ui/Container.astro";
+
+interface FilterLink {
+  label: string;
+  href: string;
+  current?: boolean;
+}
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+  /** Printed beside the title, for example "38 entries". */
+  count?: string;
+  filters?: readonly FilterLink[];
+  filtersLabel?: string;
+  /** Shown in place of the list when nothing has been published yet. */
+  empty?: string;
+  isEmpty?: boolean;
+}
+
+const {
+  eyebrow,
+  title,
+  description,
+  count,
+  filters = [],
+  filtersLabel = "Filter",
+  empty,
+  isEmpty = false,
+} = Astro.props;
+---
+
+<section class="relative isolate overflow-x-clip">
+  <div
+    class="absolute inset-x-0 top-0 -z-10 h-[28rem] bg-[radial-gradient(circle_at_top_right,rgba(240,184,63,0.2),transparent_48%),radial-gradient(circle_at_top_left,rgba(31,98,170,0.18),transparent_42%)]"
+    aria-hidden="true"
+  >
+  </div>
+
+  <Container class="pt-14 pb-20 sm:pt-20 sm:pb-28">
+    <header class="max-w-3xl">
+      <p
+        class="text-sm font-bold tracking-[0.18em] text-ambedkar-700 uppercase"
+      >
+        {eyebrow}
+      </p>
+      <h1
+        class="mt-4 text-4xl leading-[1.05] font-semibold tracking-[-0.045em] text-balance text-ambedkar-950 sm:text-6xl"
+      >
+        {title}
+      </h1>
+      <p class="mt-6 text-lg leading-8 text-ambedkar-900/75 sm:text-xl">
+        {description}
+      </p>
+      {
+        count && (
+          <p class="mt-4 text-sm font-semibold text-ambedkar-700">{count}</p>
+        )
+      }
+    </header>
+
+    {
+      filters.length > 0 && (
+        <nav class="mt-10" aria-label={filtersLabel}>
+          <ul class="flex flex-wrap gap-2">
+            {filters.map((filter) => (
+              <li>
+                <a
+                  class:list={[
+                    "inline-block rounded-full border px-4 py-2 text-sm font-semibold transition",
+                    filter.current
+                      ? "border-ambedkar-900 bg-ambedkar-900 text-white"
+                      : "border-ambedkar-900/15 bg-white text-ambedkar-800 hover:border-ambedkar-900/40 hover:text-ambedkar-950",
+                  ]}
+                  href={filter.href}
+                  aria-current={filter.current ? "page" : undefined}
+                >
+                  {filter.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )
+    }
+
+    {
+      isEmpty ? (
+        <p class="mt-12 max-w-2xl rounded-2xl border border-ambedkar-900/10 bg-white px-6 py-8 text-ambedkar-900/75">
+          {empty}
+        </p>
+      ) : (
+        <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <slot />
+        </ul>
+      )
+    }
+  </Container>
+</section>
