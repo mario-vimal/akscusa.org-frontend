@@ -80,6 +80,10 @@ records live in `cms/content/` and are edited in the CMS instead.
 When migrating existing AKSC pages, preserve the original copy. Do not
 paraphrase or drop substantive assurances or calls to action without approval.
 
+`MIGRATION-TRACKER.md` tracks every page on the two source sites
+(`akscusa.org` and `akscusa.squarespace.com`) and what has moved so far. It is a
+temporary working document; delete it once both sites are retired.
+
 ## Editorial collections
 
 Four CMS collections share one base shape, defined once in
