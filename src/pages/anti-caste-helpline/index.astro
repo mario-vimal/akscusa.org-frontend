@@ -13,10 +13,7 @@ if (!helpline || helpline.data.pageType !== "helpline") {
 const { Content } = await render(helpline);
 ---
 
-<SiteLayout
-  title={`${helpline.data.title} | AKSC USA`}
-  description={helpline.data.description}
->
+<SiteLayout title={helpline.data.title} description={helpline.data.description}>
   <AntiCasteHelpline {...helpline.data}>
     <Content />
   </AntiCasteHelpline>

@@ -7,6 +7,10 @@ const host = "127.0.0.1";
 const routes = new Map([
   ["/", "Educate. Agitate. Organize."],
   ["/anti-caste-helpline/", "Anti-Caste Helpline"],
+  [
+    "/testimonies-of-practice-of-caste-in-the-usa/",
+    "Testimonies of Caste in the USA",
+  ],
   ["/book-readings/", "Book Readings"],
   ["/conferences/", "Conferences"],
   ["/organization/", "Organization"],

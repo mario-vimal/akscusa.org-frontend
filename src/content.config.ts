@@ -56,6 +56,25 @@ const helplinePageSchema = z.object({
   flyerCaption: z.string(),
 });
 
+const testimoniesPageSchema = z.object({
+  pageType: z.literal("testimonies"),
+  title: z.string(),
+  description: z.string(),
+  eyebrow: z.string(),
+  intro: z.string(),
+  contentNote: z.string(),
+  categories: z
+    .array(
+      z.object({
+        label: z.string(),
+        id: z.string(),
+      }),
+    )
+    .min(1),
+  shareUrl: z.url(),
+  solidarityUrl: z.url(),
+});
+
 const pages = defineCollection({
   loader: glob({
     base: "./src/content/pages",
@@ -64,6 +83,7 @@ const pages = defineCollection({
   schema: z.discriminatedUnion("pageType", [
     homePageSchema,
     helplinePageSchema,
+    testimoniesPageSchema,
   ]),
 });
 

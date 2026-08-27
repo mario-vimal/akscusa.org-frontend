@@ -14,10 +14,7 @@ if (!home || home.data.pageType !== "home") {
 }
 ---
 
-<SiteLayout
-  title={`${home.data.title} | AKSC USA`}
-  description={home.data.description}
->
+<SiteLayout description={home.data.description}>
   <HomeHero hero={home.data.hero} />
   <HomeStatements statements={home.data.statements} />
   <HomeQuotes quotes={home.data.quotes} />

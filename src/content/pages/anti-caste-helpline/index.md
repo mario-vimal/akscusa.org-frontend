@@ -23,7 +23,7 @@ These experiences can produce stress, overwhelm, and trauma that affect mental w
 
 We provide support, an opportunity for dialogue, and referrals that may help with caste-based discrimination or isolation in employment, housing, domestic, social, or community spaces.
 
-[Read other testimonies about the practice of caste in the USA.](https://akscusa.org/testimonies-of-practice-of-caste-in-the-usa/)
+[Read other testimonies about the practice of caste in the USA.](/testimonies-of-practice-of-caste-in-the-usa/)
 
 1. While we cannot offer legal advice, we’re more than willing to facilitate a connection with legal experts who can provide help.
 2. Your privacy will be protected by us.

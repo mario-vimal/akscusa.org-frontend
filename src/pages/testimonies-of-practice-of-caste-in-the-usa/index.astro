@@ -1,0 +1,23 @@
+---
+import { getEntry, render } from "astro:content";
+
+import TestimoniesPage from "../../features/testimonies/components/TestimoniesPage.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const testimonies = await getEntry("pages", "testimonies");
+
+if (!testimonies || testimonies.data.pageType !== "testimonies") {
+  throw new Error("Testimonies content is missing or invalid.");
+}
+
+const { Content } = await render(testimonies);
+---
+
+<SiteLayout
+  title={testimonies.data.title}
+  description={testimonies.data.description}
+>
+  <TestimoniesPage {...testimonies.data}>
+    <Content />
+  </TestimoniesPage>
+</SiteLayout>
