@@ -1,0 +1,125 @@
+---
+import type { EditorialTopic } from "../../editorial/taxonomy";
+import type { Badge, ProgramPoster } from "../../editorial/presenters";
+import { topicLabel } from "../../editorial/taxonomy";
+
+interface Props {
+  href: string;
+  title: string;
+  summary: string;
+  eyebrow: string;
+  badge: Badge;
+  meta?: readonly string[];
+  topics?: readonly EditorialTopic[];
+  poster?: ProgramPoster;
+}
+
+const {
+  href,
+  title,
+  summary,
+  eyebrow,
+  badge,
+  meta = [],
+  topics = [],
+  poster,
+} = Astro.props;
+
+const badgeClasses =
+  badge.tone === "muted"
+    ? "bg-ambedkar-900/10 text-ambedkar-900"
+    : "bg-accent-300 text-ambedkar-950";
+---
+
+<article class="card group overflow-hidden">
+  {
+    poster ? (
+      <div class="flex aspect-4/3 items-center justify-center bg-white p-3 sm:p-4">
+        <img
+          class="size-full object-contain"
+          src={poster.src}
+          alt={poster.alt}
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    ) : (
+      <div class="on-dark relative isolate flex aspect-4/3 items-end overflow-hidden bg-ambedkar-950 p-6 text-white">
+        <div
+          class="absolute inset-0 -z-10 bg-[radial-gradient(80%_100%_at_100%_0%,var(--color-accent-900),transparent_65%)]"
+          aria-hidden="true"
+        />
+        <div
+          class="absolute inset-0 -z-10 pattern-dots text-white/12"
+          aria-hidden="true"
+        />
+        <p class="font-display text-4xl leading-none font-semibold">AKSC</p>
+      </div>
+    )
+  }
+
+  <div class="flex flex-1 p-6 sm:p-8">
+    <div class="flex min-w-0 flex-1 flex-col">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <p
+          class="text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase"
+        >
+          {eyebrow}
+        </p>
+        <span
+          class:list={[
+            "rounded-full px-2.5 py-1 text-xs font-bold tracking-wide uppercase",
+            badgeClasses,
+          ]}
+        >
+          {badge.label}
+        </span>
+      </div>
+
+      <h2
+        class="mt-3 font-display text-[1.375rem] leading-[1.2] font-semibold tracking-[-0.015em] text-balance text-ambedkar-950 sm:text-2xl"
+      >
+        <a
+          class="after:absolute after:inset-0 focus-visible:outline-none"
+          href={href}
+        >
+          {title}
+        </a>
+      </h2>
+
+      <p class="mt-3 leading-7 text-ambedkar-900/75">{summary}</p>
+
+      {
+        meta.length > 0 && (
+          <ul class="mt-4 space-y-1 text-sm text-ambedkar-900/65">
+            {meta.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        )
+      }
+
+      <div class="mt-auto pt-6">
+        {
+          topics.length > 0 && (
+            <ul class="flex flex-wrap gap-2">
+              {topics.map((topic) => (
+                <li class="tag">{topicLabel(topic)}</li>
+              ))}
+            </ul>
+          )
+        }
+        <p
+          class="mt-5 flex items-center gap-2 text-sm font-bold tracking-[0.06em] text-ambedkar-700 uppercase group-hover:text-ambedkar-900"
+          aria-hidden="true"
+        >
+          View program
+          <span
+            class="inline-block transition-transform duration-300 group-hover:translate-x-1"
+            >&rarr;</span
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+</article>

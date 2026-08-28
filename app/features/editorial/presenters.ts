@@ -1,6 +1,6 @@
 /**
  * Turns a stored entry into the handful of strings each page prints. Keeping
- * this out of the `.astro` files means the four sections stay consistent and
+ * this out of the `.astro` files keeps the sections consistent and
  * the templates stay declarative.
  */
 import {
@@ -16,6 +16,8 @@ import {
   interventionKindLabel,
   interventionKinds,
   interventionStatusLabel,
+  programKindLabel,
+  programStatusLabel,
 } from "./taxonomy";
 
 export interface Badge {
@@ -249,6 +251,58 @@ export function conferenceDetails(conference: Conference): Detail[] {
         ? "Register and see full details"
         : "Full details and speakers",
       href: conference.data.registrationUrl,
+    });
+  }
+
+  return details;
+}
+
+// --- Programs -------------------------------------------------------------
+
+type Program = EditorialEntry<"programs">;
+
+export const programBadge = (program: Program): Badge => ({
+  label: programStatusLabel(program.data.status),
+  tone: program.data.status === "scheduled" ? "accent" : "muted",
+});
+
+export const programEyebrow = (program: Program) =>
+  `${programKindLabel(program.data.kind)} · ${formatDate(program.data.date)}`;
+
+export function programMeta(program: Program): string[] {
+  return [program.data.schedule, program.data.location].filter(
+    (value): value is string => Boolean(value),
+  );
+}
+
+export type ProgramPoster = Program["data"]["posters"][number];
+
+export function programDetails(program: Program): Detail[] {
+  const details: Detail[] = [
+    {
+      term:
+        program.data.kind === "initiative" ? "Application deadline" : "Date",
+      description: formatDate(program.data.date),
+    },
+    {
+      term: "Status",
+      description: programStatusLabel(program.data.status),
+    },
+  ];
+
+  if (program.data.schedule) {
+    details.push({ term: "Time", description: program.data.schedule });
+  }
+
+  if (program.data.location) {
+    details.push({ term: "Location", description: program.data.location });
+  }
+
+  if (program.data.status === "scheduled" && program.data.registrationUrl) {
+    details.push({
+      term: "Registration",
+      description: "Register to participate",
+      href: program.data.registrationUrl,
     });
   }
 

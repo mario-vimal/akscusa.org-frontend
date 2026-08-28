@@ -11,6 +11,8 @@ import {
   generalBodyPaperKinds,
   interventionKinds,
   interventionStatuses,
+  programKinds,
+  programStatuses,
   type TaxonomyTerm,
 } from "../../app/features/editorial/taxonomy";
 import { CMS_REPO_PLACEHOLDER } from "./repo";
@@ -149,6 +151,7 @@ describe("Sveltia CMS taxonomy options", () => {
     "press-releases",
     "interventions",
     "conferences",
+    "programs",
   ];
 
   it.each(editorialCollections)("offers every topic in %s", (name) => {
@@ -166,6 +169,24 @@ describe("Sveltia CMS taxonomy options", () => {
 
   it("offers every conference format", () => {
     expectMatches("conferences", "format", conferenceFormats);
+  });
+
+  it("keeps speaker biographies on conferences", () => {
+    const conferenceSpeakers = collection("conferences").fields?.find(
+      (field) => field.name === "speakers",
+    );
+    const interventionSpeakers = collection("interventions").fields?.find(
+      (field) => field.name === "speakers",
+    );
+
+    expect(conferenceSpeakers?.widget).toBe("relation");
+    expect(interventionSpeakers).toBeUndefined();
+    expect(collection("speakers").folder).toBe("cms/content/speakers");
+  });
+
+  it("offers every program kind and status", () => {
+    expectMatches("programs", "kind", programKinds);
+    expectMatches("programs", "status", programStatuses);
   });
 
   // `kind` sits inside the `papers` list rather than at the top level, so the

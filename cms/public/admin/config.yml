@@ -34,8 +34,8 @@ public_folder: /media
 # Only repeating, structured records belong here. Static page copy stays in
 # `app/content/pages/` and is edited in Git, not through the CMS.
 #
-# The four editorial collections below (Blog, Press Releases, Interventions,
-# Conferences) share a common set of fields — title, date, summary, topics,
+# The editorial collections below share a common set of fields — title, date,
+# summary, topics,
 # hero image, source URL, featured, draft — and each adds only what its own kind
 # of entry needs. Their option lists mirror `app/features/editorial/taxonomy.ts`,
 # and `scripts/cms/config.test.ts` fails if the two drift apart.
@@ -310,6 +310,15 @@ collections:
         multiple: true
         required: false
         options: *editorial_topics
+      - name: speakers
+        label: Speakers
+        widget: relation
+        required: false
+        multiple: true
+        collection: speakers
+        value_field: "{{slug}}"
+        search_fields: [name, role]
+        display_fields: [name, role]
       - name: resources
         label: Resources
         widget: list
@@ -330,6 +339,143 @@ collections:
       - { name: featured, label: Featured, widget: boolean, default: false }
       - { name: draft, label: Draft, widget: boolean, default: false }
       - { name: body, label: Programme, widget: markdown }
+
+  - name: speakers
+    label: Speakers
+    label_singular: Speaker
+    icon: record_voice_over
+    description: Reusable speaker biographies referenced by conferences.
+    folder: cms/content/speakers
+    create: true
+    slug: "{{slug}}"
+    sortable_fields: [name, role]
+    summary: "{{name}} — {{role}}"
+    view_filters:
+      - { label: Drafts, field: draft, pattern: true }
+    fields:
+      - { name: name, label: Name, widget: string }
+      - { name: role, label: Role, widget: string }
+      - name: bio
+        label: Biography
+        widget: text
+        hint: Separate paragraphs with a blank line.
+      - name: portrait
+        label: Portrait
+        widget: object
+        required: false
+        collapsed: true
+        fields:
+          - {
+              name: src,
+              label: R2 image URL,
+              widget: string,
+              hint: "Use the public media.akscusa.org URL after uploading the portrait to R2.",
+            }
+          - {
+              name: alt,
+              label: Alternative text,
+              widget: string,
+              hint: Describe the person and setting rather than repeating their name.,
+            }
+      - {
+          name: sourceUrl,
+          label: Original biography URL,
+          widget: string,
+          required: false,
+        }
+      - { name: draft, label: Draft, widget: boolean, default: false }
+
+  - name: programs
+    label: Programs
+    label_singular: Program
+    icon: event
+    description: Public events and longer-running initiatives, newest first.
+    folder: cms/content/programs
+    create: true
+    slug: "{{slug}}"
+    media_folder: /cms/public/media/programs
+    public_folder: /media/programs
+    sortable_fields: [date, title, kind, status]
+    view_filters:
+      - { label: Scheduled, field: status, pattern: scheduled }
+      - { label: Concluded, field: status, pattern: concluded }
+      - { label: Drafts, field: draft, pattern: true }
+    fields:
+      - { name: title, label: Title, widget: string }
+      - name: date
+        label: Date or application deadline
+        widget: datetime
+        time_format: false
+      - name: kind
+        label: Kind
+        widget: select
+        options:
+          - { label: Event, value: event }
+          - { label: Initiative, value: initiative }
+      - name: status
+        label: Status
+        widget: select
+        default: scheduled
+        options:
+          - { label: Scheduled, value: scheduled }
+          - { label: Concluded, value: concluded }
+      - {
+          name: schedule,
+          label: Time,
+          widget: string,
+          required: false,
+          hint: "Use the time and time zone shown in the announcement.",
+        }
+      - { name: location, label: Location, widget: string, required: false }
+      - name: summary
+        label: Summary
+        widget: text
+        hint: One or two sentences shown on the programs index.
+      - name: registrationUrl
+        label: Registration URL
+        widget: string
+        required: false
+        hint: Shown only while the program is scheduled.
+      - name: topics
+        label: Topics
+        widget: select
+        multiple: true
+        required: false
+        options: *editorial_topics
+      - name: resources
+        label: Resources
+        widget: list
+        required: false
+        fields: *link_fields
+      - name: posters
+        label: Posters and flyers
+        label_singular: Poster or flyer
+        widget: list
+        required: false
+        summary: "{{fields.caption}}"
+        fields:
+          - {
+              name: src,
+              label: Image,
+              widget: image,
+              hint: "Keep AKSC posters in their original colors.",
+            }
+          - {
+              name: alt,
+              label: Alternative text,
+              widget: string,
+              hint: "Describe the information and people shown in the poster.",
+            }
+          - { name: caption, label: Caption, widget: string, required: false }
+      - {
+          name: sourceUrl,
+          label: Original URL,
+          widget: string,
+          required: false,
+        }
+      - { name: featured, label: Featured, widget: boolean, default: false }
+      - { name: draft, label: Draft, widget: boolean, default: false }
+      - { name: body, label: Details, widget: markdown }
 
   - name: books
     label: Books

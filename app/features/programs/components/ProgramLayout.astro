@@ -1,0 +1,190 @@
+---
+import BackLink from "../../../components/ui/BackLink.astro";
+import Container from "../../../components/ui/Container.astro";
+import PageMasthead from "../../../components/ui/PageMasthead.astro";
+import ProseContent from "../../editorial/components/ProseContent.astro";
+import type { Badge, Detail, ProgramPoster } from "../../editorial/presenters";
+import { topicLabel, type EditorialTopic } from "../../editorial/taxonomy";
+
+interface LinkItem {
+  label: string;
+  url: string;
+}
+
+interface Props {
+  title: string;
+  summary: string;
+  badge: Badge;
+  details: readonly Detail[];
+  posters?: readonly ProgramPoster[];
+  links?: readonly LinkItem[];
+  topics?: readonly EditorialTopic[];
+  sourceUrl?: string;
+}
+
+const {
+  title,
+  summary,
+  badge,
+  details,
+  posters = [],
+  links = [],
+  topics = [],
+  sourceUrl,
+} = Astro.props;
+
+const hasPosters = posters.length > 0;
+const hasMultiplePosters = posters.length > 1;
+const badgeClasses =
+  badge.tone === "muted"
+    ? "bg-white/15 text-white ring-1 ring-white/25 ring-inset"
+    : "bg-accent-300 text-ambedkar-950";
+---
+
+<article>
+  <PageMasthead
+    eyebrow="Programs"
+    title={title}
+    description={summary}
+    size="large"
+  >
+    <BackLink slot="above" href="/programs/" tone="light">
+      Back to Programs
+    </BackLink>
+
+    <p class="mt-8">
+      <span
+        class:list={[
+          "inline-block rounded-full px-3 py-1 text-xs font-bold tracking-wide uppercase",
+          badgeClasses,
+        ]}
+      >
+        {badge.label}
+      </span>
+    </p>
+  </PageMasthead>
+
+  <Container class="pt-10 pb-20 sm:pt-14 sm:pb-28">
+    <div
+      class:list={[
+        "items-start gap-10 lg:gap-14",
+        hasPosters && "grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)]",
+      ]}
+    >
+      {
+        hasPosters && (
+          <aside
+            class:list={[
+              "grid auto-rows-max content-start items-start gap-5 lg:order-2 lg:grid-cols-1",
+              hasMultiplePosters && "sm:grid-cols-2",
+            ]}
+            aria-label="Original program posters"
+          >
+            {posters.map((poster, index) => (
+              <figure class="card h-auto p-3 sm:p-4">
+                <img
+                  class="h-auto w-full rounded-2xl"
+                  src={poster.src}
+                  alt={poster.alt}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                />
+                <figcaption class="px-2 pt-4 pb-2 text-sm leading-6 text-ambedkar-900/65">
+                  {poster.caption && <span>{poster.caption} · </span>}
+                  <a
+                    class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                    href={poster.src}
+                  >
+                    Open full-size
+                  </a>
+                </figcaption>
+              </figure>
+            ))}
+          </aside>
+        )
+      }
+
+      <div class:list={["min-w-0", hasPosters && "mt-10 lg:order-1 lg:mt-0"]}>
+        <dl class="card gap-x-8 gap-y-5 p-6 sm:grid sm:grid-cols-2 sm:p-8">
+          {
+            details.map((detail) => (
+              <div>
+                <dt class="text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase">
+                  {detail.term}
+                </dt>
+                <dd class="mt-1 leading-7 text-ambedkar-900/80">
+                  {detail.href ? (
+                    <a
+                      class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                      href={detail.href}
+                    >
+                      {detail.description}
+                    </a>
+                  ) : (
+                    detail.description
+                  )}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <div class="mt-10 sm:mt-12">
+          <ProseContent>
+            <slot />
+          </ProseContent>
+        </div>
+
+        {
+          links.length > 0 && (
+            <section class="card mt-12 p-6 sm:p-8">
+              <h2 class="font-display text-xl font-semibold tracking-[-0.01em] text-ambedkar-950">
+                Resources
+              </h2>
+              <ul class="mt-4 space-y-3">
+                {links.map((item) => (
+                  <li>
+                    <a
+                      class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                      href={item.url}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        {
+          topics.length > 0 && (
+            <section class="mt-12">
+              <h2 class="eyebrow">Topics</h2>
+              <ul class="mt-4 flex flex-wrap gap-2">
+                {topics.map((topic) => (
+                  <li class="tag px-3 py-1.5 text-sm">{topicLabel(topic)}</li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        {
+          sourceUrl && (
+            <p class="mt-10 text-sm wrap-break-word text-ambedkar-900/60">
+              Originally published at{" "}
+              <a
+                class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                href={sourceUrl}
+              >
+                {sourceUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+              </a>
+              .
+            </p>
+          )
+        }
+      </div>
+    </div>
+  </Container>
+</article>

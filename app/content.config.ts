@@ -10,6 +10,8 @@ import {
   generalBodyPaperKindIds,
   interventionKindIds,
   interventionStatusIds,
+  programKindIds,
+  programStatusIds,
 } from "./features/editorial/taxonomy";
 
 const actionSchema = z.object({
@@ -138,6 +140,18 @@ const contactPageSchema = z.object({
   socialIntro: z.string(),
 });
 
+// The organization overview is one stable page, not a stream of records. Its
+// long-form argument and FAQ stay in Markdown while the component owns the
+// page navigation and calls to action.
+const organizationPageSchema = z.object({
+  pageType: z.literal("organization"),
+  title: z.string(),
+  description: z.string(),
+  eyebrow: z.string(),
+  intro: z.string(),
+  sourceUrl: z.url(),
+});
+
 // The General Body index carries a standing argument about self-dignity ahead
 // of the meetings, migrated from the WordPress documents page. That argument is
 // one-off page copy, while the meetings below it are repeating records.
@@ -163,6 +177,7 @@ const pages = defineCollection({
     testimoniesPageSchema,
     bookReadingsPageSchema,
     contactPageSchema,
+    organizationPageSchema,
     generalBodyPageSchema,
   ]),
 });
@@ -174,6 +189,11 @@ const optionalUrl = z
   .union([z.url(), z.literal("")])
   .optional()
   .transform((value) => value || undefined);
+
+const remoteImageSchema = z.object({
+  src: z.url(),
+  alt: z.string(),
+});
 
 // Editorial records share one shape so the blog, press releases, interventions,
 // and conferences can be listed, sorted, and cross-referenced by the same code.
@@ -189,12 +209,7 @@ const editorialBase = {
    * Absolute URL of a hero image. Editorial media lives outside Git, so this
    * points at the media host rather than a repository path.
    */
-  heroImage: z
-    .object({
-      src: z.url(),
-      alt: z.string(),
-    })
-    .optional(),
+  heroImage: remoteImageSchema.optional(),
   /** Where this entry was first published, kept so migrated copy is traceable. */
   sourceUrl: optionalUrl,
   featured: z.boolean().default(false),
@@ -339,6 +354,73 @@ const conferences = defineCollection({
     format: z.enum(conferenceFormatIds),
     theme: z.string().optional(),
     registrationUrl: optionalUrl,
+    speakers: z
+      .array(
+        z
+          .string()
+          .regex(
+            /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+            "Must be a lowercase kebab-case speaker slug.",
+          ),
+      )
+      .default([])
+      .refine(
+        (ids) => new Set(ids).size === ids.length,
+        "A conference cannot list the same speaker twice.",
+      ),
+    resources: z.array(linkSchema).default([]),
+  }),
+});
+
+// A speaker may appear at several conferences, so biographies are stored once
+// and conferences reference them by stable slug. They have no standalone route:
+// the conference remains the context in which a biography is presented.
+const speakers = defineCollection({
+  loader: glob({
+    base: "./cms/content/speakers",
+    pattern: "**/*.md",
+  }),
+  schema: z.object({
+    name: z.string(),
+    role: z.string(),
+    /** Paragraphs are separated by blank lines in the CMS text field. */
+    bio: z.string(),
+    portrait: remoteImageSchema.optional(),
+    sourceUrl: optionalUrl,
+    draft: z.boolean().default(false),
+  }),
+});
+
+// Programs are repeating public events and initiatives. New programs are
+// announced over time and organisers need to publish them without a developer,
+// so they belong in the CMS rather than in one-off page copy.
+const programs = defineCollection({
+  loader: glob({
+    base: "./cms/content/programs",
+    pattern: "**/*.md",
+  }),
+  schema: z.object({
+    ...editorialBase,
+    kind: z.enum(programKindIds),
+    status: z.enum(programStatusIds),
+    /** Time or range as published, retained separately from the calendar day. */
+    schedule: z.string().optional(),
+    location: z.string().optional(),
+    registrationUrl: optionalUrl,
+    posters: z
+      .array(
+        z.object({
+          src: z
+            .string()
+            .regex(
+              /^\/media\/programs\/[a-z0-9-]+\.jpg$/,
+              "Must be a lowercase kebab-case JPG under /media/programs/.",
+            ),
+          alt: z.string().min(1),
+          caption: z.string().optional(),
+        }),
+      )
+      .default([]),
     resources: z.array(linkSchema).default([]),
   }),
 });
@@ -401,5 +483,7 @@ export const collections = {
   pressReleases,
   interventions,
   conferences,
+  speakers,
+  programs,
   generalBodyMeetings,
 };

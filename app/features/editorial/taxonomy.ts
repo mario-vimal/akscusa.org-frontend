@@ -1,6 +1,5 @@
 /**
- * Shared vocabulary for the three editorial collections: articles (the blog),
- * press releases, and interventions.
+ * Shared vocabulary for the editorial collections.
  *
  * Every list here is the single source of truth. `app/content.config.ts` turns
  * these into Zod enums, the pages render the labels, and the matching Sveltia
@@ -201,6 +200,35 @@ export const conferenceFormats = [
   },
 ] as const satisfies readonly TaxonomyTerm[];
 
+/** Whether a program is a public event or a longer-running initiative. */
+export const programKinds = [
+  {
+    id: "event",
+    label: "Event",
+    description: "A gathering held on a particular date.",
+  },
+  {
+    id: "initiative",
+    label: "Initiative",
+    description:
+      "A program that recruits or works with participants over time.",
+  },
+] as const satisfies readonly TaxonomyTerm[];
+
+/** Whether a program is still ahead or retained as an archive. */
+export const programStatuses = [
+  {
+    id: "scheduled",
+    label: "Scheduled",
+    description: "Announced and still open for attendance or participation.",
+  },
+  {
+    id: "concluded",
+    label: "Concluded",
+    description: "Finished, kept as a record of the program.",
+  },
+] as const satisfies readonly TaxonomyTerm[];
+
 type Ids<T extends readonly TaxonomyTerm[]> = T[number]["id"];
 
 export type EditorialTopic = Ids<typeof editorialTopics>;
@@ -208,6 +236,8 @@ export type ArticleCategory = Ids<typeof articleCategories>;
 export type InterventionKind = Ids<typeof interventionKinds>;
 export type InterventionStatus = Ids<typeof interventionStatuses>;
 export type ConferenceFormat = Ids<typeof conferenceFormats>;
+export type ProgramKind = Ids<typeof programKinds>;
+export type ProgramStatus = Ids<typeof programStatuses>;
 export type GeneralBodyPaperKind = Ids<typeof generalBodyPaperKinds>;
 
 /**
@@ -222,6 +252,8 @@ export const articleCategoryIds = idsOf(articleCategories);
 export const interventionKindIds = idsOf(interventionKinds);
 export const interventionStatusIds = idsOf(interventionStatuses);
 export const conferenceFormatIds = idsOf(conferenceFormats);
+export const programKindIds = idsOf(programKinds);
+export const programStatusIds = idsOf(programStatuses);
 export const generalBodyPaperKindIds = idsOf(generalBodyPaperKinds);
 
 const labelLookup = (terms: readonly TaxonomyTerm[]) =>
@@ -232,6 +264,8 @@ const categoryLabels = labelLookup(articleCategories);
 const kindLabels = labelLookup(interventionKinds);
 const statusLabels = labelLookup(interventionStatuses);
 const formatLabels = labelLookup(conferenceFormats);
+const programKindLabels = labelLookup(programKinds);
+const programStatusLabels = labelLookup(programStatuses);
 const generalBodyPaperKindLabels = labelLookup(generalBodyPaperKinds);
 
 export const topicLabel = (id: EditorialTopic) => topicLabels.get(id) ?? id;
@@ -243,5 +277,9 @@ export const interventionStatusLabel = (id: InterventionStatus) =>
   statusLabels.get(id) ?? id;
 export const conferenceFormatLabel = (id: ConferenceFormat) =>
   formatLabels.get(id) ?? id;
+export const programKindLabel = (id: ProgramKind) =>
+  programKindLabels.get(id) ?? id;
+export const programStatusLabel = (id: ProgramStatus) =>
+  programStatusLabels.get(id) ?? id;
 export const generalBodyPaperKindLabel = (id: GeneralBodyPaperKind) =>
   generalBodyPaperKindLabels.get(id) ?? id;

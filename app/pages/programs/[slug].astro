@@ -1,0 +1,38 @@
+---
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+
+import { loadEditorialEntries } from "../../features/editorial/entries";
+import {
+  programBadge,
+  programDetails,
+} from "../../features/editorial/presenters";
+import ProgramLayout from "../../features/programs/components/ProgramLayout.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export const getStaticPaths = (async () => {
+  const programs = await loadEditorialEntries("programs");
+  return programs.map((program) => ({
+    params: { slug: program.id },
+    props: { program },
+  }));
+}) satisfies GetStaticPaths;
+
+const { program } = Astro.props;
+const { Content } = await render(program);
+---
+
+<SiteLayout title={program.data.title} description={program.data.summary}>
+  <ProgramLayout
+    title={program.data.title}
+    summary={program.data.summary}
+    badge={programBadge(program)}
+    details={programDetails(program)}
+    posters={program.data.posters}
+    links={program.data.resources}
+    topics={program.data.topics}
+    sourceUrl={program.data.sourceUrl}
+  >
+    <Content />
+  </ProgramLayout>
+</SiteLayout>

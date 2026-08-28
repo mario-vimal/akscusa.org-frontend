@@ -29,6 +29,10 @@ export const primaryNavigation = [
     href: "/conferences",
   },
   {
+    label: "Programs",
+    href: "/programs",
+  },
+  {
     label: "Organization",
     href: "/organization",
   },

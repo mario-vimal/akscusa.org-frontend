@@ -2,6 +2,8 @@
 import type { GetStaticPaths } from "astro";
 import { render } from "astro:content";
 
+import ConferenceSpeakers from "../../features/conferences/components/ConferenceSpeakers.astro";
+import { loadConferenceSpeakers } from "../../features/conferences/queries/speakers";
 import EntryLayout from "../../features/editorial/components/EntryLayout.astro";
 import { loadEditorialEntries } from "../../features/editorial/entries";
 import {
@@ -20,6 +22,7 @@ export const getStaticPaths = (async () => {
 
 const { conference } = Astro.props;
 const { Content } = await render(conference);
+const speakers = await loadConferenceSpeakers(conference);
 ---
 
 <SiteLayout title={conference.data.title} description={conference.data.summary}>
@@ -34,6 +37,10 @@ const { Content } = await render(conference);
     heroImage={conference.data.heroImage}
     sourceUrl={conference.data.sourceUrl}
   >
+    <ConferenceSpeakers
+      slot="before-body"
+      speakers={speakers.map((speaker) => speaker.data)}
+    />
     <Content />
   </EntryLayout>
 </SiteLayout>

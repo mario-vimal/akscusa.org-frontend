@@ -1,15 +1,16 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
 /**
- * The five collections that share the editorial base schema. They are listed,
+ * The six collections that share the editorial base schema. They are listed,
  * sorted, and linked by the same code, so a change to one section's chrome
- * lands on all five.
+ * lands on all six.
  */
 export type EditorialCollection =
   | "articles"
   | "pressReleases"
   | "interventions"
   | "conferences"
+  | "programs"
   | "bookReadings";
 
 export type EditorialEntry<
@@ -63,6 +64,15 @@ export const editorialSections = {
     description:
       "Programmes, speakers, and resolutions from the AKSC annual conference, held every year since 2018.",
     empty: "No conferences have been published yet.",
+  },
+  programs: {
+    path: "/programs",
+    label: "Programs",
+    eyebrow: "Learn and gather",
+    title: "Programs",
+    description:
+      "Public events and initiatives through which AKSC studies anti-caste thought, develops young leaders, and gathers the community.",
+    empty: "No programs have been published yet.",
   },
   bookReadings: {
     path: "/book-readings",

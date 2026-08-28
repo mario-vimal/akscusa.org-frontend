@@ -10,10 +10,12 @@
    * the two is what marks a heading as a heading rather than size alone.
    */
   --font-sans:
-    "Cabin Variable", Cabin, "Segoe UI", Helvetica, Arial, sans-serif;
+    "Cabin Variable", Cabin, "Segoe UI", "Apple Color Emoji", "Segoe UI Emoji",
+    "Noto Color Emoji", Helvetica, Arial, sans-serif;
   --font-display:
     "Source Serif 4 Variable", "Source Serif 4", "Iowan Old Style", Georgia,
-    "Times New Roman", serif;
+    "Times New Roman", "Apple Color Emoji", "Segoe UI Emoji",
+    "Noto Color Emoji", serif;
 
   --color-ambedkar-50: #f2f7fd;
   --color-ambedkar-100: #e4eef9;

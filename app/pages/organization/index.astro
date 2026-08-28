@@ -1,11 +1,20 @@
 ---
+import { getEntry, render } from "astro:content";
+
 import OrganizationOverview from "../../features/organization/components/OrganizationOverview.astro";
 import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const page = await getEntry("pages", "organization");
+
+if (!page || page.data.pageType !== "organization") {
+  throw new Error("Organization content is missing or invalid.");
+}
+
+const { Content } = await render(page);
 ---
 
-<SiteLayout
-  title="Organization"
-  description="The mission, history, leadership, and chapters of AKSC USA."
->
-  <OrganizationOverview />
+<SiteLayout title={page.data.title} description={page.data.description}>
+  <OrganizationOverview {...page.data}>
+    <Content />
+  </OrganizationOverview>
 </SiteLayout>

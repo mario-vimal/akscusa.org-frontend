@@ -1,0 +1,43 @@
+---
+import EditorialIndex from "../../editorial/components/EditorialIndex.astro";
+import {
+  editorialSections,
+  entryHref,
+  loadEditorialEntries,
+} from "../../editorial/entries";
+import {
+  programBadge,
+  programEyebrow,
+  programMeta,
+} from "../../editorial/presenters";
+import ProgramCard from "./ProgramCard.astro";
+
+const section = editorialSections.programs;
+const programs = await loadEditorialEntries("programs");
+---
+
+<EditorialIndex
+  eyebrow={section.eyebrow}
+  title={section.title}
+  description={section.description}
+  count={`${programs.length} ${programs.length === 1 ? "program" : "programs"}`}
+  empty={section.empty}
+  isEmpty={programs.length === 0}
+>
+  {
+    programs.map((program) => (
+      <li>
+        <ProgramCard
+          href={entryHref("programs", program.id)}
+          title={program.data.title}
+          summary={program.data.summary}
+          eyebrow={programEyebrow(program)}
+          badge={programBadge(program)}
+          meta={programMeta(program)}
+          topics={program.data.topics}
+          poster={program.data.posters[0]}
+        />
+      </li>
+    ))
+  }
+</EditorialIndex>

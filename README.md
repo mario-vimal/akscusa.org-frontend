@@ -86,27 +86,29 @@ temporary working document; delete it once both sites are retired.
 
 ## Editorial collections
 
-Five CMS collections share one base shape, defined once in
+Six CMS collections share one base shape, defined once in
 `app/content.config.ts` and reused by each: `title`, `date`, `summary`,
 `topics`, `heroImage`, `sourceUrl`, `featured`, and `draft`. Each then adds only
 the fields its own kind of entry needs.
 
-| Collection      | Folder                       | Route             | Adds                                                             |
-| --------------- | ---------------------------- | ----------------- | ---------------------------------------------------------------- |
-| `articles`      | `cms/content/articles`       | `/blog`           | `category`, `authors`                                            |
-| `pressReleases` | `cms/content/press-releases` | `/press-releases` | `dateline`, `issuedBy`, `contactEmail`, `attachments`            |
-| `interventions` | `cms/content/interventions`  | `/interventions`  | `kind`, `status`, `concludedDate`, `outcome`, `resources`        |
-| `conferences`   | `cms/content/conferences`    | `/conferences`    | `edition`, `endDate`, `location`, `format`, `theme`, `resources` |
-| `bookReadings`  | `cms/content/book-readings`  | `/book-readings`  | `location`, `isbn`, `participants`, `registrationUrl`            |
+| Collection      | Folder                       | Route             | Adds                                                      |
+| --------------- | ---------------------------- | ----------------- | --------------------------------------------------------- |
+| `articles`      | `cms/content/articles`       | `/blog`           | `category`, `authors`                                     |
+| `pressReleases` | `cms/content/press-releases` | `/press-releases` | `dateline`, `issuedBy`, `contactEmail`, `attachments`     |
+| `interventions` | `cms/content/interventions`  | `/interventions`  | `kind`, `status`, `concludedDate`, `outcome`, `resources` |
+| `conferences`   | `cms/content/conferences`    | `/conferences`    | `edition`, `location`, `format`, speaker references       |
+| `programs`      | `cms/content/programs`       | `/programs`       | `kind`, `status`, `schedule`, `location`, `posters`       |
+| `bookReadings`  | `cms/content/book-readings`  | `/book-readings`  | `location`, `isbn`, `participants`, `registrationUrl`     |
 
 `app/features/editorial/taxonomy.ts` is the single source of truth for every
 controlled vocabulary: shared `topics`, article categories, intervention kinds
-and statuses, and conference formats. `app/content.config.ts` turns those lists
-into Zod enums and the pages render their labels. The CMS cannot import
+and statuses, conference formats, and program kinds and statuses.
+`app/content.config.ts` turns those lists into Zod enums and the pages render
+their labels. The CMS cannot import
 TypeScript, so `cms/public/admin/config.yml` repeats the options in YAML and
 `scripts/cms/config.test.ts` fails if the two drift apart.
 
-`topics` is shared across all five collections, so an article, a statement, and
+`topics` is shared across all six collections, so an article, a statement, and
 a campaign about the same subject stay relatable without duplicating an entry.
 
 Each section has an index at its route and an entry page at
@@ -115,13 +117,22 @@ cards, since the archive grows steadily. Articles are also browsable by category
 `/blog/category/<category>/` and interventions by kind at
 `/interventions/kind/<kind>/`; only terms that have entries get a page.
 `app/features/editorial/` holds the shared list, card, and entry components, so
-a change to one section's chrome lands on all five.
+a change to one section's chrome lands on all six.
 
 Entries marked `draft` are visible in `npm run dev` and left out of the build.
 
+### Speakers, shared across conferences
+
+Speaker biographies live once in `cms/content/speakers/` and have no standalone
+route. A conference stores an ordered list of stable speaker slugs; its page
+resolves and presents those biographies in the conference context. Missing,
+draft, or misspelled references fail the build rather than silently dropping a
+speaker. Portraits are optional R2 URLs, so the same biography and image can be
+reused by future conferences without copying either.
+
 ### Books, linked by ISBN
 
-`books` is the one collection outside that base shape, because a book has no
+`books` is another collection outside that base shape, because a book has no
 publication date of its own here and never appears in a dated index. It lives in
 `cms/content/books` and is served at `/books/` and `/books/<slug>/`.
 

@@ -1,0 +1,11 @@
+---
+import ProgramsOverview from "../../features/programs/components/ProgramsOverview.astro";
+import { editorialSections } from "../../features/editorial/entries";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const section = editorialSections.programs;
+---
+
+<SiteLayout title={section.title} description={section.description}>
+  <ProgramsOverview />
+</SiteLayout>
