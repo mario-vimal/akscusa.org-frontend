@@ -170,6 +170,51 @@ flat padding Open Library adds to some images, and are matched to a book by
 filename. A book with no cover file renders without one, so nothing breaks when
 Open Library has nothing for an ISBN.
 
+### Comics and toolkit scenarios, published as panels
+
+`comics` and `toolkitScenarios` are the two drawn collections. Neither takes the
+editorial base shape: a comic has no body copy, and a scenario is not dated at
+all. Both are a titled sequence of panels, so they share one panel shape defined
+once in `app/content.config.ts`.
+
+| Collection         | Folder                          | Route                 | Ordered by              |
+| ------------------ | ------------------------------- | --------------------- | ----------------------- |
+| `comics`           | `cms/content/comics`            | `/comics`             | `date`, newest first    |
+| `toolkitScenarios` | `cms/content/toolkit-scenarios` | `/anti-caste-toolkit` | `order`, counted from 1 |
+
+A scenario is ordered by hand rather than by date, because a playbook is read in
+the sequence its authors chose. Scenarios have no route of their own: a four
+panel scene is not worth a click, so they are sections of the toolkit page.
+
+Every panel carries **two** descriptions, and they are not interchangeable:
+
+- `alt` describes the drawing — who is in it, where they are, what they are
+  doing.
+- `transcript` is every word drawn inside the panel, in reading order, one line
+  per bubble, with `Speaker: line` naming who is talking.
+
+A comic bakes its argument into a picture. Without a transcript none of that
+argument reaches a screen reader, a translation, or a search result; and
+repeating the lettering inside `alt` would have a screen reader announce it
+twice. `app/features/artwork/` holds the shared panel machinery: the transcript
+parser, the build-time size reader, and `PanelSequence.astro`, which renders a
+sequence with numbered anchors, per-panel transcripts, and a full-screen viewer
+with keyboard paging. Transcripts are `details` elements and work with no
+JavaScript; the viewer's controls stay hidden until the script that gives them
+meaning has run.
+
+Panels are committed under `cms/public/media/comics/` and
+`cms/public/media/anti-caste-toolkit/` and served from `/media/`, so a published
+comic is a file this site serves. Astro never sees them as an import and so
+cannot supply their dimensions, which `app/features/artwork/panels.ts` reads off
+each committed file at build time; a page of 37 images would otherwise reflow as
+each one arrives.
+
+`scripts/content/artwork.test.ts` fails the build on a panel with no
+description, on a panel that is referenced but not committed, on an uploaded
+panel that nothing references, and on a comic with no credit. Publishing other
+artists' work is the point of the collection, so an uncredited comic is a bug.
+
 `cms/content/` is in `.prettierignore`. Sveltia writes those files when an
 editor saves, and it does not format them the way Prettier would, so checking
 them would fail every pull request the CMS opens.

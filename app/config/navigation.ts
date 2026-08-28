@@ -33,6 +33,10 @@ export const primaryNavigation = [
     href: "/programs",
   },
   {
+    label: "Comics",
+    href: "/comics",
+  },
+  {
     label: "Organization",
     href: "/organization",
   },
@@ -58,9 +62,15 @@ export const helplineNavigation = {
 /**
  * Pages that belong in the footer rather than the header. The primary bar is
  * already full at the desktop breakpoint, and these are pages a reader looks
- * for deliberately rather than browses.
+ * for deliberately rather than browses. The toolkit is reached from the comics
+ * and from the testimonies as well, because both readers arrive at it wanting
+ * the same thing: something to say next time.
  */
 export const secondaryNavigation = [
+  {
+    label: "Anti-caste Toolkit",
+    href: "/anti-caste-toolkit",
+  },
   {
     label: "General Body",
     href: "/organization/general-body",

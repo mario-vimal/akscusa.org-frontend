@@ -1,0 +1,173 @@
+---
+import PanelSequence from "../../artwork/components/PanelSequence.astro";
+import type { SizedPanel } from "../../artwork/panels";
+
+interface Props {
+  /** Position in the playbook, printed so scenarios can be referred to. */
+  number: number;
+  id: string;
+  title: string;
+  setting: string;
+  summary: string;
+  /** The question put to the reader once they have read the scenario. */
+  prompt: string;
+  panels: readonly SizedPanel[];
+  form: { label: string; href: string };
+  credits: readonly { name: string; role?: string; url?: string }[];
+}
+
+const { number, id, title, setting, summary, prompt, panels, form, credits } =
+  Astro.props;
+
+const paddedNumber = String(number).padStart(2, "0");
+---
+
+<!--
+  One scenario in the playbook. It is a section rather than a page of its own:
+  the whole point is to read the situations one after another and recognise
+  them, and a four panel scene is not worth a click.
+-->
+<section class="scenario" id={id} aria-labelledby={`${id}-title`}>
+  <header class="scenario__header">
+    <p class="scenario__number" aria-hidden="true">{paddedNumber}</p>
+    <div>
+      <p class="eyebrow">{setting}</p>
+      <h3 class="scenario__title" id={`${id}-title`}>{title}</h3>
+      <p class="scenario__summary">{summary}</p>
+    </div>
+  </header>
+
+  <div class="mt-9">
+    <PanelSequence
+      panels={panels}
+      label={title}
+      id={`${id}-panels`}
+      layout="grid"
+      unit="Panel"
+      tone="light"
+    />
+  </div>
+
+  {
+    credits.length > 0 && (
+      <p class="mt-6 text-sm text-ambedkar-900/70">
+        Illustrations:{" "}
+        {credits.map((credit, index) => (
+          <>
+            {index > 0 && <span aria-hidden="true"> · </span>}
+            {credit.url ? (
+              <a
+                class="link-underline font-semibold"
+                href={credit.url}
+                rel="noopener"
+              >
+                {credit.name}
+              </a>
+            ) : (
+              <span class="font-semibold">{credit.name}</span>
+            )}
+          </>
+        ))}
+      </p>
+    )
+  }
+
+  <!--
+    Every scenario ends in the same place: the question, and the form that
+    collects the answer. The playbook is being written out of these replies, so
+    the ask is repeated rather than saved for the bottom of the page.
+  -->
+  <div class="scenario__prompt">
+    <p class="eyebrow">Your turn</p>
+    <p class="scenario__question">{prompt}</p>
+    <a class="btn btn-ink mt-6" href={form.href} rel="noopener">
+      {form.label}
+    </a>
+  </div>
+</section>
+
+<style>
+  .scenario {
+    scroll-margin-top: 6rem;
+  }
+
+  .scenario__header {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .scenario__number {
+    font-family: var(--font-display);
+    font-size: 2.75rem;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: color-mix(in srgb, var(--color-ambedkar-900) 22%, transparent);
+  }
+
+  .scenario__title {
+    margin-top: 0.75rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.625rem, 3.5vw, 2.125rem);
+    font-weight: 600;
+    line-height: 1.18;
+    letter-spacing: -0.015em;
+    color: var(--color-ambedkar-950);
+    text-wrap: balance;
+  }
+
+  .scenario__summary {
+    margin-top: 0.875rem;
+    max-width: 44rem;
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: color-mix(in srgb, var(--color-ambedkar-900) 75%, transparent);
+  }
+
+  @media (width >= 48rem) {
+    .scenario__header {
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 1.75rem;
+      align-items: start;
+    }
+
+    .scenario__number {
+      font-size: 4rem;
+    }
+
+    .scenario__title {
+      margin-top: 0.625rem;
+    }
+  }
+
+  .scenario__prompt {
+    margin-top: 2.5rem;
+    border: 1px solid
+      color-mix(in srgb, var(--color-accent-800) 18%, transparent);
+    border-radius: 1.5rem;
+    background: linear-gradient(
+      135deg,
+      var(--color-accent-50),
+      color-mix(in srgb, var(--color-mist) 70%, #fff) 70%
+    );
+    padding: 1.75rem;
+  }
+
+  .scenario__question {
+    margin-top: 0.875rem;
+    max-width: 40rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2.5vw, 1.625rem);
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    color: var(--color-ambedkar-950);
+    text-wrap: pretty;
+  }
+
+  @media (width >= 40rem) {
+    .scenario__prompt {
+      padding: 2.25rem 2.5rem;
+    }
+  }
+</style>

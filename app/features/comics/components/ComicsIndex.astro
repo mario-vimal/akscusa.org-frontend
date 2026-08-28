@@ -1,0 +1,83 @@
+---
+import Container from "../../../components/ui/Container.astro";
+import PageMasthead from "../../../components/ui/PageMasthead.astro";
+import ContributeCallout from "../../artwork/components/ContributeCallout.astro";
+import type { SizedPanel } from "../../artwork/panels";
+import ProseContent from "../../editorial/components/ProseContent.astro";
+import ComicCard from "./ComicCard.astro";
+
+interface Action {
+  label: string;
+  href: string;
+}
+
+export interface ComicSummary {
+  href: string;
+  title: string;
+  summary: string;
+  /** The comic's title panel, used as its cover. */
+  cover: SizedPanel;
+  credit: string;
+  panelCount: string;
+  contentNote?: string;
+}
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  intro: string;
+  comics: readonly ComicSummary[];
+  totalPanels: number;
+  contribute: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    steps: readonly string[];
+    primaryAction: Action;
+    secondaryAction?: Action;
+    note?: string;
+  };
+}
+
+const { eyebrow, title, intro, comics, totalPanels, contribute } = Astro.props;
+
+const meta =
+  comics.length === 0
+    ? undefined
+    : `${comics.length} ${comics.length === 1 ? "comic" : "comics"} · ${totalPanels} panels`;
+---
+
+<section>
+  <PageMasthead
+    eyebrow={eyebrow}
+    title={title}
+    description={intro}
+    meta={meta}
+    size="large"
+  />
+
+  <Container class="pt-14 pb-20 sm:pt-16 sm:pb-28">
+    <!-- How to read the comics, and where they came from. -->
+    <ProseContent>
+      <slot />
+    </ProseContent>
+
+    {
+      comics.length === 0 ? (
+        <p class="card mt-12 max-w-2xl px-6 py-8 leading-7 text-ambedkar-900/75">
+          The first comics are being drawn. Please check back soon.
+        </p>
+      ) : (
+        <ul class="reveal-children mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {comics.map((comic) => (
+            <li>
+              <ComicCard {...comic} />
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <ContributeCallout class="mt-16 sm:mt-20" {...contribute} />
+  </Container>
+</section>

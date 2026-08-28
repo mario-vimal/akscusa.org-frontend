@@ -17,8 +17,8 @@ Last reconciled: **2026-08-28**
 | WordPress — to migrate                     | 0      |
 | WordPress — not migrating                  | 13     |
 | **WordPress total**                        | **92** |
-| Squarespace — migrated                     | 6      |
-| Squarespace — to migrate                   | 2      |
+| Squarespace — migrated                     | 8      |
+| Squarespace — to migrate                   | 0      |
 | Squarespace — needs a decision             | 9      |
 
 **79 of 92** WordPress URLs are migrated (86%). The other **13** are documented
@@ -135,39 +135,39 @@ None.
 
 `akscusa.squarespace.com` is a partial rebuild. Most of it is either empty or unedited Squarespace starter content, but it is the **only** source for the 2026 conference, the 2025 speaker biographies, the anti-caste toolkit, and the comics.
 
-| Status          | Priority | Source path                                  | Title                                            | Notes                                                                                                                                                                                                                          |
-| --------------- | -------- | -------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Migrated        | —        | `/conf-26`                                   | Annual Conference 2026                           | Migrated to `/conferences/aksc-7th-annual-conference-2026/`; the incorrect 2025 checkout link is not reproduced.                                                                                                               |
-| Migrated        | —        | `/annual-conference-2025`                    | Annual Conference 2025                           | Narrative, schedule, poster-session call, and speaker biographies are in `/conferences/aksc-6th-annual-conference-2025/`.                                                                                                      |
-| Migrated        | —        | `/conf-speaker-annapurna-waughray`           | Speaker: Annapurna Waughray                      | Stored in the reusable speakers collection and rendered on `/conferences/aksc-6th-annual-conference-2025/`.                                                                                                                    |
-| Migrated        | —        | `/conf-speaker-prachi-patankar`              | Speaker: Prachi Patankar                         | Stored in the reusable speakers collection and rendered on `/conferences/aksc-6th-annual-conference-2025/`.                                                                                                                    |
-| Migrated        | —        | `/conf-speaker-sandy-perry`                  | Speaker: Sandy Perry                             | Stored in the reusable speakers collection and rendered on `/conferences/aksc-6th-annual-conference-2025/`.                                                                                                                    |
-| Migrated        | —        | `/conf-speaker-roja-singh`                   | Speaker: Roja Singh                              | Stored in the reusable speakers collection and rendered on `/conferences/aksc-6th-annual-conference-2025/`.                                                                                                                    |
-| To migrate      | High     | `/anti-caste-toolkit`                        | Anti-caste Toolkit                               | Recently enabled. “Beyond the Freeze Response” playbook: 3 illustrated scenarios (12 images) plus a Google Form for contributions. Original content, not on WordPress. Needs a carefully designed page.                        |
-| To migrate      | High     | `/comics`                                    | AKSC Comics                                      | Recently enabled, replacing /new-page. Four comic series (62 images): teaching caste in classrooms, does caste exist in the US today, caste has a cost, and the Gail comic. Original content. Needs a carefully designed page. |
-| Decide          | Medium   | `/store`                                     | Store                                            | Sells conference and Jayanthi tickets. Order records belong in D1, not in content. The 2026 conference ticket is on sale but is not in the sitemap yet.                                                                        |
-| Decide          | Low      | `/store/p/aksc-annual-conference-2025`       | Product: AKSC Annual Conference 2025             | Sold out; keep only if the store is rebuilt.                                                                                                                                                                                   |
-| Decide          | Low      | `/store/p/aksc-annual-conference-2025-lp4a4` | Product: AKSC Annual Conference 2025 (duplicate) | Still titled as a 2025 product but linked by the 2026 conference registration button; do not reproduce that misleading checkout link.                                                                                          |
-| Decide          | Low      | `/store/p/ambedkar-jayanthi-2026`            | Product: Ambedkar Jayanthi 2026                  | Sold out.                                                                                                                                                                                                                      |
-| Already covered | —        | `/helpline`                                  | Helpline                                         | The WordPress version is the source for /anti-caste-helpline/; compare wording before discarding.                                                                                                                              |
-| Already covered | —        | `/home`                                      | Home                                             | Same slogan and framing as the built home page.                                                                                                                                                                                |
-| Reference only  | Low      | `/book-readings`                             | Book Readings                                    | Two sentences of intro; the WordPress reading pages are the real source.                                                                                                                                                       |
-| Already covered | —        | `/press-releases`                            | Press Releases                                   | Index only, and shorter than the WordPress version already migrated.                                                                                                                                                           |
-| Reference only  | Low      | `/events`                                    | Events                                           | Lists only Squarespace demo events.                                                                                                                                                                                            |
-| Skip            | —        | `/ourmission`                                | Our Mission                                      | Squarespace starter copy (“It all begins with an idea”).                                                                                                                                                                       |
-| Skip            | —        | `/membership`                                | Membership                                       | Squarespace starter copy; the WordPress page is the real source.                                                                                                                                                               |
-| Skip            | —        | `/interventions`                             | Interventions                                    | Empty placeholder.                                                                                                                                                                                                             |
-| Skip            | —        | `/programs`                                  | Programs                                         | Empty placeholder.                                                                                                                                                                                                             |
-| Skip            | —        | `/organization`                              | Organization                                     | Empty placeholder.                                                                                                                                                                                                             |
-| Skip            | —        | `/constitution`                              | Constitution                                     | Empty placeholder.                                                                                                                                                                                                             |
-| Skip            | —        | `/constitution-1`                            | Constitution (duplicate)                         | Empty duplicate.                                                                                                                                                                                                               |
-| Watch           | Low      | `/legal-cases`                               | Legal Cases                                      | Empty today, but the title suggests planned content worth checking again.                                                                                                                                                      |
-| Watch           | Low      | `/articles-to-read`                          | Articles to read                                 | Empty today; may duplicate /interventions/deep-dive-caste-litigation-in-the-usa/.                                                                                                                                              |
-| Watch           | Low      | `/recommended-books`                         | Recommended Books                                | Empty today; would suit the book-readings collection.                                                                                                                                                                          |
-| Watch           | Low      | `/resources-1`                               | Resources                                        | Empty today.                                                                                                                                                                                                                   |
-| Watch           | Low      | `/newsletter`                                | Newsletter                                       | Empty today; signup would need a mailing provider.                                                                                                                                                                             |
-| Skip            | —        | `/blog-3-1`                                  | Blog 3                                           | Squarespace demo blog with placeholder posts.                                                                                                                                                                                  |
-| Skip            | —        | `/blog-3-2`                                  | Blog 3 (duplicate)                               | Squarespace demo blog with placeholder posts.                                                                                                                                                                                  |
+| Status          | Priority | Source path                                  | Title                                            | Notes                                                                                                                                                                                                                    |
+| --------------- | -------- | -------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Migrated        | —        | `/conf-26`                                   | Annual Conference 2026                           | Migrated to `/conferences/aksc-7th-annual-conference-2026/`; the incorrect 2025 checkout link is not reproduced.                                                                                                         |
+| Migrated        | —        | `/annual-conference-2025`                    | Annual Conference 2025                           | Narrative, schedule, poster-session call, and speaker biographies are in `/conferences/aksc-6th-annual-conference-2025/`.                                                                                                |
+| Migrated        | —        | `/conf-speaker-annapurna-waughray`           | Speaker: Annapurna Waughray                      | Stored in the reusable speakers collection and rendered on `/conferences/aksc-6th-annual-conference-2025/`.                                                                                                              |
+| Migrated        | —        | `/conf-speaker-prachi-patankar`              | Speaker: Prachi Patankar                         | Stored in the reusable speakers collection and rendered on `/conferences/aksc-6th-annual-conference-2025/`.                                                                                                              |
+| Migrated        | —        | `/conf-speaker-sandy-perry`                  | Speaker: Sandy Perry                             | Stored in the reusable speakers collection and rendered on `/conferences/aksc-6th-annual-conference-2025/`.                                                                                                              |
+| Migrated        | —        | `/conf-speaker-roja-singh`                   | Speaker: Roja Singh                              | Stored in the reusable speakers collection and rendered on `/conferences/aksc-6th-annual-conference-2025/`.                                                                                                              |
+| Migrated        | —        | `/anti-caste-toolkit`                        | Anti-caste Toolkit                               | Migrated to `/anti-caste-toolkit/`. The argument is static copy in `app/content/pages/`; the three illustrated scenarios are a `toolkitScenarios` collection. The Google Form is preserved as the call to action.        |
+| Migrated        | —        | `/comics`                                    | AKSC Comics                                      | Migrated to `/comics/` and `/comics/<slug>/`. The two Squarespace carousels are two comics, 21 and 37 panels, in a `comics` collection. Alt text and transcripts were written for all 58 panels; the source had neither. |
+| Decide          | Medium   | `/store`                                     | Store                                            | Sells conference and Jayanthi tickets. Order records belong in D1, not in content. The 2026 conference ticket is on sale but is not in the sitemap yet.                                                                  |
+| Decide          | Low      | `/store/p/aksc-annual-conference-2025`       | Product: AKSC Annual Conference 2025             | Sold out; keep only if the store is rebuilt.                                                                                                                                                                             |
+| Decide          | Low      | `/store/p/aksc-annual-conference-2025-lp4a4` | Product: AKSC Annual Conference 2025 (duplicate) | Still titled as a 2025 product but linked by the 2026 conference registration button; do not reproduce that misleading checkout link.                                                                                    |
+| Decide          | Low      | `/store/p/ambedkar-jayanthi-2026`            | Product: Ambedkar Jayanthi 2026                  | Sold out.                                                                                                                                                                                                                |
+| Already covered | —        | `/helpline`                                  | Helpline                                         | The WordPress version is the source for /anti-caste-helpline/; compare wording before discarding.                                                                                                                        |
+| Already covered | —        | `/home`                                      | Home                                             | Same slogan and framing as the built home page.                                                                                                                                                                          |
+| Reference only  | Low      | `/book-readings`                             | Book Readings                                    | Two sentences of intro; the WordPress reading pages are the real source.                                                                                                                                                 |
+| Already covered | —        | `/press-releases`                            | Press Releases                                   | Index only, and shorter than the WordPress version already migrated.                                                                                                                                                     |
+| Reference only  | Low      | `/events`                                    | Events                                           | Lists only Squarespace demo events.                                                                                                                                                                                      |
+| Skip            | —        | `/ourmission`                                | Our Mission                                      | Squarespace starter copy (“It all begins with an idea”).                                                                                                                                                                 |
+| Skip            | —        | `/membership`                                | Membership                                       | Squarespace starter copy; the WordPress page is the real source.                                                                                                                                                         |
+| Skip            | —        | `/interventions`                             | Interventions                                    | Empty placeholder.                                                                                                                                                                                                       |
+| Skip            | —        | `/programs`                                  | Programs                                         | Empty placeholder.                                                                                                                                                                                                       |
+| Skip            | —        | `/organization`                              | Organization                                     | Empty placeholder.                                                                                                                                                                                                       |
+| Skip            | —        | `/constitution`                              | Constitution                                     | Empty placeholder.                                                                                                                                                                                                       |
+| Skip            | —        | `/constitution-1`                            | Constitution (duplicate)                         | Empty duplicate.                                                                                                                                                                                                         |
+| Watch           | Low      | `/legal-cases`                               | Legal Cases                                      | Empty today, but the title suggests planned content worth checking again.                                                                                                                                                |
+| Watch           | Low      | `/articles-to-read`                          | Articles to read                                 | Empty today; may duplicate /interventions/deep-dive-caste-litigation-in-the-usa/.                                                                                                                                        |
+| Watch           | Low      | `/recommended-books`                         | Recommended Books                                | Empty today; would suit the book-readings collection.                                                                                                                                                                    |
+| Watch           | Low      | `/resources-1`                               | Resources                                        | Empty today.                                                                                                                                                                                                             |
+| Watch           | Low      | `/newsletter`                                | Newsletter                                       | Empty today; signup would need a mailing provider.                                                                                                                                                                       |
+| Skip            | —        | `/blog-3-1`                                  | Blog 3                                           | Squarespace demo blog with placeholder posts.                                                                                                                                                                            |
+| Skip            | —        | `/blog-3-2`                                  | Blog 3 (duplicate)                               | Squarespace demo blog with placeholder posts.                                                                                                                                                                            |
 
 Not listed: the Squarespace demo pages under `/blog-3-1/`, `/blog-3-2/`, `/events/event-`, which are unedited template placeholders.
 
@@ -199,7 +199,66 @@ extending to the editorial collections when their images are brought over.
 
 ## Open questions
 
-- **Image-led pages.** `/anti-caste-toolkit` and `/comics` are almost entirely illustration — 12 and 62 panels respectively, presented as carousels. No current collection models a sequence of images, and both were asked to be visually strong, so they need a bespoke design rather than a Markdown entry. The Squarespace alt text is only filenames, so every panel needs real alternative text written for it.
+- **Image-led pages.** `/anti-caste-toolkit` and `/comics` are almost entirely
+  illustration and were the last two Squarespace pages to move. Both are
+  migrated.
+
+  The Squarespace source turned out to be two things rather than four: the
+  comics page carried **two** carousels, of 21 and 37 slides, not four series.
+  The four filename stems (`soru_x_teaching_caste_in_classrooms`,
+  `does_the_caste_system_exist_in_the_us_today_`,
+  `abridged_caste_has_a_cost_who_profits_and_who_pays_`, `gail_comic`) are
+  export batches, and each carousel interleaves two of them: carousel one is
+  _Does the caste system exist in the US today?_, carousel two is _Caste has a
+  cost: who profits and who pays?_. Counting unique slides gives 58 panels, not
+  the 62 URLs in the page source, because a carousel preloads its first slide
+  under a second URL. The toolkit is three scenarios of four panels each.
+
+  The CMS-or-static split, decided before writing code:
+
+  - **CMS**, `comics` and `toolkitScenarios`. Both pass all three tests. Several
+    entries share one shape; more arrive over time, since publishing other
+    artists' work is the point of the comics and the toolkit is explicitly a
+    playbook written out of reader submissions; and an artist or organiser must
+    be able to publish one without a developer.
+  - **Static**, `app/content/pages/comics/` and
+    `app/content/pages/anti-caste-toolkit/`. The framing question, the argument
+    about the freeze response, the submission instructions, and the form link
+    are one-off copy that changes when the invitation changes, not when a comic
+    is published.
+
+  The Squarespace alt text was only filenames, so real alternative text was
+  written for every one of the 70 panels, and a **transcript** of the words
+  drawn inside each panel was written alongside it. The two are separate fields
+  on purpose: a comic bakes its argument into a picture, so without a transcript
+  none of it reaches a screen reader, a translation, or a search result, and
+  repeating the lettering in `alt` would have it read out twice.
+  `scripts/content/artwork.test.ts` fails the build on a panel with no
+  description, on a panel file that is referenced but not committed, and on an
+  uploaded panel that nothing references.
+
+  Panels are committed under `cms/public/media/comics/` and
+  `cms/public/media/anti-caste-toolkit/`, following the decision taken with the
+  documents batch, and losslessly re-encoded on the way in: 12.4 MB of
+  Squarespace PNGs became 7.5 MB with no change to a pixel.
+
+  Two things the source page never showed were recovered by reading the
+  artwork. _Caste has a cost_ names its source in its second-to-last panel,
+  "Inspired from “Towards a Marxist Analysis of Caste” by Gail Omvedt", so
+  Omvedt is credited on the entry rather than left inside an image. And the
+  comic the filenames call `gail_comic` is that same comic, which is why the
+  stem was never a title.
+
+- **Comic artists are not named.** Neither the Squarespace page nor any panel
+  names the person who drew these, so both comics are credited to the
+  Ambedkar King Study Circle and the toolkit scenarios to AKSC as well. The
+  filename stem `soru_x_teaching_caste_in_classrooms` reads like a
+  collaboration with an organisation called SORU, but nothing on either source
+  site confirms it, and inventing an attribution is worse than a general one.
+  Ask AKSC who drew each comic and set `credits` properly; the schema takes a
+  list of name, role, and link, so an artist can be added without touching a
+  panel.
+
 - **Store.** Squarespace sells conference and Ambedkar Jayanthi tickets. Rebuilding it means order records in D1 and a payment provider, so it is a project rather than a page migration.
 - **General Body meetings.** Migrated from `/documents/`, which was a flat list
   of eight PDFs. Modelled as meetings rather than files, because the meeting is

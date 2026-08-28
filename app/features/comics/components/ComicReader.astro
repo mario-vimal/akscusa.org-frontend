@@ -1,0 +1,269 @@
+---
+import BackLink from "../../../components/ui/BackLink.astro";
+import Container from "../../../components/ui/Container.astro";
+import PageMasthead from "../../../components/ui/PageMasthead.astro";
+import ContributeCallout from "../../artwork/components/ContributeCallout.astro";
+import PanelSequence from "../../artwork/components/PanelSequence.astro";
+import type { SizedPanel } from "../../artwork/panels";
+import { topicLabel, type EditorialTopic } from "../../editorial/taxonomy";
+
+interface Action {
+  label: string;
+  href: string;
+}
+
+interface Credit {
+  name: string;
+  role?: string;
+  url?: string;
+}
+
+interface Neighbour {
+  href: string;
+  title: string;
+}
+
+interface Props {
+  title: string;
+  summary: string;
+  published: string;
+  credits: readonly Credit[];
+  topics: readonly EditorialTopic[];
+  contentNote?: string;
+  panels: readonly SizedPanel[];
+  previous?: Neighbour;
+  next?: Neighbour;
+  sourceUrl?: string;
+  contribute: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    steps: readonly string[];
+    primaryAction: Action;
+    secondaryAction?: Action;
+    note?: string;
+  };
+}
+
+const {
+  title,
+  summary,
+  published,
+  credits,
+  topics,
+  contentNote,
+  panels,
+  previous,
+  next,
+  sourceUrl,
+  contribute,
+} = Astro.props;
+
+const total = panels.length;
+---
+
+<!--
+  A comic, read on its own dark surface.
+
+  The artwork is drawn on light grounds, so setting the page around it dark
+  gives every panel an edge of its own and stops a column of squares reading as
+  one long sheet. It also marks the reader out from the rest of the site: a
+  comic is read, not skimmed.
+-->
+<article>
+  <PageMasthead
+    eyebrow="Comic"
+    title={title}
+    description={summary}
+    size="large"
+  >
+    <BackLink slot="above" href="/comics/" tone="light">
+      Back to Comics
+    </BackLink>
+
+    <dl class="mt-9 flex flex-wrap gap-x-10 gap-y-5 text-sm">
+      <div>
+        <dt
+          class="text-xs font-bold tracking-[0.14em] text-accent-300 uppercase"
+        >
+          {credits.length === 1 ? "Credit" : "Credits"}
+        </dt>
+        <dd class="mt-1.5 leading-6 text-white/85">
+          {
+            credits.map((credit, index) => (
+              <>
+                {index > 0 && <span aria-hidden="true"> · </span>}
+                {credit.url ? (
+                  <a
+                    class="link-underline font-semibold"
+                    href={credit.url}
+                    rel="noopener"
+                  >
+                    {credit.name}
+                  </a>
+                ) : (
+                  <span class="font-semibold">{credit.name}</span>
+                )}
+                {credit.role && (
+                  <span class="text-white/70"> — {credit.role}</span>
+                )}
+              </>
+            ))
+          }
+        </dd>
+      </div>
+
+      <div>
+        <dt
+          class="text-xs font-bold tracking-[0.14em] text-accent-300 uppercase"
+        >
+          Length
+        </dt>
+        <dd class="mt-1.5 leading-6 text-white/85">
+          {total}
+          {total === 1 ? "panel" : "panels"}
+        </dd>
+      </div>
+
+      <div>
+        <dt
+          class="text-xs font-bold tracking-[0.14em] text-accent-300 uppercase"
+        >
+          Published
+        </dt>
+        <dd class="mt-1.5 leading-6 text-white/85">{published}</dd>
+      </div>
+    </dl>
+
+    {
+      topics.length > 0 && (
+        <ul class="mt-7 flex flex-wrap gap-2">
+          {topics.map((topic) => (
+            <li class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/85 ring-1 ring-white/15 ring-inset">
+              {topicLabel(topic)}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </PageMasthead>
+
+  <div class="on-dark relative isolate bg-ambedkar-1000 text-white">
+    <div
+      class="absolute inset-0 -z-10 pattern-grid mask-[radial-gradient(80%_60%_at_50%_0%,black,transparent)] text-white/6"
+      aria-hidden="true"
+    >
+    </div>
+    <div class="absolute inset-0 -z-10 grain opacity-[0.05]" aria-hidden="true">
+    </div>
+
+    <Container class="pt-12 pb-16 sm:pt-14 sm:pb-20">
+      {
+        contentNote && (
+          <p class="mx-auto mb-10 max-w-[46rem] rounded-l-md rounded-r-2xl border border-l-4 border-white/12 border-l-alert-600 bg-white/6 px-5 py-4 text-sm leading-6 text-white/80">
+            <span class="font-bold text-white">Content note. </span>
+            {contentNote}
+          </p>
+        )
+      }
+
+      <p class="mx-auto mb-8 max-w-[46rem] text-sm leading-6 text-white/60">
+        Every panel carries a transcript of the words drawn inside it, and can
+        be opened full screen. Use the arrow keys to move between panels once
+        one is open.
+      </p>
+
+      <PanelSequence
+        panels={panels}
+        label={title}
+        id="comic"
+        layout="strip"
+        tone="dark"
+      />
+
+      {
+        sourceUrl && (
+          <p class="mx-auto mt-12 max-w-[46rem] text-sm text-white/60">
+            First published at{" "}
+            <a class="link-underline" href={sourceUrl} rel="noopener">
+              {sourceUrl}
+            </a>
+            .
+          </p>
+        )
+      }
+    </Container>
+
+    <!--
+      A scroll-driven progress line, so the length of a 37 panel comic is
+      legible while reading it. It is decorative and CSS-only: a browser
+      without scroll-driven animations simply never draws it.
+    -->
+    <div class="reading-progress" aria-hidden="true"></div>
+  </div>
+
+  <Container class="pt-14 pb-20 sm:pt-16 sm:pb-28">
+    {
+      (previous || next) && (
+        <nav class="grid gap-4 sm:grid-cols-2" aria-label="More comics">
+          {previous ? (
+            <a class="card group p-6 sm:p-7" href={previous.href}>
+              <p class="eyebrow">Previous comic</p>
+              <p class="mt-3 font-display text-xl leading-snug font-semibold text-ambedkar-950 group-hover:text-ambedkar-800">
+                {previous.title}
+              </p>
+            </a>
+          ) : (
+            <div class="hidden sm:block" />
+          )}
+          {next && (
+            <a class="card group p-6 sm:p-7" href={next.href}>
+              <p class="eyebrow">Next comic</p>
+              <p class="mt-3 font-display text-xl leading-snug font-semibold text-ambedkar-950 group-hover:text-ambedkar-800">
+                {next.title}
+              </p>
+            </a>
+          )}
+        </nav>
+      )
+    }
+
+    <ContributeCallout class="mt-12 sm:mt-16" {...contribute} />
+  </Container>
+</article>
+
+<style>
+  .reading-progress {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 40;
+    height: 0.1875rem;
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    background: linear-gradient(
+      to right,
+      var(--color-accent-600),
+      var(--color-accent-300)
+    );
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .reading-progress {
+      animation: reading-progress linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+
+  @keyframes reading-progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @media print {
+    .reading-progress {
+      display: none;
+    }
+  }
+</style>

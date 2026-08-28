@@ -48,6 +48,13 @@ const routes = new Map([
   ],
   ["/organization/", "What is AKSC"],
   ["/organization/general-body/", "6th General Body Meeting"],
+  ["/comics/", "How to talk to your kids"],
+  [
+    "/comics/does-caste-exist-in-the-us-today/",
+    "Does the caste system exist in the US?",
+  ],
+  ["/comics/caste-has-a-cost/", "Towards a Marxist Analysis of Caste"],
+  ["/anti-caste-toolkit/", "A Playbook to kickstart our Toolkit"],
   ["/contact/", "Best way to reach us"],
   ["/donate/", "Donate"],
   ["/admin/", "AKSC USA Content Manager"],

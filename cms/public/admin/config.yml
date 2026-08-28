@@ -678,3 +678,162 @@ collections:
         required: false
         hint: "Where these papers were first published, kept so migrated copy is traceable."
       - { name: draft, label: Draft, widget: boolean, default: false }
+
+  # Drawn work. A comic and a toolkit scenario are both a titled sequence of
+  # panels, and both ask the same two things of whoever publishes one: describe
+  # the drawing, and write out the words drawn inside it. A comic that carries
+  # neither is closed to a screen reader, to translation, and to search, so the
+  # panel list asks for both every time.
+  #
+  # Panels are uploaded into the repository rather than to a bucket, so a
+  # published comic is a file this site serves and cannot be broken by somebody
+  # else's host going away.
+  - name: comics
+    label: Comics
+    label_singular: Comic
+    icon: draw
+    description: >-
+      Illustrated comics, read panel by panel. Upload the panels in reading
+      order; the first one is the cover shown on the comics index.
+    folder: cms/content/comics
+    create: true
+    slug: "{{slug}}"
+    media_folder: /cms/public/media/comics
+    public_folder: /media/comics
+    sortable_fields: [date, title]
+    summary: "{{title}}"
+    view_filters:
+      - { label: Featured, field: featured, pattern: true }
+      - { label: Drafts, field: draft, pattern: true }
+    fields:
+      - { name: title, label: Title, widget: string }
+      - name: date
+        label: Publication date
+        widget: datetime
+        time_format: false
+      - name: summary
+        label: Summary
+        widget: text
+        hint: One or two sentences shown on the comics index and in search results.
+      - name: credits
+        label: Credits
+        label_singular: Credit
+        widget: list
+        summary: "{{fields.name}}"
+        hint: "Everyone whose work is in the comic. A comic is never published without a credit."
+        fields: &credit_fields
+          - { name: name, label: Name, widget: string }
+          - {
+              name: role,
+              label: Role,
+              widget: string,
+              required: false,
+              hint: "For example Art, Script, or Art and script.",
+            }
+          - {
+              name: url,
+              label: Link,
+              widget: string,
+              required: false,
+              hint: "Where readers can find more of their work.",
+            }
+      - name: topics
+        label: Topics
+        widget: select
+        multiple: true
+        required: false
+        options: *editorial_topics
+      - name: contentNote
+        label: Content note
+        widget: string
+        required: false
+        hint: "Shown before the comic starts. Use it when a comic depicts violence or reproduces a slur."
+      - name: panels
+        label: Panels
+        label_singular: Panel
+        widget: list
+        summary: "{{fields.alt}}"
+        hint: "In reading order. The first panel is used as the cover."
+        fields: &panel_fields
+          - {
+              name: src,
+              label: Panel image,
+              widget: image,
+              hint: "Square panels at least 1140 pixels wide read best. Keep the artwork in its original colors.",
+            }
+          - name: alt
+            label: Alternative text
+            widget: string
+            hint: "Describe the drawing: who is in it, where they are, and what they are doing. The words in the panel go in the transcript below, so do not repeat them here."
+          - name: transcript
+            label: Transcript
+            widget: text
+            required: false
+            hint: "Every word drawn in the panel, in reading order, one line per bubble. Write “Aish: Hmmm.” to name who is speaking."
+      - {
+          name: sourceUrl,
+          label: Original URL,
+          widget: string,
+          required: false,
+        }
+      - { name: featured, label: Featured, widget: boolean, default: false }
+      - { name: draft, label: Draft, widget: boolean, default: false }
+
+  - name: toolkit-scenarios
+    label: Toolkit Scenarios
+    label_singular: Scenario
+    icon: forum
+    description: >-
+      Illustrated scenarios in the anti-caste toolkit. Each is a short situation
+      that ends in a question to the reader, ordered by hand rather than by date
+      because a playbook is read in the order its authors chose.
+    folder: cms/content/toolkit-scenarios
+    create: true
+    slug: "{{slug}}"
+    media_folder: /cms/public/media/anti-caste-toolkit
+    public_folder: /media/anti-caste-toolkit
+    sortable_fields: [order, title]
+    summary: "{{order}}. {{title}}"
+    view_filters:
+      - { label: Drafts, field: draft, pattern: true }
+    fields:
+      - { name: title, label: Title, widget: string }
+      - name: order
+        label: Position in the playbook
+        widget: number
+        value_type: int
+        min: 1
+        hint: "Counting from 1. Scenarios are read in this order."
+      - name: setting
+        label: Setting
+        widget: string
+        hint: "Where it happens, in a few words, such as “A school cafeteria”."
+      - name: summary
+        label: Summary
+        widget: text
+        hint: One sentence saying what happens and what the reader is asked to consider.
+      - name: prompt
+        label: Question to the reader
+        widget: text
+        hint: "Printed under the panels, above the link to the form."
+      - name: panels
+        label: Panels
+        label_singular: Panel
+        widget: list
+        summary: "{{fields.alt}}"
+        hint: "In reading order."
+        fields: *panel_fields
+      - name: credits
+        label: Credits
+        label_singular: Credit
+        widget: list
+        required: false
+        summary: "{{fields.name}}"
+        fields: *credit_fields
+      - {
+          name: sourceUrl,
+          label: Original URL,
+          widget: string,
+          required: false,
+        }
+      - { name: draft, label: Draft, widget: boolean, default: false }

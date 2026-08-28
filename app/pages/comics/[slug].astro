@@ -1,0 +1,63 @@
+---
+import type { GetStaticPaths } from "astro";
+import { getEntry } from "astro:content";
+
+import { sizePanels } from "../../features/artwork/panels";
+import ComicReader from "../../features/comics/components/ComicReader.astro";
+import {
+  comicHref,
+  loadComics,
+  neighbours,
+} from "../../features/comics/queries/comics";
+import { formatDate } from "../../features/editorial/entries";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+export const getStaticPaths = (async () => {
+  const comics = await loadComics();
+
+  return comics.map((comic) => {
+    const { previous, next } = neighbours(comics, comic.id);
+
+    return {
+      params: { slug: comic.id },
+      props: {
+        comic,
+        previous: previous
+          ? { href: comicHref(previous.id), title: previous.data.title }
+          : undefined,
+        next: next
+          ? { href: comicHref(next.id), title: next.data.title }
+          : undefined,
+      },
+    };
+  });
+}) satisfies GetStaticPaths;
+
+const { comic, previous, next } = Astro.props;
+const panels = await sizePanels(comic.data.panels);
+
+// The invitation to other artists is written once on the comics index and
+// repeated at the end of a comic, which is where somebody who could draw one is
+// most likely to be reading.
+const page = await getEntry("pages", "comics");
+
+if (!page || page.data.pageType !== "comics") {
+  throw new Error("Comics page content is missing or invalid.");
+}
+---
+
+<SiteLayout title={comic.data.title} description={comic.data.summary}>
+  <ComicReader
+    title={comic.data.title}
+    summary={comic.data.summary}
+    published={formatDate(comic.data.date)}
+    credits={comic.data.credits}
+    topics={comic.data.topics}
+    contentNote={comic.data.contentNote}
+    panels={panels}
+    previous={previous}
+    next={next}
+    sourceUrl={comic.data.sourceUrl}
+    contribute={page.data.contribute}
+  />
+</SiteLayout>

@@ -1,0 +1,47 @@
+---
+import { getEntry, render } from "astro:content";
+
+import ToolkitPage from "../../features/anti-caste-toolkit/components/ToolkitPage.astro";
+import { loadToolkitScenarios } from "../../features/anti-caste-toolkit/queries/scenarios";
+import { sizePanels } from "../../features/artwork/panels";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+
+const page = await getEntry("pages", "anti-caste-toolkit");
+
+if (!page || page.data.pageType !== "anti-caste-toolkit") {
+  throw new Error("Anti-caste Toolkit content is missing or invalid.");
+}
+
+const entries = await loadToolkitScenarios();
+
+const scenarios = await Promise.all(
+  entries.map(async (scenario) => ({
+    id: scenario.id,
+    title: scenario.data.title,
+    setting: scenario.data.setting,
+    summary: scenario.data.summary,
+    prompt: scenario.data.prompt,
+    panels: await sizePanels(scenario.data.panels),
+    credits: scenario.data.credits,
+  })),
+);
+
+const { Content } = await render(page);
+---
+
+<SiteLayout title={page.data.title} description={page.data.description}>
+  <ToolkitPage
+    eyebrow={page.data.eyebrow}
+    title={page.data.title}
+    description={page.data.tagline}
+    lede={page.data.lede}
+    scenariosHeading={page.data.scenariosHeading}
+    scenariosIntro={page.data.scenariosIntro}
+    form={page.data.form}
+    scenarios={scenarios}
+    contribute={page.data.contribute}
+    sourceUrl={page.data.sourceUrl}
+  >
+    <Content />
+  </ToolkitPage>
+</SiteLayout>

@@ -44,10 +44,10 @@ Caste discrimination, akin to race, gender, religion, and sexual orientation, un
 
 ### What are the differences between a membership-based organization and a volunteer-based organization?
 
-| Question | Volunteer-based organization | Membership-based organization |
-| --- | --- | --- |
+| Question                    | Volunteer-based organization                              | Membership-based organization                                                                                                                  |
+| --------------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Whose welfare is the focus? | Focused on _charity_: upliftment and welfare of _others_. | _Collective empowerment_: those impacted or affected are responsible for their own upliftment and liberation; hence they need to be organized. |
-| What do they do? | Project-based work, advocacy, lobbying. | Advance the ideas of social justice and social change through mobilizing the masses, advocacy, and lobbying. |
+| What do they do?            | Project-based work, advocacy, lobbying.                   | Advance the ideas of social justice and social change through mobilizing the masses, advocacy, and lobbying.                                   |
 
 ## Become a member now!
 

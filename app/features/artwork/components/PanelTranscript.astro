@@ -1,0 +1,51 @@
+---
+import { parseTranscript } from "../panels";
+
+interface Props {
+  transcript: string;
+  class?: string;
+}
+
+const { transcript, class: className } = Astro.props;
+const lines = parseTranscript(transcript);
+---
+
+<!--
+  The lettering of a panel, set as a script. Speakers are marked up separately
+  from what they say, so a reader following the transcript instead of the
+  drawing still knows who is speaking.
+-->
+<ol class:list={["panel-transcript", className]}>
+  {
+    lines.map((line) => (
+      <li>
+        {line.speaker && (
+          <b class="panel-transcript__speaker">{line.speaker}</b>
+        )}
+        <span>{line.text}</span>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .panel-transcript {
+    display: grid;
+    gap: 0.625rem;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+  }
+
+  .panel-transcript li {
+    display: grid;
+    gap: 0.125rem;
+  }
+
+  .panel-transcript__speaker {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    line-height: 1.4;
+    text-transform: uppercase;
+  }
+</style>
