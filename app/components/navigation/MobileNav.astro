@@ -20,7 +20,7 @@ const { currentPath } = Astro.props;
 -->
 <details class="group xl:hidden" data-mobile-nav>
   <summary
-    class="flex size-12 cursor-pointer list-none items-center justify-center rounded-full border border-ambedkar-900/15 bg-white text-ambedkar-900 transition-colors marker:content-none hover:border-ambedkar-900/35 hover:text-ambedkar-950"
+    class="flex size-11 cursor-pointer list-none items-center justify-center rounded-lg border border-rule-strong bg-paper text-ambedkar-900 transition-colors marker:content-none hover:border-ambedkar-950 hover:text-ambedkar-950"
     aria-label="Open menu"
   >
     <svg
@@ -48,20 +48,20 @@ const { currentPath } = Astro.props;
   </summary>
 
   <div
-    class="absolute inset-x-0 top-full max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain border-b border-ambedkar-900/10 bg-mist shadow-soft"
+    class="absolute inset-x-0 top-full max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain border-b border-rule bg-mist shadow-soft"
   >
     <div class="mx-auto w-full max-w-6xl px-5 py-6 sm:px-6">
       <nav aria-label="Mobile navigation">
-        <ul class="grid gap-1 sm:grid-cols-2">
+        <ul class="grid sm:grid-cols-2 sm:gap-x-8">
           {
             [...primaryNavigation, ...secondaryNavigation].map((item) => (
-              <li>
+              <li class="flex">
                 <NavLink {...item} currentPath={currentPath} variant="mobile" />
               </li>
             ))
           }
         </ul>
-        <div class="mt-5">
+        <div class="mt-6">
           <NavLink
             {...donateNavigation}
             currentPath={currentPath}
@@ -70,17 +70,13 @@ const { currentPath } = Astro.props;
         </div>
       </nav>
 
-      <p
-        class="mt-8 text-xs font-bold tracking-[0.16em] text-ambedkar-700 uppercase"
-      >
-        Follow
-      </p>
-      <ul class="mt-3 flex flex-wrap gap-2">
+      <p class="eyebrow mt-8">Follow</p>
+      <ul class="mt-4 flex flex-wrap gap-2">
         {
           socialLinks.map((item) => (
             <li>
               <a
-                class="inline-flex rounded-full border border-ambedkar-900/15 bg-white px-4 py-2 text-sm font-semibold text-ambedkar-800 transition-colors hover:border-ambedkar-900/40 hover:text-ambedkar-950"
+                class="inline-flex rounded-md border border-rule-strong bg-paper px-3.5 py-2 font-display text-[0.8125rem] font-medium text-ambedkar-800 transition-colors hover:border-ambedkar-950 hover:text-ambedkar-950"
                 href={item.href}
                 rel="me"
               >

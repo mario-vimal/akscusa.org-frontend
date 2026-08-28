@@ -1,0 +1,221 @@
+---
+import type { ImageMetadata } from "astro";
+import { getImage } from "astro:assets";
+import { Image } from "astro:assets";
+
+interface Props {
+  /** An imported image, or a path to a file already in `public/`. */
+  src: ImageMetadata | string;
+  alt: string;
+  caption?: string;
+  /** Sizes hint for imported images. */
+  sizes?: string;
+  widths?: number[];
+  loading?: "eager" | "lazy";
+  class?: string;
+}
+
+const {
+  src,
+  alt,
+  caption,
+  sizes = "(min-width: 1024px) 380px, calc(100vw - 5rem)",
+  widths = [320, 640, 960],
+  loading = "lazy",
+  class: className,
+} = Astro.props;
+
+const isImported = typeof src !== "string";
+
+// The viewer shows one large file rather than the responsive set: it is opened
+// deliberately, one poster at a time, so the extra bytes buy real detail.
+const fullSrc = isImported
+  ? (
+      await getImage({
+        src,
+        format: "webp",
+        quality: 90,
+        width: Math.min(src.width, 1600),
+      })
+    ).src
+  : src;
+
+const responsiveWidths = isImported
+  ? widths.filter((width) => width <= src.width)
+  : widths;
+---
+
+<!--
+  A poster on its own sheet. The artwork is a link to the full file, which the
+  viewer script upgrades in place: with no JavaScript the poster still opens,
+  and with it the poster opens over the page instead of navigating away and
+  making the reader find their place again.
+-->
+<figure class:list={["card poster", className]}>
+  <div class="poster__frame">
+    {
+      isImported ? (
+        <Image
+          class="poster__image"
+          src={src}
+          alt={alt}
+          decoding="async"
+          format="webp"
+          loading={loading}
+          quality={82}
+          sizes={sizes}
+          widths={responsiveWidths}
+        />
+      ) : (
+        <img
+          class="poster__image"
+          src={src}
+          alt={alt}
+          loading={loading}
+          decoding="async"
+        />
+      )
+    }
+    <a
+      class="poster__open"
+      href={fullSrc}
+      data-poster-open
+      data-poster-caption={caption}
+    >
+      <span class="sr-only">Enlarge poster</span>
+      <span class="poster__zoom" aria-hidden="true">&#x2922;</span>
+    </a>
+  </div>
+  {caption && <figcaption class="poster__caption">{caption}</figcaption>}
+</figure>
+
+<script>
+  // One viewer serves every poster on the page. Astro includes a component's
+  // script once no matter how many times the component is used, so this runs
+  // a single time and binds by delegation.
+  interface PosterViewer {
+    dialog: HTMLDialogElement;
+    image: HTMLImageElement;
+    caption: HTMLElement;
+  }
+
+  let viewer: PosterViewer | null = null;
+  let opener: HTMLElement | null = null;
+
+  /**
+   * Whether a point falls on the drawn artwork rather than on the empty band
+   * `object-fit: contain` leaves beside it.
+   */
+  function overArtwork(image: HTMLImageElement, x: number, y: number) {
+    const box = image.getBoundingClientRect();
+    const { naturalWidth, naturalHeight } = image;
+    if (!naturalWidth || !naturalHeight) return false;
+
+    const scale = Math.min(
+      box.width / naturalWidth,
+      box.height / naturalHeight,
+    );
+    const width = naturalWidth * scale;
+    const height = naturalHeight * scale;
+    const left = box.left + (box.width - width) / 2;
+    const top = box.top + (box.height - height) / 2;
+
+    return x >= left && x <= left + width && y >= top && y <= top + height;
+  }
+
+  function buildViewer(): PosterViewer {
+    const dialog = document.createElement("dialog");
+    dialog.className = "poster-viewer";
+    dialog.setAttribute("aria-label", "Poster viewer");
+
+    const bar = document.createElement("div");
+    bar.className = "poster-viewer__bar";
+
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "poster-viewer__close";
+    close.textContent = "Close";
+    bar.appendChild(close);
+
+    const stage = document.createElement("div");
+    stage.className = "poster-viewer__stage";
+
+    const image = document.createElement("img");
+    image.className = "poster-viewer__image";
+    image.decoding = "async";
+    stage.appendChild(image);
+
+    const caption = document.createElement("p");
+    caption.className = "poster-viewer__caption";
+
+    dialog.appendChild(bar);
+    dialog.appendChild(stage);
+    dialog.appendChild(caption);
+    document.body.appendChild(dialog);
+
+    close.addEventListener("click", () => dialog.close());
+
+    // Close on any click that is not the close button or the poster itself.
+    //
+    // The image box fills the stage and the artwork is letterboxed inside it,
+    // so a click in the empty margin still reports the image as its target.
+    // Testing the target alone would make the whole stage inert; the visible
+    // artwork has to be measured instead.
+    dialog.addEventListener("click", (event) => {
+      const target = event.target as Element | null;
+      if (target && close.contains(target)) return;
+      if (target === image && overArtwork(image, event.clientX, event.clientY))
+        return;
+      dialog.close();
+    });
+
+    // `showModal` moves focus into the dialog; put it back where it was so
+    // the reader returns to the poster they opened rather than the page top.
+    dialog.addEventListener("close", () => {
+      image.removeAttribute("src");
+      opener?.focus();
+      opener = null;
+    });
+
+    return { dialog, image, caption };
+  }
+
+  function open(trigger: HTMLAnchorElement) {
+    viewer ??= buildViewer();
+    const figure = trigger.closest("figure");
+    const source = figure?.querySelector<HTMLImageElement>(".poster__image");
+
+    viewer.image.src = trigger.href;
+    viewer.image.alt = source?.alt ?? "";
+    viewer.caption.textContent = trigger.dataset.posterCaption ?? "";
+
+    opener = trigger;
+    viewer.dialog.showModal();
+  }
+
+  function ready() {
+    const triggers =
+      document.querySelectorAll<HTMLAnchorElement>("[data-poster-open]");
+    if (triggers.length === 0) return;
+
+    for (const trigger of triggers) {
+      // Marks the control as upgraded, so the zoom cursor only appears once
+      // the click actually opens the viewer instead of leaving the page.
+      trigger.dataset.posterReady = "";
+    }
+
+    document.addEventListener("click", (event) => {
+      const target = event.target as Element | null;
+      const trigger = target?.closest<HTMLAnchorElement>("[data-poster-open]");
+      if (!trigger) return;
+      // Leave modified clicks alone: they are a deliberate request for a tab.
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+        return;
+      event.preventDefault();
+      open(trigger);
+    });
+  }
+
+  ready();
+  document.addEventListener("astro:after-swap", ready);
+</script>

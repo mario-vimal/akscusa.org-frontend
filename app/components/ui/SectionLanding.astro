@@ -52,14 +52,25 @@ const {
     backgroundPosition={backgroundPosition}
   />
 
-  <Container class="pt-14 pb-20 sm:pt-16 sm:pb-28">
-    <ul class="reveal-children grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  <Container class="pt-16 pb-20 sm:pt-20 sm:pb-28">
+    <!--
+      A contents page rather than a tray of tiles. Each entry opens under its
+      own rule and is numbered, so the set reads as an ordered index of the
+      section instead of a grid of floating panels.
+    -->
+    <ul class="reveal-children grid gap-x-10 sm:grid-cols-2 lg:grid-cols-3">
       {
-        items.map((item) => (
-          <li class="card group p-7 sm:p-8">
-            <h2 class="font-display text-[1.375rem] leading-[1.2] font-semibold tracking-[-0.015em] text-balance text-ambedkar-950">
+        items.map((item, index) => (
+          <li class="group relative flex flex-col border-t border-rule-strong pt-5 pb-9">
+            <span class="index-figure" aria-hidden="true">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <h2 class="card-title mt-4 font-display text-[1.5rem] leading-[1.12] font-semibold tracking-title text-balance text-ambedkar-950">
               {item.href ? (
-                <a class="after:absolute after:inset-0" href={item.href}>
+                <a
+                  class="bg-[linear-gradient(to_right,currentColor,currentColor)] bg-[length:0%_1px] bg-[position:0_100%] bg-no-repeat transition-[background-size] duration-300 ease-[var(--ease-out-firm)] group-hover:bg-[length:100%_1px] after:absolute after:inset-0"
+                  href={item.href}
+                >
                   {item.title}
                 </a>
               ) : (
@@ -71,11 +82,11 @@ const {
             </p>
             {item.href && (
               <p
-                class="mt-auto flex items-center gap-2 pt-6 text-sm font-bold tracking-[0.06em] text-ambedkar-700 uppercase group-hover:text-ambedkar-900"
+                class="mt-auto flex items-center gap-2 pt-6 font-display text-xs font-semibold tracking-[0.12em] text-ambedkar-700 uppercase transition-colors group-hover:text-ambedkar-950"
                 aria-hidden="true"
               >
                 View
-                <span class="inline-block transition-transform duration-300 group-hover:translate-x-1">
+                <span class="inline-block transition-transform duration-300 ease-[var(--ease-out-firm)] group-hover:translate-x-1">
                   &rarr;
                 </span>
               </p>

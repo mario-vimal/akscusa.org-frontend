@@ -70,16 +70,16 @@ const {
   >
     {
       filters.length > 0 && (
-        <nav class="mt-10" aria-label={filtersLabel}>
-          <ul class="flex flex-wrap gap-2">
+        <nav class="mt-12" aria-label={filtersLabel}>
+          <ul class="flex flex-wrap gap-x-6 gap-y-2">
             {filters.map((filter) => (
               <li>
                 <a
                   class:list={[
-                    "inline-block rounded-full px-4 py-2 text-sm font-semibold transition-colors",
+                    "inline-block border-b-2 py-1 font-display text-[0.875rem] font-medium transition-colors",
                     filter.current
-                      ? "bg-accent-300 text-ambedkar-950"
-                      : "bg-white/10 text-white/85 ring-1 ring-white/20 ring-inset hover:bg-white/20 hover:text-white",
+                      ? "border-accent-300 text-white"
+                      : "border-transparent text-white/60 hover:border-white/40 hover:text-white",
                   ]}
                   href={filter.href}
                   aria-current={filter.current ? "page" : undefined}
@@ -94,7 +94,7 @@ const {
     }
   </PageMasthead>
 
-  <Container class="pt-14 pb-20 sm:pt-16 sm:pb-28">
+  <Container class="pt-16 pb-20 sm:pt-20 sm:pb-28">
     <!-- Standing context a section may need above its entries, such as how
       the reading circle meets. Most indexes leave this empty. -->
     <slot name="intro" />
@@ -105,7 +105,7 @@ const {
           {empty}
         </p>
       ) : list ? (
-        <ul class="reveal-children grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <ul class="reveal-children grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <slot />
         </ul>
       ) : (

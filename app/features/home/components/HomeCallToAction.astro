@@ -9,40 +9,26 @@ interface Props {
 const { closing } = Astro.props;
 ---
 
-<section class="bg-haze">
-  <Container class="py-16 sm:py-24">
-    <!--
-      The closing ask is a panel rather than a full-bleed band, so it reads as
-      one object on the page instead of merging into the footer directly below.
-    -->
-    <div
-      class="on-dark reveal relative isolate overflow-hidden rounded-4xl bg-ambedkar-900 px-6 py-12 text-white shadow-soft sm:px-12 sm:py-16"
-    >
-      <div
-        class="absolute inset-0 -z-10 bg-[radial-gradient(85%_120%_at_100%_0%,var(--color-accent-800),transparent_58%),radial-gradient(70%_100%_at_0%_100%,var(--color-ambedkar-950),transparent_60%)]"
-        aria-hidden="true"
-      >
-      </div>
-      <div
-        class="absolute inset-0 -z-10 pattern-dots mask-[radial-gradient(60%_80%_at_85%_20%,black,transparent)] text-white/10"
-        aria-hidden="true"
-      >
-      </div>
-      <div
-        class="absolute inset-0 -z-10 grain opacity-[0.06]"
-        aria-hidden="true"
-      >
-      </div>
+<!--
+  The closing ask is a light band between two dark ones. It used to be a dark
+  rounded panel floating on a tinted strip, which put three dark surfaces in a
+  row and left the page with nowhere to breathe before the footer.
+-->
+<section class="bg-paper">
+  <Container class="py-20 sm:py-28 lg:py-32">
+    <div class="reveal section-head">
+      <p class="eyebrow">{closing.eyebrow}</p>
 
-      <div class="grid gap-10 lg:grid-cols-[1.4fr_auto] lg:items-end">
-        <div class="max-w-2xl">
-          <p class="eyebrow eyebrow-light">{closing.eyebrow}</p>
+      <div class="grid gap-10 lg:grid-cols-[1.55fr_auto] lg:items-end">
+        <div>
           <h2
-            class="mt-5 font-display text-display-md leading-[1.05] font-semibold tracking-[-0.02em] text-balance"
+            class="max-w-3xl font-display text-display-md leading-[0.98] font-bold tracking-display text-balance text-ambedkar-950"
           >
             {closing.title}
           </h2>
-          <p class="mt-6 text-lg leading-8 text-white/78">
+          <p
+            class="mt-7 max-w-2xl font-serif text-xl leading-[1.6] text-ambedkar-900/75"
+          >
             {closing.description}
           </p>
         </div>
@@ -50,7 +36,7 @@ const { closing } = Astro.props;
           <a class="btn btn-primary" href={closing.primaryAction.href}>
             {closing.primaryAction.label}
           </a>
-          <a class="btn btn-outline-light" href={closing.secondaryAction.href}>
+          <a class="btn btn-outline" href={closing.secondaryAction.href}>
             {closing.secondaryAction.label}
           </a>
         </div>

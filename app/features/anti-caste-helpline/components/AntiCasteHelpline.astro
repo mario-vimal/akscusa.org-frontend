@@ -3,6 +3,7 @@ import type { CollectionEntry } from "astro:content";
 
 import Container from "../../../components/ui/Container.astro";
 import ResponsiveImage from "../../../components/ui/ResponsiveImage.astro";
+import Poster from "../../../components/ui/Poster.astro";
 import helplineBanner from "../assets/helpline-banner.jpg";
 import helplineFlyer from "../assets/helpline-flyer.jpg";
 
@@ -38,7 +39,7 @@ const {
     class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 py-3 text-center text-sm leading-6 font-semibold"
   >
     <span
-      class="rounded-full bg-alert-600 px-2.5 py-1 text-xs font-bold tracking-wide text-white uppercase"
+      class="rounded-sm bg-alert-600 px-1.5 py-0.5 font-display text-[0.625rem] font-semibold tracking-[0.1em] text-white uppercase"
     >
       Emergency
     </span>
@@ -57,7 +58,7 @@ const {
     <ResponsiveImage
       src={helplineBanner}
       alt={bannerAlt}
-      class="w-full rounded-3xl shadow-lift"
+      class="w-full rounded-xl shadow-lift"
       loading="eager"
       sizes="(min-width: 1360px) 1296px, calc(100vw - 2.5rem)"
     />
@@ -71,7 +72,7 @@ const {
         <p class="eyebrow">{eyebrow}</p>
         <h1
           id="helpline-title"
-          class="mt-5 font-display text-display-lg leading-[1.04] font-semibold tracking-[-0.02em] text-balance text-ambedkar-950"
+          class="mt-5 font-display text-display-lg leading-[0.98] font-bold tracking-display text-balance text-ambedkar-950"
         >
           {title}
         </h1>
@@ -91,21 +92,18 @@ const {
         </ul>
 
         <div
-          class="on-dark relative isolate mt-10 overflow-hidden rounded-3xl bg-ambedkar-950 p-6 text-white shadow-soft sm:p-8"
+          class="on-dark relative isolate mt-10 overflow-hidden rounded-xl bg-ambedkar-950 p-6 text-white sm:p-8"
           aria-labelledby="contact-title"
         >
           <div
-            class="absolute inset-0 -z-10 bg-[radial-gradient(100%_130%_at_100%_0%,var(--color-accent-900),transparent_60%),radial-gradient(80%_110%_at_0%_100%,var(--color-ambedkar-800),transparent_58%)]"
+            class="absolute inset-0 -z-10 bg-linear-to-br from-ambedkar-900 to-ambedkar-1000"
             aria-hidden="true"
           >
           </div>
-          <div
-            class="absolute inset-0 -z-10 pattern-dots mask-[radial-gradient(60%_80%_at_90%_10%,black,transparent)] text-white/10"
-            aria-hidden="true"
+          <h2
+            id="contact-title"
+            class="font-display text-2xl leading-[1.12] font-semibold tracking-title"
           >
-          </div>
-
-          <h2 id="contact-title" class="font-display text-2xl font-semibold">
             Contact the helpline
           </h2>
           <div class="mt-5 flex flex-col gap-3">
@@ -134,20 +132,15 @@ const {
         </div>
       </div>
 
-      <figure class="card p-3 sm:p-4 lg:sticky lg:top-24">
-        <ResponsiveImage
+      <div class="lg:sticky lg:top-24">
+        <Poster
           src={helplineFlyer}
           alt={flyerAlt}
-          class="w-full rounded-2xl"
+          caption={flyerCaption}
           sizes="(min-width: 1024px) 380px, calc(100vw - 5rem)"
           widths={[320, 640, 960]}
         />
-        <figcaption
-          class="px-2 pt-4 pb-2 text-sm leading-6 text-ambedkar-900/65"
-        >
-          {flyerCaption}
-        </figcaption>
-      </figure>
+      </div>
     </div>
   </Container>
 </section>

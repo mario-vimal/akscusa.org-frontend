@@ -2,6 +2,7 @@
 import BackLink from "../../../components/ui/BackLink.astro";
 import Container from "../../../components/ui/Container.astro";
 import PageMasthead from "../../../components/ui/PageMasthead.astro";
+import Poster from "../../../components/ui/Poster.astro";
 import ProseContent from "../../editorial/components/ProseContent.astro";
 import type { Badge, Detail, ProgramPoster } from "../../editorial/presenters";
 import { topicLabel, type EditorialTopic } from "../../editorial/taxonomy";
@@ -37,8 +38,8 @@ const hasPosters = posters.length > 0;
 const hasMultiplePosters = posters.length > 1;
 const badgeClasses =
   badge.tone === "muted"
-    ? "bg-white/15 text-white ring-1 ring-white/25 ring-inset"
-    : "bg-accent-300 text-ambedkar-950";
+    ? "border-white/40 text-white/85"
+    : "border-accent-400/70 text-accent-300";
 ---
 
 <article>
@@ -55,7 +56,7 @@ const badgeClasses =
     <p class="mt-8">
       <span
         class:list={[
-          "inline-block rounded-full px-3 py-1 text-xs font-bold tracking-wide uppercase",
+          "inline-block rounded-sm border px-1.5 py-0.5 font-display text-[0.625rem] font-semibold tracking-[0.1em] uppercase",
           badgeClasses,
         ]}
       >
@@ -81,24 +82,12 @@ const badgeClasses =
             aria-label="Original program posters"
           >
             {posters.map((poster, index) => (
-              <figure class="card h-auto p-3 sm:p-4">
-                <img
-                  class="h-auto w-full rounded-2xl"
-                  src={poster.src}
-                  alt={poster.alt}
-                  loading={index === 0 ? "eager" : "lazy"}
-                  decoding="async"
-                />
-                <figcaption class="px-2 pt-4 pb-2 text-sm leading-6 text-ambedkar-900/65">
-                  {poster.caption && <span>{poster.caption} · </span>}
-                  <a
-                    class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
-                    href={poster.src}
-                  >
-                    Open full-size
-                  </a>
-                </figcaption>
-              </figure>
+              <Poster
+                src={poster.src}
+                alt={poster.alt}
+                caption={poster.caption}
+                loading={index === 0 ? "eager" : "lazy"}
+              />
             ))}
           </aside>
         )
@@ -109,7 +98,7 @@ const badgeClasses =
           {
             details.map((detail) => (
               <div>
-                <dt class="text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase">
+                <dt class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase">
                   {detail.term}
                 </dt>
                 <dd class="mt-1 leading-7 text-ambedkar-900/80">
@@ -138,7 +127,7 @@ const badgeClasses =
         {
           links.length > 0 && (
             <section class="card mt-12 p-6 sm:p-8">
-              <h2 class="font-display text-xl font-semibold tracking-[-0.01em] text-ambedkar-950">
+              <h2 class="font-display text-xl font-semibold tracking-title text-ambedkar-950">
                 Resources
               </h2>
               <ul class="mt-4 space-y-3">
@@ -172,7 +161,7 @@ const badgeClasses =
 
         {
           sourceUrl && (
-            <p class="mt-10 text-sm wrap-break-word text-ambedkar-900/60">
+            <p class="mt-10 text-sm wrap-break-word text-ambedkar-900/70">
               Originally published at{" "}
               <a
                 class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"

@@ -15,105 +15,107 @@ const { quotes } = Astro.props;
   data-quote-carousel
 >
   <div
-    class="absolute inset-0 -z-10 bg-[radial-gradient(85%_100%_at_10%_0%,var(--color-ambedkar-800),transparent_58%),radial-gradient(75%_90%_at_95%_100%,var(--color-accent-950),transparent_58%)]"
+    class="absolute inset-0 -z-10 bg-linear-to-b from-ambedkar-950 to-ambedkar-1000"
     aria-hidden="true"
   >
   </div>
-  <div class="absolute inset-0 -z-10 grain opacity-[0.05]" aria-hidden="true">
+  <div class="absolute inset-0 -z-10 grain opacity-[0.035]" aria-hidden="true">
   </div>
 
-  <Container class="py-16 sm:py-24">
-    <div class="reveal gap-8 sm:flex sm:items-end sm:justify-between">
-      <div class="max-w-2xl">
-        <p class="eyebrow eyebrow-light">Revolutionary voices</p>
+  <Container class="py-20 sm:py-28">
+    <div class="reveal section-head border-white/20">
+      <p class="eyebrow eyebrow-light">Revolutionary voices</p>
+
+      <div class="flex flex-wrap items-end justify-between gap-6">
         <h2
           id="voices-title"
-          class="mt-5 font-display text-display-md leading-[1.06] font-semibold tracking-[-0.02em] text-balance"
+          class="max-w-2xl font-display text-display-md leading-[0.98] font-bold tracking-display text-balance"
         >
           Words for struggle, dignity, and liberation.
         </h2>
-      </div>
 
-      <!--
-        Hidden until the script is ready. Without JavaScript the quotations
-        remain a touch-scrollable, scroll-snapping list rather than leaving a
-        row of controls that does nothing.
-      -->
-      <div
-        class="mt-8 flex items-center gap-2 sm:mt-0"
-        data-carousel-controls
-        hidden
-      >
-        <button
-          class="inline-flex size-11 items-center justify-center rounded-full border border-white/25 bg-white/8 text-white transition-colors hover:border-white/60 hover:bg-white/16"
-          type="button"
-          aria-label="Previous quotation"
-          data-carousel-previous
-        >
-          <svg
-            class="size-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
+        <!--
+          Hidden until the script is ready. Without JavaScript the quotations
+          remain a touch-scrollable, scroll-snapping list rather than leaving a
+          row of controls that does nothing.
+        -->
+        <div class="flex items-center" data-carousel-controls hidden>
+          <button
+            class="inline-flex size-10 items-center justify-center border border-white/25 text-white transition-colors hover:border-white/70 hover:bg-white/10"
+            type="button"
+            aria-label="Previous quotation"
+            data-carousel-previous
           >
-            <path d="m15 18-6-6 6-6"></path>
-          </svg>
-        </button>
+            <svg
+              class="size-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m15 18-6-6 6-6"></path>
+            </svg>
+          </button>
 
-        <button
-          class="inline-flex size-11 items-center justify-center rounded-full border border-white/25 bg-white/8 text-white transition-colors hover:border-white/60 hover:bg-white/16"
-          type="button"
-          aria-label="Pause quotations"
-          data-carousel-toggle
-        >
-          <svg
-            class="size-5"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-            data-carousel-pause-icon
+          <button
+            class="-ml-px inline-flex size-10 items-center justify-center border border-white/25 text-white transition-colors hover:border-white/70 hover:bg-white/10"
+            type="button"
+            aria-label="Pause quotations"
+            data-carousel-toggle
           >
-            <path d="M6.5 5h3v14h-3zM14.5 5h3v14h-3z"></path>
-          </svg>
-          <svg
-            class="hidden size-5"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-            data-carousel-play-icon
-          >
-            <path d="m8 5 11 7-11 7z"></path>
-          </svg>
-        </button>
+            <svg
+              class="size-4"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+              data-carousel-pause-icon
+            >
+              <path d="M6.5 5h3v14h-3zM14.5 5h3v14h-3z"></path>
+            </svg>
+            <svg
+              class="hidden size-4"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+              data-carousel-play-icon
+            >
+              <path d="m8 5 11 7-11 7z"></path>
+            </svg>
+          </button>
 
-        <button
-          class="inline-flex size-11 items-center justify-center rounded-full border border-white/25 bg-white/8 text-white transition-colors hover:border-white/60 hover:bg-white/16"
-          type="button"
-          aria-label="Next quotation"
-          data-carousel-next
-        >
-          <svg
-            class="size-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
+          <button
+            class="-ml-px inline-flex size-10 items-center justify-center border border-white/25 text-white transition-colors hover:border-white/70 hover:bg-white/10"
+            type="button"
+            aria-label="Next quotation"
+            data-carousel-next
           >
-            <path d="m9 18 6-6-6-6"></path>
-          </svg>
-        </button>
+            <svg
+              class="size-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
+    <!--
+      The quotation is set straight onto the ink rather than lifted onto a white
+      panel. These are the words the organisation was founded on; a card would
+      make them one more tile on a page of tiles.
+    -->
     <div
-      class="quotes-viewport mt-12 snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth rounded-3xl"
+      class="quotes-viewport mt-14 snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth sm:mt-16"
       role="region"
       aria-roledescription="carousel"
       aria-label="Quotations by revolutionary leaders"
@@ -121,39 +123,26 @@ const { quotes } = Astro.props;
       tabindex="0"
       data-carousel-viewport
     >
-      <ul class="flex gap-4">
+      <ul class="flex">
         {
           quotes.map((quote, index) => (
             <li
-              class="w-full shrink-0 snap-start"
+              class="w-full shrink-0 snap-start pr-6 sm:pr-10"
               role="group"
               aria-roledescription="slide"
               aria-label={`${index + 1} of ${quotes.length}`}
               data-carousel-slide
             >
-              <figure class="relative flex min-h-76 flex-col justify-between overflow-hidden rounded-3xl border border-ambedkar-200 bg-mist p-7 text-ambedkar-950 sm:min-h-80 sm:p-10 lg:px-12 lg:py-10">
-                {/* The quotation mark is decoration; the blockquote already
-                    conveys that meaning to assistive software. */}
-                <span
-                  class="pointer-events-none absolute -top-3 right-6 font-display text-8xl leading-none font-bold text-accent-600/14 select-none sm:right-10 sm:text-9xl"
-                  aria-hidden="true"
-                >
-                  &ldquo;
-                </span>
-
-                <blockquote class="relative max-w-4xl font-display text-2xl leading-[1.28] font-semibold tracking-[-0.012em] text-balance sm:text-3xl lg:text-4xl">
+              <figure class="flex min-h-72 flex-col justify-between sm:min-h-80">
+                <blockquote class="max-w-5xl font-serif text-[1.75rem] leading-[1.18] font-normal tracking-[-0.02em] text-balance text-white sm:text-[2.5rem] lg:text-[3.25rem]">
                   {quote.text}
                 </blockquote>
 
-                <figcaption class="relative mt-8 border-t border-ambedkar-900/12 pt-5">
-                  <p class="flex items-center gap-3 text-sm font-bold tracking-[0.12em] text-ambedkar-700 uppercase">
-                    <span
-                      class="h-0.5 w-8 flex-none bg-accent-600"
-                      aria-hidden="true"
-                    />
+                <figcaption class="mt-10 border-t border-white/20 pt-4">
+                  <p class="font-display text-xs font-semibold tracking-[0.16em] text-accent-300 uppercase">
                     {quote.author}
                   </p>
-                  <cite class="mt-2 block pl-11 text-sm text-ambedkar-900/75 not-italic">
+                  <cite class="mt-1.5 block text-sm text-white/55 not-italic">
                     {quote.source}
                   </cite>
                 </figcaption>

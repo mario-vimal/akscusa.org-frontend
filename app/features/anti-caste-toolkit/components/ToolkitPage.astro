@@ -86,7 +86,7 @@ const panelTotal = scenarios.reduce(
       </ProseContent>
     </div>
 
-    <div class="mt-16 border-t border-ambedkar-900/12 pt-12 sm:mt-20 sm:pt-14">
+    <div class="mt-16 border-t border-rule pt-12 sm:mt-20 sm:pt-14">
       <p class="eyebrow">The playbook so far</p>
       <h2 class="toolkit__heading">{scenariosHeading}</h2>
       <p class="toolkit__intro">{scenariosIntro}</p>
@@ -98,7 +98,7 @@ const panelTotal = scenarios.reduce(
               {scenarios.map((scenario, index) => (
                 <li>
                   <a
-                    class="inline-flex items-center gap-2 rounded-full border border-ambedkar-900/12 bg-white px-4 py-2 text-sm font-semibold text-ambedkar-800 shadow-card transition-colors hover:border-ambedkar-900/35 hover:text-ambedkar-950"
+                    class="inline-flex items-center gap-2 rounded-md border border-rule-strong bg-white px-3.5 py-2 font-display text-[0.8125rem] font-medium text-ambedkar-800 shadow-card transition-colors hover:border-ambedkar-950 hover:text-ambedkar-950"
                     href={`#${scenario.id}`}
                   >
                     <span class="font-bold text-accent-700" aria-hidden="true">
@@ -114,7 +114,7 @@ const panelTotal = scenarios.reduce(
       }
 
       <p class="mt-6 text-sm text-ambedkar-900/70">
-        {scenarios.length}
+        {scenarios.length}{" "}
         {scenarios.length === 1 ? "scenario" : "scenarios"}, {panelTotal} illustrated
         panels. Every panel carries a transcript and can be opened full screen.
       </p>

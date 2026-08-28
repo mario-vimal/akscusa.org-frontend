@@ -16,18 +16,20 @@ const isActive =
 
 const variantClasses = {
   default:
-    "link-underline relative rounded-sm px-1 py-2 text-[0.9375rem] font-semibold whitespace-nowrap text-ambedkar-900/80 transition-colors hover:text-ambedkar-950",
-  action: "btn btn-ink w-full text-[0.9375rem] sm:w-auto",
+    "relative rounded-xs py-4 font-display text-[0.875rem] font-medium whitespace-nowrap text-ambedkar-900/75 transition-colors hover:text-ambedkar-950 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:bg-accent-600 after:transition-transform after:duration-300 after:ease-[var(--ease-out-firm)] hover:after:scale-x-100",
+  action: "btn btn-ink btn-sm w-full sm:w-auto",
   mobile:
-    "flex items-center justify-between gap-3 rounded-xl px-4 py-3.5 text-lg font-semibold text-ambedkar-900 transition-colors hover:bg-ambedkar-50 hover:text-ambedkar-950",
+    "flex items-center justify-between gap-3 border-b border-rule py-3.5 font-display text-lg font-medium text-ambedkar-900 transition-colors hover:text-ambedkar-950",
 };
 ---
 
 <a
   class:list={[
     variantClasses[variant],
-    isActive && variant === "default" && "text-ambedkar-950",
-    isActive && variant === "mobile" && "bg-ambedkar-50 text-ambedkar-950",
+    isActive &&
+      variant === "default" &&
+      "text-ambedkar-950 after:scale-x-100 after:bg-ambedkar-950",
+    isActive && variant === "mobile" && "text-ambedkar-950",
   ]}
   href={href}
   aria-current={isActive ? "page" : undefined}

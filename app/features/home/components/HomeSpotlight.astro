@@ -1,0 +1,117 @@
+---
+import Container from "../../../components/ui/Container.astro";
+import { isoDate } from "../../editorial/entries";
+import type { Spotlight } from "../featured";
+
+interface Props {
+  spotlight: Spotlight;
+}
+
+const { spotlight } = Astro.props;
+
+// The dates in this collection are read as UTC everywhere else on the site, so
+// the parts are taken the same way rather than in the visitor's zone.
+const part = (options: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat("en-US", { ...options, timeZone: "UTC" }).format(
+    spotlight.date,
+  );
+
+const month = part({ month: "short" });
+const day = part({ day: "numeric" });
+const year = part({ year: "numeric" });
+const weekday = part({ weekday: "long" });
+---
+
+<!--
+  What AKSC is doing next, built around the date rather than around a heading.
+  Every other band on this page opens with a label and a title, so this one
+  deliberately does not: the day is the thing a reader is deciding about, so
+  the day is set at display size and everything else reads off it.
+-->
+<section class="bg-mist" aria-labelledby="spotlight-title">
+  <Container class="py-20 sm:py-28">
+    <div class="rule-draw"></div>
+
+    <div
+      class="reveal-children mt-10 grid gap-10 sm:mt-12 lg:grid-cols-[minmax(0,13rem)_minmax(0,1fr)] lg:items-start lg:gap-16"
+    >
+      <div>
+        <p class="eyebrow">{spotlight.upcoming ? "Next up" : "Most recent"}</p>
+        <time
+          class="mt-6 block"
+          datetime={isoDate(spotlight.date)}
+          aria-label={`${weekday}, ${month} ${day}, ${year}`}
+        >
+          <span
+            aria-hidden="true"
+            class="block font-display text-sm font-semibold tracking-[0.24em] text-ambedkar-900/70 uppercase"
+            >{month}</span
+          >
+          <span
+            aria-hidden="true"
+            class="block font-display text-[4.5rem] leading-[0.82] font-bold tracking-display text-ambedkar-950 tabular-nums sm:text-[5.5rem]"
+            >{day}</span
+          >
+          <span
+            aria-hidden="true"
+            class="mt-1 block font-display text-2xl leading-none font-semibold tracking-display text-ambedkar-900/70 tabular-nums"
+            >{year}</span
+          >
+        </time>
+        <p class="mt-5 text-sm text-ambedkar-900/70">{weekday}</p>
+      </div>
+
+      <div>
+        <p
+          class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-accent-700 uppercase"
+        >
+          {spotlight.section}
+        </p>
+        <h2
+          id="spotlight-title"
+          class="mt-4 font-display text-display-sm leading-[1.04] font-bold tracking-display text-balance text-ambedkar-950"
+        >
+          <a class="link-underline" href={spotlight.href}>{spotlight.title}</a>
+        </h2>
+        {
+          spotlight.theme && (
+            <p class="mt-5 max-w-2xl font-serif text-xl leading-[1.45] text-ambedkar-900/80 italic sm:text-2xl">
+              {spotlight.theme}
+            </p>
+          )
+        }
+        <p
+          class="mt-5 max-w-2xl font-serif text-lg leading-[1.7] text-ambedkar-900/80"
+        >
+          {spotlight.summary}
+        </p>
+
+        {
+          spotlight.location && (
+            <dl class="mt-8">
+              <dt class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase">
+                Where
+              </dt>
+              <dd class="mt-1 max-w-md text-ambedkar-900/80">
+                {spotlight.location}
+              </dd>
+            </dl>
+          )
+        }
+
+        <div class="mt-9 flex flex-wrap gap-3">
+          <a class="btn btn-primary" href={spotlight.href}>
+            {spotlight.upcoming ? "See what's planned" : "Read the programme"}
+          </a>
+          {
+            spotlight.registrationUrl && spotlight.upcoming && (
+              <a class="btn btn-outline" href={spotlight.registrationUrl}>
+                Register
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>

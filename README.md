@@ -57,9 +57,15 @@ widths.
 
 ## Visual system
 
-`app/styles/global.css` defines Ambedkar blue as the primary scale, saffron as
-an accent, and the self-hosted Cabin variable font. Use named Tailwind tokens
-rather than one-off colors or font families.
+`app/styles/global.css` defines Ambedkar blue as the primary scale, a teal
+`accent` as a controlled secondary, and a crimson `alert` reserved for urgency.
+Type is a three-role system of self-hosted variable fonts: Archivo for headings
+and labels (`font-display`), Instrument Sans for interface text (`font-sans`),
+and Newsreader for long-form reading (`font-serif`). Structure is drawn with
+hairline rules rather than shadows: the one line with weight is the 2px accent
+rule that draws itself in on scroll, carried by `section-head` or on its own as
+`rule-draw`. Use named Tailwind tokens rather than one-off colors or font
+families.
 
 ## Images
 
@@ -68,6 +74,8 @@ rather than one-off colors or font families.
 - Editorial media lives in R2; store its public URL in CMS content.
 - Render imports through `ResponsiveImage.astro` or Astro's image components so
   dimensions, `srcset`, and optimized formats are generated.
+- Posters and flyers go through `Poster.astro`, which sizes the figure to the
+  artwork and enlarges it in an in-page `<dialog>` rather than a new tab.
 - Lowercase kebab-case filenames and useful alt text.
 
 ## Markdown content

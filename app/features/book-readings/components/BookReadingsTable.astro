@@ -18,19 +18,19 @@ const columns = [
 
 <div class="mt-12">
   <div
-    class="rounded-3xl border border-ambedkar-900/10 bg-white p-5 shadow-card sm:p-6"
+    class="rounded-xl border border-rule bg-white p-5 shadow-card sm:p-6"
     data-readings-controls
     hidden
   >
     <div role="search" class="max-w-xl">
       <label
-        class="block text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase"
+        class="block font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase"
         for="reading-search"
       >
         Search readings
       </label>
       <input
-        class="mt-2 w-full rounded-full border border-ambedkar-900/20 bg-mist px-5 py-3 text-ambedkar-950 transition-colors placeholder:text-ambedkar-900/45 hover:border-ambedkar-900/35"
+        class="mt-2 w-full rounded-lg border border-rule-strong bg-paper px-4 py-3 text-ambedkar-950 transition-colors placeholder:text-ambedkar-900/60 hover:border-ambedkar-950"
         id="reading-search"
         type="search"
         autocomplete="off"
@@ -38,7 +38,7 @@ const columns = [
         placeholder="Try a book, an author, a topic, or a year"
         data-readings-search
       />
-      <p class="mt-2 text-sm text-ambedkar-900/60" id="reading-search-hint">
+      <p class="mt-2 text-sm text-ambedkar-900/70" id="reading-search-hint">
         Matches the title, book, author, location, topics, and date of every
         reading. Sort the table by selecting a column heading.
       </p>
@@ -54,24 +54,24 @@ const columns = [
   </p>
 
   <div
-    class="mt-4 overflow-x-auto rounded-3xl border border-ambedkar-900/10 bg-white shadow-card"
+    class="mt-4 overflow-x-auto rounded-xl border border-rule bg-white shadow-card"
     tabindex="0"
     role="region"
     aria-labelledby="readings-table-caption"
   >
     <table class="w-full min-w-176 border-collapse text-left">
       <caption
-        class="px-6 pt-6 text-left text-sm text-ambedkar-900/60"
+        class="px-6 pt-6 text-left text-sm text-ambedkar-900/70"
         id="readings-table-caption"
       >
         Every reading the circle has held, newest first.
       </caption>
       <thead>
-        <tr class="border-b border-ambedkar-900/12">
+        <tr class="border-b border-rule">
           {
             columns.map((column) => (
               <th
-                class="px-6 py-4 text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase"
+                class="px-6 py-4 font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase"
                 scope="col"
                 data-readings-column={column.key}
                 aria-sort={column.key === "date" ? "descending" : "none"}
@@ -81,7 +81,7 @@ const columns = [
             ))
           }
           <th
-            class="hidden px-6 py-4 text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase lg:table-cell"
+            class="hidden px-6 py-4 font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase lg:table-cell"
             scope="col"
           >
             Where
@@ -107,7 +107,7 @@ const columns = [
                   {row.dateLabel}
                 </time>
                 {row.upcoming && (
-                  <span class="mt-2 block w-fit rounded-full bg-accent-300 px-2.5 py-1 text-xs font-bold tracking-wide text-ambedkar-950 uppercase">
+                  <span class="mt-2 block w-fit rounded-sm border border-accent-600 px-1.5 py-0.5 font-display text-[0.625rem] font-semibold tracking-[0.1em] text-accent-700 uppercase">
                     Upcoming
                   </span>
                 )}
@@ -129,16 +129,16 @@ const columns = [
                     >
                       <cite class="not-italic">{row.book.title}</cite>
                     </a>
-                    <span class="mt-1 block text-sm text-ambedkar-900/60">
+                    <span class="mt-1 block text-sm text-ambedkar-900/70">
                       {row.book.authors}
                     </span>
                   </>
                 ) : row.readsArticles ? (
-                  <span class="text-sm text-ambedkar-900/55">
+                  <span class="text-sm text-ambedkar-900/70">
                     Articles and papers
                   </span>
                 ) : (
-                  <span class="text-sm text-ambedkar-900/55" aria-hidden="true">
+                  <span class="text-sm text-ambedkar-900/70" aria-hidden="true">
                     &mdash;
                   </span>
                 )}
@@ -234,7 +234,7 @@ const columns = [
       const button = document.createElement("button");
       button.type = "button";
       button.className =
-        "-mx-2 flex items-center gap-1.5 rounded-full px-2 py-1 text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase transition hover:text-ambedkar-950";
+        "-mx-2 -my-4 flex items-center gap-1.5 rounded-sm px-2 py-4 font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase transition hover:text-ambedkar-950";
       button.textContent = header.textContent?.trim() ?? "";
 
       const arrow = document.createElement("span");
@@ -252,7 +252,7 @@ const columns = [
             ? "\u2191"
             : "\u2193"
           : "\u2195";
-        arrow.className = active ? "text-ambedkar-900" : "text-ambedkar-900/35";
+        arrow.className = active ? "text-ambedkar-900" : "text-ambedkar-900/70";
       });
 
       button.addEventListener("click", () => {

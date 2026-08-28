@@ -53,6 +53,10 @@ const backgroundPositionClass =
   at full strength, so the brand colour leads each page rather than only edging
   it. Optional photographs remain decorative and are returned to the palette by
   the blue tint; the dark gradient protects the text across every image crop.
+
+  The panel is a flat field with the column grid drawn faintly across it. The
+  blurred colour blobs that used to sit here were decoration standing in for
+  structure, and every generated page has them.
 -->
 <div
   class:list={[
@@ -76,54 +80,46 @@ const backgroundPositionClass =
           aria-hidden="true"
         />
         <div
-          class="absolute inset-0 -z-10 bg-linear-to-r from-ambedkar-1000/95 via-ambedkar-950/88 to-ambedkar-900/82"
-          aria-hidden="true"
-        />
-        <div
-          class="absolute inset-0 -z-10 bg-linear-to-t from-ambedkar-1000/55 via-transparent to-ambedkar-950/20"
+          class="absolute inset-0 -z-10 bg-linear-to-r from-ambedkar-1000/96 via-ambedkar-950/90 to-ambedkar-950/78"
           aria-hidden="true"
         />
       </>
     ) : (
       <div
-        class="absolute inset-0 -z-10 bg-[radial-gradient(115%_125%_at_86%_-15%,var(--color-ambedkar-700),transparent_56%),radial-gradient(75%_95%_at_-5%_110%,var(--color-accent-950),transparent_58%)]"
+        class="absolute inset-0 -z-10 bg-linear-to-b from-ambedkar-900 to-ambedkar-1000"
         aria-hidden="true"
       />
     )
   }
-  <div
-    class="absolute inset-0 -z-10 pattern-dots mask-[linear-gradient(to_bottom,black,transparent_78%)] text-white/12"
-    aria-hidden="true"
-  >
-  </div>
-  <div class="absolute inset-0 -z-10 grain opacity-[0.045]" aria-hidden="true">
+  <div class="absolute inset-0 -z-10 grain opacity-[0.035]" aria-hidden="true">
   </div>
 
-  <Container class="pt-12 pb-14 sm:pt-16 sm:pb-20">
+  <Container class="pt-14 pb-16 sm:pt-20 sm:pb-24">
     <slot name="above" />
 
     <div
       class:list={[
-        size === "large" ? "max-w-4xl" : "max-w-3xl",
-        hasAbove && "mt-9",
+        "rise",
+        size === "large" ? "max-w-5xl" : "max-w-4xl",
+        hasAbove && "mt-10",
       ]}
     >
       <p class="eyebrow eyebrow-light">{eyebrow}</p>
       <h1
-        class="mt-5 font-display text-display-lg leading-[1.04] font-semibold tracking-[-0.02em] text-balance"
+        class="mt-6 font-display text-display-lg leading-[0.98] font-bold tracking-display text-balance"
       >
         {title}
       </h1>
       {
         description && (
-          <p class="mt-6 max-w-2xl text-lg leading-8 text-white/78 sm:text-xl">
+          <p class="mt-7 max-w-2xl font-serif text-xl leading-[1.65] text-white/75 sm:text-[1.375rem]">
             {description}
           </p>
         )
       }
       {
         meta && (
-          <p class="mt-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-white/85 ring-1 ring-white/15 ring-inset">
+          <p class="mt-8 font-display text-xs font-semibold tracking-[0.14em] text-white/70 uppercase">
             {meta}
           </p>
         )
@@ -135,22 +131,24 @@ const backgroundPositionClass =
 
   {
     backgroundImage && (backgroundLabel || backgroundCredit) && (
-      <div class="absolute right-4 bottom-3 max-w-[calc(100%-2rem)] rounded-xl bg-ambedkar-1000/70 px-3 py-1.5 text-right text-[0.6875rem] leading-4 text-white/80 ring-1 ring-white/15 ring-inset sm:right-6 sm:bottom-4">
+      <div class="absolute right-4 bottom-4 max-w-[calc(100%-2rem)] text-right sm:right-6 sm:bottom-5">
         {backgroundLabel && (
-          <p class="font-semibold">Pictured: {backgroundLabel}</p>
+          <p class="font-display text-[0.625rem] font-semibold tracking-[0.12em] text-white/65 uppercase [text-shadow:0_1px_4px_var(--color-ambedkar-1000)]">
+            Pictured: {backgroundLabel}
+          </p>
         )}
         {backgroundCredit && (
-          <p class="text-white/65">
+          <p class="mt-1 text-[0.6875rem] leading-4 text-white/55 [text-shadow:0_1px_4px_var(--color-ambedkar-1000)]">
             Image:{" "}
             <a
-              class="underline decoration-white/30 underline-offset-2 hover:text-white"
+              class="underline decoration-white/25 underline-offset-2 hover:text-white"
               href={backgroundCredit.sourceHref}
             >
               {backgroundCredit.creator}
             </a>{" "}
             ·{" "}
             <a
-              class="underline decoration-white/30 underline-offset-2 hover:text-white"
+              class="underline decoration-white/25 underline-offset-2 hover:text-white"
               href={backgroundCredit.licenseHref}
               rel="license"
             >
@@ -162,10 +160,4 @@ const backgroundPositionClass =
       </div>
     )
   }
-
-  <div
-    class="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-accent-600 via-accent-300/70 to-transparent"
-    aria-hidden="true"
-  >
-  </div>
 </div>

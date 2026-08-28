@@ -48,7 +48,7 @@ const sessionLabel =
         />
       ) : (
         <div
-          class="flex w-20 shrink-0 items-center justify-center self-start rounded-lg border border-dashed border-ambedkar-900/20 bg-ambedkar-50 px-2 py-8 text-center text-xs font-semibold text-ambedkar-800/70 sm:w-24"
+          class="flex w-20 shrink-0 items-center justify-center self-start rounded-lg border border-dashed border-rule-strong bg-ambedkar-50 px-2 py-8 text-center text-xs font-semibold text-ambedkar-800/70 sm:w-24"
           aria-hidden="true"
         >
           No cover
@@ -58,12 +58,12 @@ const sessionLabel =
 
     <div class="min-w-0">
       <p
-        class="text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase"
+        class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase"
       >
         {authors}
       </p>
       <h2
-        class="mt-2 font-display text-xl leading-[1.2] font-semibold tracking-[-0.015em] text-balance text-ambedkar-950"
+        class="mt-2 font-display text-xl leading-[1.16] font-semibold tracking-title text-balance text-ambedkar-950"
       >
         <a
           class="after:absolute after:inset-0 focus-visible:outline-none"
@@ -72,13 +72,13 @@ const sessionLabel =
           {title}
         </a>
       </h2>
-      {subtitle && <p class="mt-1 text-sm text-ambedkar-900/60">{subtitle}</p>}
+      {subtitle && <p class="mt-1 text-sm text-ambedkar-900/70">{subtitle}</p>}
       <span
         class:list={[
-          "mt-3 inline-block rounded-full px-2.5 py-1 text-xs font-bold tracking-wide uppercase",
+          "mt-3 inline-block rounded-sm border px-1.5 py-0.5 font-display text-[0.625rem] font-semibold tracking-[0.1em] uppercase",
           sessions > 0
-            ? "bg-ambedkar-900/10 text-ambedkar-900"
-            : "bg-accent-300 text-ambedkar-950",
+            ? "border-rule-strong text-ambedkar-900/70"
+            : "border-accent-600 text-accent-700",
         ]}
       >
         {sessionLabel}
@@ -88,7 +88,7 @@ const sessionLabel =
 
   <p class="mt-5 leading-7 text-ambedkar-900/75">{summary}</p>
 
-  <ul class="mt-4 space-y-1 text-sm text-ambedkar-900/65">
+  <ul class="mt-4 space-y-1 text-sm text-ambedkar-900/70">
     <li class="wrap-break-word">ISBN {isbn}</li>
     {publisher && <li>{publisher}</li>}
   </ul>
@@ -104,7 +104,7 @@ const sessionLabel =
       )
     }
     <p
-      class="mt-5 flex items-center gap-2 text-sm font-bold tracking-[0.06em] text-ambedkar-700 uppercase group-hover:text-ambedkar-900"
+      class="mt-5 flex items-center gap-2 font-display text-xs font-semibold tracking-[0.12em] text-ambedkar-700 uppercase transition-colors group-hover:text-ambedkar-950"
       aria-hidden="true"
     >
       Read more

@@ -34,7 +34,7 @@ const paragraphs = (bio: string) => bio.split(/\n\s*\n/).filter(Boolean);
       <p class="eyebrow">People and movements</p>
       <h2
         id="speakers-heading"
-        class="mt-4 font-display text-3xl font-semibold tracking-[-0.015em] text-ambedkar-950 sm:text-4xl"
+        class="mt-4 font-display text-3xl leading-[1.05] font-bold tracking-display text-ambedkar-950 sm:text-4xl"
       >
         Conference speakers
       </h2>
@@ -58,14 +58,14 @@ const paragraphs = (bio: string) => bio.split(/\n\s*\n/).filter(Boolean);
                   />
                 ) : (
                   <span
-                    class="on-dark flex size-14 shrink-0 items-center justify-center rounded-2xl bg-ambedkar-950 font-display text-xl font-semibold text-accent-300"
+                    class="on-dark flex size-14 shrink-0 items-center justify-center rounded-2xl bg-ambedkar-950 font-display text-xl leading-[1.15] font-semibold tracking-title text-accent-300"
                     aria-hidden="true"
                   >
                     {initials(speaker.name)}
                   </span>
                 )}
                 <span class="min-w-0">
-                  <span class="block font-display text-xl leading-tight font-semibold text-ambedkar-950 sm:text-2xl">
+                  <span class="block font-display text-xl leading-[1.16] font-semibold tracking-title text-ambedkar-950 sm:text-2xl">
                     {speaker.name}
                   </span>
                   <span class="mt-2 block text-sm leading-6 text-ambedkar-900/70">
@@ -73,7 +73,7 @@ const paragraphs = (bio: string) => bio.split(/\n\s*\n/).filter(Boolean);
                   </span>
                 </span>
               </div>
-              <span class="mt-5 flex items-center justify-between border-t border-ambedkar-900/10 pt-4 text-sm font-bold tracking-[0.06em] text-ambedkar-700 uppercase">
+              <span class="mt-5 flex items-center justify-between border-t border-rule pt-4 font-display text-xs font-semibold tracking-[0.12em] text-ambedkar-700 uppercase">
                 <span class="group-open:hidden">Read biography</span>
                 <span class="hidden group-open:inline">Close biography</span>
                 <span
@@ -85,7 +85,7 @@ const paragraphs = (bio: string) => bio.split(/\n\s*\n/).filter(Boolean);
               </span>
             </summary>
 
-            <div class="border-t border-ambedkar-900/10 px-6 pt-5 pb-7 sm:px-7">
+            <div class="border-t border-rule px-6 pt-5 pb-7 sm:px-7">
               {paragraphs(speaker.bio).map((paragraph) => (
                 <p class="mt-4 leading-7 text-ambedkar-900/78 first:mt-0">
                   {paragraph}

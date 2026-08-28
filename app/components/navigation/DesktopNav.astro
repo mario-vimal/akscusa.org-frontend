@@ -14,15 +14,17 @@ const { currentPath } = Astro.props;
   breathe from 1280px up. Below that the sheet in MobileNav takes over, so the
   links are never squeezed to the point of being hard to hit or read.
 -->
-<nav class="hidden items-center gap-6 xl:flex" aria-label="Primary navigation">
-  <ul class="flex items-center gap-5">
+<nav class="hidden items-stretch gap-7 xl:flex" aria-label="Primary navigation">
+  <ul class="flex items-stretch gap-6">
     {
       primaryNavigation.map((item) => (
-        <li>
+        <li class="flex items-stretch">
           <NavLink {...item} currentPath={currentPath} />
         </li>
       ))
     }
   </ul>
-  <NavLink {...donateNavigation} currentPath={currentPath} variant="action" />
+  <div class="flex items-center">
+    <NavLink {...donateNavigation} currentPath={currentPath} variant="action" />
+  </div>
 </nav>

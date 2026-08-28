@@ -36,12 +36,12 @@ const {
 -->
 <aside
   class:list={[
-    "on-dark relative isolate overflow-hidden rounded-3xl bg-ambedkar-950 px-6 py-9 text-white shadow-soft sm:px-10 sm:py-12",
+    "on-dark relative isolate overflow-hidden rounded-xl bg-ambedkar-950 px-6 py-9 text-white sm:px-10 sm:py-12",
     className,
   ]}
 >
   <div
-    class="absolute inset-0 -z-10 bg-[radial-gradient(90%_140%_at_100%_0%,var(--color-accent-900),transparent_58%),radial-gradient(70%_110%_at_0%_100%,var(--color-ambedkar-800),transparent_58%)]"
+    class="absolute inset-0 -z-10 bg-linear-to-br from-ambedkar-900 to-ambedkar-1000"
     aria-hidden="true"
   >
   </div>
@@ -51,7 +51,7 @@ const {
   <div class="max-w-3xl">
     <p class="eyebrow eyebrow-light">{eyebrow}</p>
     <h2
-      class="mt-4 font-display text-display-sm leading-tight font-semibold tracking-[-0.015em] text-balance"
+      class="mt-4 font-display text-display-sm leading-[1.04] font-bold tracking-display text-balance"
     >
       {title}
     </h2>
@@ -61,9 +61,9 @@ const {
       steps.length > 0 && (
         <ol class="mt-8 grid gap-4 sm:grid-cols-3">
           {steps.map((step, index) => (
-            <li class="rounded-2xl bg-white/8 p-5 ring-1 ring-white/12 ring-inset">
+            <li class="rounded-lg bg-white/8 p-5 ring-1 ring-white/12 ring-inset">
               <p
-                class="font-display text-2xl leading-none font-semibold text-accent-300"
+                class="font-display text-2xl leading-none font-bold tracking-display text-accent-300"
                 aria-hidden="true"
               >
                 {index + 1}

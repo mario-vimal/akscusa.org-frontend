@@ -12,7 +12,7 @@ const { hero } = Astro.props;
 ---
 
 <section
-  class="on-dark relative isolate flex min-h-136 flex-col justify-end overflow-hidden bg-ambedkar-950 sm:min-h-160 lg:min-h-184"
+  class="on-dark relative isolate flex min-h-152 flex-col justify-end overflow-hidden bg-ambedkar-950 sm:min-h-176 lg:min-h-200"
 >
   <ResponsiveImage
     src={organizeHero}
@@ -23,10 +23,11 @@ const { hero } = Astro.props;
     widths={[640, 960, 1280, 1500]}
   />
   <!--
-    Three layers over the photograph rather than one. The first returns the
-    brand blue that `duotone` stripped out, the second darkens the corner the
-    text sits in, and the third lifts the far edge so the picture does not go
-    flat where nothing is written over it.
+    Two layers over the photograph rather than four. The first returns the brand
+    blue that `duotone` stripped out; the second is a single vertical ramp that
+    carries the picture down into the ink the headline is set on. The dot field
+    and the blurred teal blob that used to sit here were doing nothing the type
+    was not already doing better.
   -->
   <div
     class="absolute inset-0 -z-20 bg-ambedkar-800 mix-blend-color"
@@ -34,32 +35,27 @@ const { hero } = Astro.props;
   >
   </div>
   <div
-    class="absolute inset-0 -z-10 bg-[linear-gradient(to_top,var(--color-ambedkar-950)_4%,rgb(16_35_62/0.86)_34%,rgb(16_35_62/0.5)_66%,rgb(16_35_62/0.72)_100%),radial-gradient(70%_90%_at_100%_100%,rgb(13_143_136/0.35),transparent_60%)]"
+    class="absolute inset-0 -z-10 bg-[linear-gradient(to_top,var(--color-ambedkar-950)_0%,rgb(12_30_54/0.96)_44%,rgb(12_30_54/0.6)_72%,rgb(12_30_54/0.42)_100%)]"
     aria-hidden="true"
   >
   </div>
-  <div
-    class="absolute inset-0 -z-10 pattern-dots mask-[linear-gradient(to_top,black,transparent_55%)] text-white/10"
-    aria-hidden="true"
-  >
-  </div>
-  <div class="absolute inset-0 -z-10 grain opacity-[0.06]" aria-hidden="true">
+  <div class="absolute inset-0 -z-10 grain opacity-[0.04]" aria-hidden="true">
   </div>
 
-  <Container class="pt-24 pb-14 sm:pt-32 sm:pb-20">
-    <div class="max-w-4xl">
+  <Container class="pt-28 pb-16 sm:pt-36 sm:pb-20">
+    <div class="rise max-w-5xl">
       <p class="eyebrow eyebrow-light">{hero.eyebrow}</p>
       <h1
-        class="mt-6 font-display text-display-xl leading-[0.98] font-bold tracking-[-0.025em] text-balance text-white"
+        class="mt-7 font-display text-display-xl leading-[0.9] font-bold tracking-display text-balance text-white"
       >
         {hero.title}
       </h1>
       <p
-        class="mt-7 max-w-2xl border-l-2 border-accent-300/70 pl-5 text-lg leading-8 text-white/85 sm:text-xl"
+        class="mt-8 max-w-2xl font-serif text-xl leading-[1.6] text-white/80 sm:text-2xl"
       >
         {hero.description}
       </p>
-      <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <div class="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <a class="btn btn-primary" href={hero.primaryAction.href}>
           {hero.primaryAction.label}
         </a>

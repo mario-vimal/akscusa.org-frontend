@@ -8,21 +8,25 @@ interface Props {
 const { href, tone = "dark" } = Astro.props;
 
 const toneClasses = {
-  light:
-    "border-white/25 bg-white/10 text-white/90 hover:border-white/60 hover:bg-white/20 hover:text-white",
-  dark: "border-ambedkar-900/15 bg-white text-ambedkar-800 hover:border-ambedkar-900/40 hover:text-ambedkar-950",
+  light: "text-white/70 hover:text-white",
+  dark: "text-ambedkar-900/70 hover:text-ambedkar-950",
 };
 ---
 
+<!--
+  A plain link with an arrow rather than a bordered chip. Boxing every
+  navigational aid puts a control where a sentence would do, and the row of
+  them was the first thing on each detail page.
+-->
 <a
   class:list={[
-    "group inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+    "group inline-flex min-h-11 items-center gap-2 font-display text-[0.8125rem] font-medium tracking-[0.02em] transition-colors",
     toneClasses[tone],
   ]}
   href={href}
 >
   <span
-    class="inline-block transition-transform duration-300 group-hover:-translate-x-1"
+    class="inline-block transition-transform duration-300 ease-[var(--ease-out-firm)] group-hover:-translate-x-1"
     aria-hidden="true">&larr;</span
   >
   <slot />

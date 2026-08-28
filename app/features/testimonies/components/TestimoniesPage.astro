@@ -48,14 +48,14 @@ const {
 
   <Container class="pt-10 pb-20 sm:pt-12 sm:pb-28">
     <p
-      class="max-w-3xl rounded-l-md rounded-r-2xl border border-l-4 border-ambedkar-900/10 border-l-alert-600 bg-white px-5 py-4 text-sm leading-6 text-ambedkar-900/75 shadow-card"
+      class="max-w-3xl rounded-l-md rounded-r-2xl border border-l-4 border-rule border-l-alert-600 bg-white px-5 py-4 text-sm leading-6 text-ambedkar-900/75 shadow-card"
     >
       {contentNote}
     </p>
 
     <details
       data-topic-menu
-      class="group sticky top-22 z-30 mt-8 rounded-2xl border border-ambedkar-900/10 bg-white p-5 shadow-card lg:hidden"
+      class="group sticky top-22 z-30 mt-8 rounded-2xl border border-rule bg-white p-5 shadow-card lg:hidden"
     >
       <summary
         class="flex cursor-pointer items-center justify-between gap-3 font-semibold text-ambedkar-950"
@@ -90,7 +90,7 @@ const {
     <div class="mt-10 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-14">
       <aside class="sticky top-24 hidden self-start lg:block">
         <nav
-          class="max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-ambedkar-900/10 bg-white p-5 shadow-card"
+          class="max-h-[calc(100vh-7rem)] overflow-y-auto rounded-2xl border border-rule bg-white p-5 shadow-card"
           aria-label="Testimony topics"
         >
           <p class="eyebrow px-1">Browse by topic</p>
@@ -117,10 +117,10 @@ const {
     </div>
 
     <div
-      class="on-dark relative isolate mt-16 overflow-hidden rounded-3xl bg-ambedkar-950 px-6 py-9 text-white shadow-soft sm:px-10 sm:py-11 lg:ml-78"
+      class="on-dark relative isolate mt-16 overflow-hidden rounded-xl bg-ambedkar-950 px-6 py-9 text-white sm:px-10 sm:py-11 lg:ml-78"
     >
       <div
-        class="absolute inset-0 -z-10 bg-[radial-gradient(90%_140%_at_100%_0%,var(--color-accent-900),transparent_58%),radial-gradient(70%_110%_at_0%_100%,var(--color-ambedkar-800),transparent_58%)]"
+        class="absolute inset-0 -z-10 bg-linear-to-br from-ambedkar-900 to-ambedkar-1000"
         aria-hidden="true"
       >
       </div>
@@ -132,7 +132,7 @@ const {
 
       <p class="eyebrow eyebrow-light">Add your voice</p>
       <h2
-        class="mt-4 font-display text-display-sm leading-tight font-semibold tracking-[-0.015em] text-balance"
+        class="mt-4 font-display text-display-sm leading-[1.04] font-bold tracking-display text-balance"
       >
         Help document and end caste practices in the USA.
       </h2>

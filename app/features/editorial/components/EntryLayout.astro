@@ -49,8 +49,8 @@ const { path, label } = editorialSections[section];
 
 const badgeClasses =
   badge?.tone === "muted"
-    ? "bg-white/15 text-white ring-1 ring-white/25 ring-inset"
-    : "bg-accent-300 text-ambedkar-950";
+    ? "border-white/40 text-white/85"
+    : "border-accent-400/70 text-accent-300";
 ---
 
 <article>
@@ -69,7 +69,7 @@ const badgeClasses =
         <p class="mt-8">
           <span
             class:list={[
-              "inline-block rounded-full px-3 py-1 text-xs font-bold tracking-wide uppercase",
+              "inline-block rounded-sm border px-1.5 py-0.5 font-display text-[0.625rem] font-semibold tracking-[0.1em] uppercase",
               badgeClasses,
             ]}
           >
@@ -83,16 +83,16 @@ const badgeClasses =
   <Container class="pt-12 pb-20 sm:pt-14 sm:pb-28">
     {
       details.length > 0 && (
-        <dl class="card max-w-3xl gap-x-8 gap-y-5 p-6 sm:grid sm:grid-cols-2 sm:p-8">
+        <dl class="max-w-3xl border-t border-ambedkar-950 sm:grid sm:grid-cols-2 sm:gap-x-10">
           {details.map((detail) => (
-            <div>
-              <dt class="text-xs font-bold tracking-[0.14em] text-ambedkar-700 uppercase">
+            <div class="border-b border-rule py-4">
+              <dt class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase">
                 {detail.term}
               </dt>
-              <dd class="mt-1 leading-7 text-ambedkar-900/80">
+              <dd class="mt-1.5 leading-7 text-ambedkar-900/80">
                 {detail.href ? (
                   <a
-                    class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                    class="link-underline font-medium text-ambedkar-800"
                     href={detail.href}
                   >
                     {detail.description}
@@ -111,12 +111,12 @@ const badgeClasses =
       callout && (
         <div
           class:list={[
-            "on-dark relative isolate max-w-3xl overflow-hidden rounded-3xl bg-ambedkar-950 px-6 py-7 text-mist shadow-soft sm:px-8",
+            "on-dark relative isolate max-w-3xl overflow-hidden rounded-xl bg-ambedkar-950 px-6 py-7 text-mist sm:px-8",
             details.length > 0 ? "mt-8" : "",
           ]}
         >
           <div
-            class="absolute inset-0 -z-10 bg-[radial-gradient(80%_120%_at_100%_0%,var(--color-accent-900),transparent_60%)]"
+            class="absolute inset-0 -z-10 bg-linear-to-br from-ambedkar-900 to-ambedkar-1000"
             aria-hidden="true"
           />
           <p class="eyebrow eyebrow-light">{callout.heading}</p>
@@ -128,7 +128,7 @@ const badgeClasses =
     {
       heroImage && (
         <img
-          class="mt-10 w-full max-w-3xl rounded-3xl border border-ambedkar-900/10 shadow-card"
+          class="mt-10 w-full max-w-3xl rounded-xl border border-rule shadow-card"
           src={heroImage.src}
           alt={heroImage.alt}
           loading="eager"
@@ -148,7 +148,7 @@ const badgeClasses =
     {
       links && links.items.length > 0 && (
         <section class="card mt-12 max-w-3xl p-6 sm:p-8">
-          <h2 class="font-display text-xl font-semibold tracking-[-0.01em] text-ambedkar-950">
+          <h2 class="font-display text-xl font-semibold tracking-title text-ambedkar-950">
             {links.heading}
           </h2>
           <ul class="mt-4 space-y-3">
@@ -182,7 +182,7 @@ const badgeClasses =
 
     {
       sourceUrl && (
-        <p class="mt-10 max-w-3xl text-sm wrap-break-word text-ambedkar-900/60">
+        <p class="mt-10 max-w-3xl text-sm wrap-break-word text-ambedkar-900/70">
           Originally published at{" "}
           <a
             class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"

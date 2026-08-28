@@ -1,21 +1,45 @@
-@import "@fontsource-variable/cabin";
-@import "@fontsource-variable/source-serif-4";
+@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource-variable/instrument-sans/wdth.css";
+@import "@fontsource-variable/newsreader/opsz.css";
+@import "@fontsource-variable/newsreader/opsz-italic.css";
 @import "tailwindcss";
 
 @theme {
   /*
-   * Cabin carries the interface and body copy. Source Serif 4 carries display
-   * headlines, pull quotes, and editorial headings: the pairing gives the page
-   * a printed, argued quality that suits a study circle, and the shift between
-   * the two is what marks a heading as a heading rather than size alone.
+   * Three faces, three jobs. A site that sets everything in one serif and one
+   * sans has to make a heading a heading with size alone, and the result reads
+   * as a template rather than as a publication.
+   *
+   * Archivo is a grotesque drawn from the American gothics of newspaper decks
+   * and printed placards. It carries the institution's voice: titles, section
+   * headings, buttons, navigation, labels, and figures. It is set tight and
+   * slightly expanded so a headline holds a page the way a banner holds a
+   * street.
+   *
+   * Instrument Sans carries the interface and the short copy around it. It is
+   * quieter and narrower than Archivo, so a caption never competes with the
+   * heading above it.
+   *
+   * Newsreader carries argument: article bodies, ledes, and quotation. It was
+   * drawn for reading news on a screen and has a true italic, which a study
+   * circle that publishes at length actually needs.
    */
-  --font-sans:
-    "Cabin Variable", Cabin, "Segoe UI", "Apple Color Emoji", "Segoe UI Emoji",
-    "Noto Color Emoji", Helvetica, Arial, sans-serif;
   --font-display:
-    "Source Serif 4 Variable", "Source Serif 4", "Iowan Old Style", Georgia,
+    "Archivo Variable", Archivo, "Helvetica Neue", "Segoe UI",
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", Helvetica, Arial,
+    sans-serif;
+  --font-display--font-variation-settings: "wdth" 104;
+
+  --font-sans:
+    "Instrument Sans Variable", "Instrument Sans", "Segoe UI",
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", Helvetica, Arial,
+    sans-serif;
+
+  --font-serif:
+    "Newsreader Variable", Newsreader, "Iowan Old Style", Georgia,
     "Times New Roman", "Apple Color Emoji", "Segoe UI Emoji",
     "Noto Color Emoji", serif;
+  --font-serif--font-variation-settings: "opsz" 20;
 
   --color-ambedkar-50: #f2f7fd;
   --color-ambedkar-100: #e4eef9;
@@ -26,10 +50,11 @@
   --color-ambedkar-600: #1f62aa;
   --color-ambedkar-700: #194e8a;
   --color-ambedkar-800: #193f6e;
-  --color-ambedkar-900: #19375c;
-  --color-ambedkar-950: #10233e;
+  --color-ambedkar-900: #16304f;
+  /* Deepened, so the ink reads as ink rather than as a dark blue tint. */
+  --color-ambedkar-950: #0c1e36;
   /* One step below 950, so panels can be layered on the darkest sections. */
-  --color-ambedkar-1000: #0a172b;
+  --color-ambedkar-1000: #071324;
 
   /*
    * Accent scale. Deliberately teal rather than the saffron this replaced:
@@ -40,8 +65,9 @@
    * contrast-checked: 300 carries dark text on it and light text on dark blue,
    * 400 is the hover step, and 600 covers the focus ring and decorative marks.
    *
-   * The scale is filled out so the accent can carry tints and shades of its own
-   * instead of being faked with the blue at low opacity.
+   * The accent now works at hairline scale almost everywhere: a rule under a
+   * label, an active tab, a link's underline. A colour that fills large shapes
+   * stops being an accent.
    */
   --color-accent-50: #edfbf8;
   --color-accent-100: #d3f5ef;
@@ -69,29 +95,60 @@
   --color-alert-700: #a70b31;
   --color-alert-950: #4a0a1c;
 
-  /* Page surface: a blue-tinted paper, so white cards separate from it. */
-  --color-mist: #eff4fa;
+  /*
+   * Paper. The page used to be a blue wash, which tinted every photograph and
+   * every white card sitting on it. It is now very nearly neutral, so the blue
+   * only appears where it is put on purpose.
+   */
+  --color-paper: #ffffff;
+  --color-mist: #f6f7f9;
   /* A step deeper than mist, for banding one light section against the next. */
-  --color-haze: #e2ebf6;
+  --color-haze: #eaecf0;
 
-  --shadow-soft: 0 24px 80px -40px rgb(16 35 62 / 45%);
-  /* Two parts: a tight contact edge, then a wide and very soft cast. */
-  --shadow-card:
-    0 1px 2px rgb(16 35 62 / 6%), 0 12px 32px -20px rgb(16 35 62 / 32%);
+  /*
+   * Hairlines carry the structure of the page, so they are named rather than
+   * re-mixed at every call site. `rule` is the ordinary divider, `rule-strong`
+   * the one that marks a real break.
+   */
+  --color-rule: #dde1e8;
+  --color-rule-strong: #c3cad6;
+
+  /*
+   * Shadows are now almost absent. Soft drop shadows under every card were
+   * what made the page read as a stack of floating panels; structure comes
+   * from hairlines and space instead. What is left is a contact edge, and one
+   * genuine cast for elements that really do sit above the page, such as the
+   * mobile navigation sheet.
+   */
+  --shadow-card: 0 1px 1px rgb(12 30 54 / 4%);
   --shadow-lift:
-    0 2px 4px rgb(16 35 62 / 8%), 0 28px 56px -28px rgb(16 35 62 / 42%);
+    0 1px 1px rgb(12 30 54 / 5%), 0 18px 40px -28px rgb(12 30 54 / 35%);
+  --shadow-soft: 0 40px 80px -48px rgb(7 19 36 / 55%);
 
   /*
    * Fluid display sizes. Each clamp is anchored so the smallest value is
    * comfortable at 320px and the largest only arrives past the container width,
    * which removes the row of breakpoint overrides these headings used to carry.
+   *
+   * The top of the scale is far larger than it was. A masthead that is only a
+   * little bigger than the paragraph under it does not lead anything.
    */
-  --text-display-sm: clamp(1.75rem, 1.35rem + 2vw, 2.5rem);
-  --text-display-md: clamp(2rem, 1.45rem + 2.75vw, 3.25rem);
-  --text-display-lg: clamp(2.375rem, 1.55rem + 4.1vw, 4.25rem);
-  --text-display-xl: clamp(2.75rem, 1.5rem + 6.25vw, 5.5rem);
+  --text-display-sm: clamp(1.625rem, 1.28rem + 1.7vw, 2.25rem);
+  --text-display-md: clamp(2.125rem, 1.4rem + 3.2vw, 3.5rem);
+  --text-display-lg: clamp(2.5rem, 1.35rem + 5vw, 4.5rem);
+  --text-display-xl: clamp(2.875rem, 1.1rem + 7.7vw, 6.5rem);
+
+  /*
+   * Optical tracking. Type set large needs to be pulled in and type set small
+   * needs to be opened out; the same letterspacing at both sizes is the mark of
+   * a page nobody looked at.
+   */
+  --tracking-display: -0.035em;
+  --tracking-title: -0.022em;
+  --tracking-label: 0.14em;
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-firm: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
@@ -105,13 +162,25 @@
     background: var(--color-mist);
     color: var(--color-ambedkar-950);
     font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   ::selection {
-    background: var(--color-accent-300);
+    background: var(--color-accent-200);
     color: var(--color-ambedkar-950);
+  }
+
+  /*
+   * Figures are set in the display face throughout, and tabular figures keep a
+   * column of dates and counts from shifting as the numbers change.
+   */
+  time,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
   }
 
   /*
@@ -120,8 +189,9 @@
    * saffron ring it replaces sat at 1.7:1 on the page background.
    */
   :focus-visible {
-    outline: 3px solid var(--color-accent-600);
+    outline: 2px solid var(--color-accent-600);
     outline-offset: 3px;
+    border-radius: 0.125rem;
   }
 
   /*
@@ -136,26 +206,11 @@
 }
 
 /*
- * Decorative surfaces. Every one of these is a background layer only: they
- * carry no meaning, so they sit on aria-hidden elements or pseudo elements and
- * never enter the reading order.
- */
-@utility pattern-dots {
-  background-image: radial-gradient(currentColor 1px, transparent 1.15px);
-  background-size: 1.25rem 1.25rem;
-}
-
-@utility pattern-grid {
-  background-image:
-    linear-gradient(to right, currentColor 1px, transparent 1px),
-    linear-gradient(to bottom, currentColor 1px, transparent 1px);
-  background-size: 4rem 4rem;
-}
-
-/*
- * A fine film of noise. Large flat gradients band on wide screens and read as
- * plastic; grain breaks both up. It is drawn as an inline SVG so it costs no
- * request and tiles at any size.
+ * A fine film of noise. Large flat fields of a single dark colour band on wide
+ * screens and read as plastic; grain breaks them up. It is drawn as an inline
+ * SVG so it costs no request and tiles at any size, and it is the only texture
+ * left on the site: the dot fields and the blurred colour blobs that used to
+ * sit under every dark panel were decoration standing in for structure.
  */
 @utility grain {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -167,87 +222,96 @@
  * palette together and stops a warm image reading as the saffron it avoids.
  */
 @utility duotone {
-  filter: grayscale(1) contrast(1.06) brightness(0.94);
+  filter: grayscale(1) contrast(1.32) brightness(0.5);
 }
 
 @layer components {
   /*
-   * Small caps label with a short rule in front of it, set above headings
-   * across the site so every section opens the same way.
+   * The section label. It used to be an uppercase word behind a short dash,
+   * which is the single most copied ornament on the web, and then a word under
+   * a full-measure rule, which put a horizontal line above every heading on
+   * the site. It is now only type: the display face, small, letterspaced, and
+   * in the accent. Weight, width, and colour separate it from the heading
+   * beneath, which is what the rule was there to do.
    */
   .eyebrow {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    line-height: 1.4;
-    text-transform: uppercase;
-    color: var(--color-ambedkar-700);
-  }
-
-  .eyebrow::before {
-    content: "";
     display: block;
-    height: 0.125rem;
-    width: 1.75rem;
-    flex: none;
-    border-radius: 999px;
-    background: var(--color-accent-600);
+    font-family: var(--font-display);
+    font-variation-settings: "wdth" 100;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    line-height: 1.3;
+    text-transform: uppercase;
+    color: var(--color-accent-700);
   }
 
   .eyebrow-light {
     color: var(--color-accent-300);
   }
 
-  .eyebrow-light::before {
-    background: var(--color-accent-300);
-  }
-
   @media (width >= 40rem) {
     .eyebrow {
-      font-size: 0.8125rem;
+      font-size: 0.75rem;
     }
   }
 
   /*
-   * Buttons: one shape, four weights of emphasis. The 3rem minimum height keeps
-   * every one of them a comfortable touch target on a phone.
+   * Buttons: one shape, four weights of emphasis. The 2.875rem minimum height
+   * keeps every one of them a comfortable touch target on a phone.
+   *
+   * They are no longer capsules. A fully rounded pill filled with mint is the
+   * house style of every generated landing page; a small, even radius reads as
+   * a control that belongs to the rest of the page. They also no longer jump on
+   * hover: a button that moves away from the pointer is a gimmick.
    */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    min-height: 3rem;
-    border-radius: 999px;
-    padding: 0.75rem 1.5rem;
-    font-weight: 700;
+    min-height: 2.875rem;
+    border-radius: 0.5rem;
+    padding: 0.6875rem 1.375rem;
+    font-family: var(--font-display);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
     line-height: 1.25;
     text-align: center;
     transition:
-      background-color 200ms var(--ease-out-soft),
-      border-color 200ms var(--ease-out-soft),
-      color 200ms var(--ease-out-soft),
-      box-shadow 200ms var(--ease-out-soft),
-      translate 200ms var(--ease-out-soft);
+      background-color 180ms var(--ease-out-firm),
+      border-color 180ms var(--ease-out-firm),
+      color 180ms var(--ease-out-firm),
+      box-shadow 180ms var(--ease-out-firm);
   }
 
+  /*
+   * The strongest action on a page. It takes its colour from the panel it sits
+   * in rather than from a variant name, so the same class is ink on paper and
+   * paper on ink, and no call site has to know which.
+   */
   .btn-primary {
-    background: var(--color-accent-300);
-    color: var(--color-ambedkar-950);
-    box-shadow: var(--shadow-card);
+    background: var(--color-ambedkar-950);
+    color: #fff;
   }
 
   .btn-primary:hover {
-    background: var(--color-accent-400);
+    background: var(--color-ambedkar-800);
+  }
+
+  .on-dark .btn-primary {
+    background: #fff;
+    color: var(--color-ambedkar-950);
+  }
+
+  .on-dark .btn-primary:hover {
+    background: var(--color-accent-100);
   }
 
   .btn-ink {
     background: var(--color-ambedkar-950);
     color: #fff;
-    box-shadow: var(--shadow-card);
   }
 
   .btn-ink:hover {
@@ -255,60 +319,48 @@
   }
 
   .btn-outline {
-    border: 1px solid
-      color-mix(in srgb, var(--color-ambedkar-950) 20%, transparent);
-    background: rgb(255 255 255 / 70%);
+    border: 1px solid var(--color-rule-strong);
+    background: transparent;
     color: var(--color-ambedkar-900);
   }
 
   .btn-outline:hover {
-    border-color: color-mix(
-      in srgb,
-      var(--color-ambedkar-950) 45%,
-      transparent
-    );
-    background: #fff;
+    border-color: var(--color-ambedkar-950);
+    background: color-mix(in srgb, var(--color-ambedkar-950) 4%, transparent);
     color: var(--color-ambedkar-950);
   }
 
   .btn-outline-light {
-    border: 1px solid rgb(255 255 255 / 40%);
-    background: rgb(255 255 255 / 8%);
+    border: 1px solid rgb(255 255 255 / 32%);
+    background: transparent;
     color: #fff;
   }
 
   .btn-outline-light:hover {
-    border-color: rgb(255 255 255 / 75%);
-    background: rgb(255 255 255 / 16%);
+    border-color: rgb(255 255 255 / 70%);
+    background: rgb(255 255 255 / 10%);
   }
 
   /* Compact size, for the utility strip above the header. */
   .btn-sm {
-    min-height: 2.25rem;
-    padding: 0.375rem 1rem;
-    font-size: 0.875rem;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .btn:hover {
-      translate: 0 -2px;
-    }
+    min-height: 2.125rem;
+    border-radius: 0.375rem;
+    padding: 0.3125rem 0.8125rem;
+    font-size: 0.8125rem;
   }
 
   /*
-   * The card every index uses. The teal rule along the top edge is drawn at
-   * zero width and grows on hover, so a grid of them stays calm until one is
-   * being read. `focus-within` matches it, so keyboard users see the same
-   * signal that pointer users do.
+   * The card every index uses. It is now a sheet rather than a floating panel:
+   * a hairline, a small radius, and no resting shadow. The grid of them reads
+   * as a contents page instead of a tray of tiles.
    *
-   * The rule is clipped by the card, so it follows the rounded top edge and
-   * reads as the card lighting up rather than as a bar laid over it. `clip`
+   * Hover and focus draw a rule along the top edge and firm up the border. The
+   * rule is clipped by the card, so it follows the rounded top edge. `clip`
    * rather than `hidden`: nothing in a card should ever become scrollable, and
    * `clip` cannot be scrolled into a shifted position by a focused child.
    *
-   * The lift uses `translate` rather than `transform` on purpose: a card can
-   * sit inside a `reveal-children` group, whose entrance animation owns
-   * `transform`, and an animated property always beats a hover rule.
+   * `focus-within` matches hover, so keyboard users see the same signal that
+   * pointer users do.
    */
   .card {
     position: relative;
@@ -316,15 +368,12 @@
     height: 100%;
     flex-direction: column;
     overflow: clip;
-    border-radius: 1.5rem;
-    border: 1px solid
-      color-mix(in srgb, var(--color-ambedkar-900) 10%, transparent);
-    background: #fff;
-    box-shadow: var(--shadow-card);
+    border-radius: 0.75rem;
+    border: 1px solid var(--color-rule);
+    background: var(--color-paper);
     transition:
-      border-color 250ms var(--ease-out-soft),
-      box-shadow 250ms var(--ease-out-soft),
-      translate 250ms var(--ease-out-soft);
+      border-color 220ms var(--ease-out-firm),
+      box-shadow 220ms var(--ease-out-firm);
   }
 
   .card::before {
@@ -332,24 +381,16 @@
     position: absolute;
     inset-inline: 0;
     top: 0;
-    height: 0.1875rem;
+    height: 2px;
     transform: scaleX(0);
     transform-origin: left;
-    background: linear-gradient(
-      to right,
-      var(--color-accent-600),
-      var(--color-accent-300)
-    );
-    transition: transform 350ms var(--ease-out-soft);
+    background: var(--color-accent-600);
+    transition: transform 420ms var(--ease-out-firm);
   }
 
   .card:hover,
   .card:focus-within {
-    border-color: color-mix(
-      in srgb,
-      var(--color-ambedkar-900) 22%,
-      transparent
-    );
+    border-color: var(--color-rule-strong);
     box-shadow: var(--shadow-lift);
   }
 
@@ -358,24 +399,55 @@
     transform: scaleX(1);
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .card:hover,
-    .card:focus-within {
-      translate: 0 -3px;
-    }
+  /*
+   * A card whose whole face is the link hands its ring to the card, the same
+   * move `PanelSequence` makes. The stretched anchor's own box is a zero-height
+   * sliver, so a ring drawn on it would trace nothing the eye can read as the
+   * thing being focused. An element's own outline escapes its own `clip`.
+   */
+  .card:has(:focus-visible) {
+    outline: 2px solid var(--color-accent-600);
+    outline-offset: 3px;
   }
 
-  /* Pill used for topics, kinds, and statuses. */
+  .on-dark .card:has(:focus-visible) {
+    outline-color: var(--color-accent-300);
+  }
+
+  /*
+   * The title inside a card underlines itself when the card is engaged. It is
+   * the link that is being followed, so it is the link that should respond.
+   */
+  .card-title a {
+    background-image: linear-gradient(to right, currentColor, currentColor);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    transition: background-size 300ms var(--ease-out-firm);
+  }
+
+  .card:hover .card-title a,
+  .card:focus-within .card-title a {
+    background-size: 100% 1px;
+  }
+
+  /*
+   * Pill used for topics, kinds, and statuses. Squared off and hairlined, so a
+   * row of them reads as an index of terms rather than as a handful of sweets.
+   */
   .tag {
     display: inline-block;
-    border-radius: 999px;
-    background: var(--color-ambedkar-50);
-    padding: 0.25rem 0.625rem;
-    font-size: 0.75rem;
+    border: 1px solid var(--color-rule);
+    border-radius: 0.25rem;
+    background: transparent;
+    padding: 0.1875rem 0.4375rem;
+    font-family: var(--font-display);
+    font-size: 0.6875rem;
     font-weight: 600;
+    letter-spacing: 0.06em;
+    line-height: 1.35;
+    text-transform: uppercase;
     color: var(--color-ambedkar-800);
-    box-shadow: inset 0 0 0 1px
-      color-mix(in srgb, var(--color-ambedkar-900) 8%, transparent);
   }
 
   /*
@@ -387,14 +459,276 @@
     background-image: linear-gradient(to right, currentColor, currentColor);
     background-position: 0 100%;
     background-repeat: no-repeat;
-    background-size: 0% 2px;
-    transition: background-size 250ms var(--ease-out-soft);
+    background-size: 0% 1px;
+    transition: background-size 250ms var(--ease-out-firm);
   }
 
   .link-underline:hover,
-  .link-underline[aria-current="page"] {
-    background-size: 100% 2px;
+  .link-underline[aria-current="page"],
+  a:hover > .link-underline,
+  a:focus-visible > .link-underline {
+    background-size: 100% 1px;
   }
+
+  /*
+   * The section opener: the label under an accent rule that draws itself in as
+   * the section arrives, with the heading set large beside it. The rule used to
+   * be a static grey hairline, which put the same dead line across every
+   * section on the site. Drawn in the accent and animated on scroll it belongs
+   * to the same family as the underline that grows under a nav item or across
+   * the top of a card, so the page has one idea about lines rather than two.
+   */
+  .section-head {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  /*
+   * The same rule on its own, for a section that opens on something other than
+   * an eyebrow and a heading. A page that varies its sections still wants one
+   * idea about how a section begins.
+   */
+  .rule-draw,
+  .section-head::before {
+    height: 2px;
+    background: var(--color-accent-600);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .section-head::before {
+    content: "";
+    grid-column: 1 / -1;
+  }
+
+  .on-dark .rule-draw,
+  .on-dark .section-head::before {
+    background: var(--color-accent-300);
+  }
+
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .rule-draw,
+      .section-head::before {
+        animation: draw-rule linear both;
+        animation-timeline: view();
+        animation-range: entry 10% entry 55%;
+      }
+    }
+  }
+
+  /* No scroll timeline, or motion turned down: the rule is simply there. */
+  @supports not (animation-timeline: view()) {
+    .rule-draw,
+    .section-head::before {
+      transform: scaleX(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rule-draw,
+    .section-head::before {
+      transform: scaleX(1);
+    }
+  }
+
+  @media (width >= 64rem) {
+    .section-head {
+      grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+      gap: 2rem 3rem;
+      align-items: start;
+    }
+  }
+
+  /*
+   * Running figures: the 01, 02, 03 down the side of an index. Set in the
+   * display face at a light weight so they measure the list without shouting
+   * over it.
+   */
+  .index-figure {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--color-ambedkar-900) 58%, transparent);
+  }
+
+  /*
+   * A poster sheet: the artwork at its own size with a hairline around it and
+   * the caption beneath. `.card` stretches to fill its grid row so a row of
+   * cards squares off; a poster must not, or it floats in a tall empty box
+   * beside a long column of text.
+   */
+  .poster {
+    height: auto;
+    padding: 0.75rem;
+  }
+
+  @media (width >= 40rem) {
+    .poster {
+      padding: 1rem;
+    }
+  }
+
+  /*
+   * The artwork and its zoom affordance share a stacking context so the
+   * control can sit over the image without a wrapper that would break the
+   * figure's intrinsic height.
+   */
+  .poster__frame {
+    position: relative;
+    display: block;
+    overflow: clip;
+    border-radius: 0.5rem;
+  }
+
+  .poster__image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /*
+   * Served as a link to the file so the poster is still reachable with no
+   * JavaScript; the viewer script upgrades it in place rather than adding a
+   * second control beside it.
+   */
+  .poster__open {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-items: end;
+    justify-items: end;
+    padding: 0.625rem;
+  }
+
+  .poster__open[data-poster-ready] {
+    cursor: zoom-in;
+  }
+
+  .poster__zoom {
+    display: grid;
+    height: 2.25rem;
+    width: 2.25rem;
+    place-items: center;
+    border-radius: 0.375rem;
+    background: var(--color-ambedkar-950);
+    font-size: 1rem;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out-firm);
+  }
+
+  .poster__frame:hover .poster__zoom,
+  .poster__open:focus-visible .poster__zoom {
+    opacity: 1;
+  }
+
+  /* A coarse pointer has no hover, so the affordance has to stay put. */
+  @media (hover: none) {
+    .poster__zoom {
+      opacity: 1;
+    }
+  }
+
+  .poster__caption {
+    padding: 1rem 0.5rem 0.25rem;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    color: color-mix(in srgb, var(--color-ambedkar-900) 70%, transparent);
+  }
+}
+
+/*
+ * The poster viewer. A native `<dialog>` opened with `showModal()`, so the
+ * focus trap, the Esc key, and the inert background come from the platform
+ * rather than from script. It is built once per page by the poster script and
+ * shared by every poster on it, which is why it is styled here rather than in
+ * a component: the markup has no scope attribute to match.
+ */
+.poster-viewer {
+  margin: 0;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #fff;
+  overflow: hidden;
+}
+
+.poster-viewer:not([open]) {
+  display: none;
+}
+
+.poster-viewer[open] {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.poster-viewer::backdrop {
+  background: rgb(7 19 36 / 94%);
+}
+
+.poster-viewer__bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+}
+
+.poster-viewer__close {
+  min-height: 2.75rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 200ms var(--ease-out-firm);
+}
+
+.poster-viewer__close:hover {
+  background: rgb(255 255 255 / 14%);
+}
+
+.poster-viewer__stage {
+  position: relative;
+  display: grid;
+  place-items: stretch;
+  min-height: 0;
+  padding-inline: 0.75rem;
+}
+
+/*
+ * The box fills the stage and the poster is letterboxed inside it. Sizing with
+ * `max-height: 100%` does not work here: the stage's height comes from
+ * stretching into a `1fr` row rather than from a specified height, so the
+ * percentage never resolves and a tall poster is laid out at the full stage
+ * width, overflowing the viewport. `PanelSequence` solves it the same way.
+ */
+.poster-viewer__image {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+}
+
+.poster-viewer__caption {
+  padding: 0.75rem 1.25rem 1.25rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.5rem;
+  color: rgb(255 255 255 / 75%);
+}
+
+.poster-viewer__caption:empty {
+  display: none;
 }
 
 /*
@@ -407,6 +741,9 @@
  * `reveal-children` animates a grid or list one row at a time, because every
  * item in a row crosses the same point of the viewport together.
  *
+ * The travel is shorter and the range tighter than it was. An entrance the
+ * reader can watch happening is an entrance that got in the way.
+ *
  * Scoped to `screen`, because a printed page has no scroll position and would
  * otherwise commit whatever opacity each element happened to be sitting at.
  */
@@ -415,25 +752,77 @@
     .reveal {
       animation: reveal-rise linear both;
       animation-timeline: view();
-      animation-range: entry 0% entry 55%;
+      animation-range: entry 5% entry 40%;
     }
 
     .reveal-children > * {
       animation: reveal-rise linear both;
       animation-timeline: view();
-      animation-range: entry 0% entry 45%;
+      animation-range: entry 5% entry 35%;
     }
+  }
+
+  /*
+   * The one entrance that runs on load rather than on scroll: the opening
+   * lines of a masthead, which are already in view when the page arrives. Each
+   * element rises out from behind a mask, so the headline resolves rather than
+   * fades.
+   */
+  .rise > * {
+    animation: rise-in 900ms var(--ease-out-firm) both;
+    animation-delay: calc(var(--rise-step, 90ms) * var(--rise-index, 0));
+  }
+
+  .rise > *:nth-child(1) {
+    --rise-index: 0;
+  }
+  .rise > *:nth-child(2) {
+    --rise-index: 1;
+  }
+  .rise > *:nth-child(3) {
+    --rise-index: 2;
+  }
+  .rise > *:nth-child(4) {
+    --rise-index: 3;
+  }
+  .rise > *:nth-child(5) {
+    --rise-index: 4;
   }
 }
 
 @keyframes reveal-rise {
   from {
     opacity: 0;
-    transform: translateY(1.5rem);
+    transform: translateY(0.875rem);
   }
 
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* The accent rule drawing itself across a section opener. */
+@keyframes draw-rule {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    clip-path: inset(0 0 0.75em 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(-0.5em -0.5em -0.5em -0.5em);
   }
 }

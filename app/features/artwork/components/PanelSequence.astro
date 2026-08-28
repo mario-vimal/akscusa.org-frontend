@@ -198,11 +198,12 @@ const hasTranscripts = panels.some((panel) => panel.transcript);
     gap: 0.5rem;
     min-height: 2.75rem;
     border: 1px solid var(--panel-line);
-    border-radius: 999px;
+    border-radius: 0.5rem;
     background: var(--panel-chip);
     padding: 0.5rem 1.125rem;
+    font-family: var(--font-display);
     font-size: 0.875rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--panel-ink);
     transition: border-color 200ms var(--ease-out-soft);
   }
@@ -256,7 +257,7 @@ const hasTranscripts = panels.some((panel) => panel.transcript);
     position: relative;
     overflow: clip;
     border: 1px solid var(--panel-line);
-    border-radius: 1.25rem;
+    border-radius: 0.75rem;
     background: #fff;
     box-shadow: var(--shadow-card);
   }
@@ -328,11 +329,12 @@ const hasTranscripts = panels.some((panel) => panel.transcript);
     position: absolute;
     top: 0.75rem;
     left: 0.75rem;
-    border-radius: 999px;
+    border-radius: 0.25rem;
     background: rgb(16 35 62 / 78%);
-    padding: 0.1875rem 0.625rem;
+    padding: 0.1875rem 0.5rem;
+    font-family: var(--font-display);
     font-size: 0.75rem;
-    font-weight: 700;
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
     color: #fff;
   }
@@ -346,7 +348,11 @@ const hasTranscripts = panels.some((panel) => panel.transcript);
 
   .panel__count {
     justify-self: start;
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.75rem;
+    font-family: var(--font-display);
+    font-weight: 600;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -359,15 +365,19 @@ const hasTranscripts = panels.some((panel) => panel.transcript);
 
   .panel__transcript {
     border: 1px solid var(--panel-line);
-    border-radius: 1rem;
+    border-radius: 0.5rem;
     background: var(--panel-chip);
     padding: 0.75rem 1rem;
     color: var(--panel-muted);
   }
 
   .panel__transcript summary {
+    display: flex;
+    align-items: center;
+    min-height: 1.75rem;
     cursor: pointer;
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-weight: 600;
     color: var(--panel-ink);
   }
 
@@ -441,9 +451,10 @@ const hasTranscripts = panels.some((panel) => panel.transcript);
   .panel-viewer__close {
     min-height: 2.75rem;
     border: 1px solid rgb(255 255 255 / 35%);
-    border-radius: 999px;
+    border-radius: 0.5rem;
     padding: 0.5rem 1.25rem;
-    font-weight: 700;
+    font-family: var(--font-display);
+    font-weight: 600;
     transition: background-color 200ms var(--ease-out-soft);
   }
 

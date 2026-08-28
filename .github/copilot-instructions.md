@@ -12,20 +12,44 @@
   banner and content notes. Do not use it decoratively; a red that appears
   everywhere stops carrying a warning. Keep it crimson rather than vermillion
   so it never reads as saffron.
-- Set body copy and interface text in the self-hosted Cabin variable font
-  through the global `font-sans` token. Set page titles, section headings,
-  card titles, pull quotes, and Markdown headings in Source Serif 4 through
-  `font-display`. The shift between the two carries the hierarchy, so do not
-  make a heading a heading with size alone.
+- Set headings, labels, buttons, and navigation in the self-hosted Archivo
+  variable font through `font-display`. Set interface text, captions, and
+  metadata in Instrument Sans through `font-sans`. Set long-form reading,
+  ledes, and pull quotes in Newsreader through `font-serif`. The pairing is
+  deliberately inverted from the usual serif-headline default: a grotesque
+  states, a serif explains. Do not set a headline in the serif.
 - Consume named theme tokens in components; do not introduce isolated hex
   colors or untracked font declarations.
+- Keep the shape language flat. Radii stay small (`rounded-sm` to
+  `rounded-xl`); nothing is a pill except a true dot. Separate things with the
+  `rule` and `rule-strong` hairline tokens rather than with drop shadows, and
+  reserve `shadow-soft` for genuinely floating layers such as the mobile nav
+  sheet.
 - Reuse the shared classes in `global.css` before writing new utilities:
-  `eyebrow`, `btn` with its variants, `card`, `tag`, `link-underline`, the
-  `pattern-dots`, `pattern-grid`, `grain`, and `duotone` surfaces, and the
-  `reveal` and `reveal-children` entrance animations.
+  `eyebrow`, `section-head`, `rule-draw`, `index-figure`, `btn` with its
+  variants, `card` and `card-title`, `tag`, `link-underline`, the `grain` and
+  `duotone` surfaces, and the `reveal`, `reveal-children`, and `rise` entrance
+  animations.
+- Keep one idea about lines. A rule on the page is the 2px accent rule that
+  draws itself in on scroll — `section-head` carries it, and `rule-draw` is the
+  same rule for a section that opens on something other than a label and a
+  heading. Do not scatter static grey hairlines above labels, headings, or
+  captions, and do not draw a decorative column grid over a section; a line
+  that is everywhere separates nothing.
+- Do not add decorative overlays. Blurred colour blobs, dot fields, and drawn
+  grid lines are decoration standing in for structure, and they are the first
+  thing that marks a page as generated.
+- Show a poster or flyer with `Poster.astro`, which sizes the figure to the
+  artwork and opens it in an in-page `<dialog>` viewer. A reader enlarging an
+  image should not lose their place on the page.
+- Vary the page rhythm. An eyebrow over a heading over a paragraph over three
+  equal cards, repeated down every page, is the shape every template arrives
+  in. Alternate ruled indexes, editorial lists, full-bleed ink panels, and
+  card grids, and alternate light and dark bands. Two sections in a row that
+  open the same way are already one too many.
 - Open every page with `PageMasthead`, so the brand blue leads a page rather
   than only edging it. Mark any dark panel with `on-dark` so the focus ring
-  switches to the light end of the accent scale.
+  and `btn-primary` switch to the light end of the scale.
 - Prefer `translate` over `transform` for hover lifts. A scroll-driven reveal
   animation owns `transform`, and an animated property always beats a hover
   rule.

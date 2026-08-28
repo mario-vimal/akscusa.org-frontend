@@ -73,14 +73,14 @@ const paperLabel = (paper: GeneralBodyMeeting["data"]["papers"][number]) =>
   <section class="mt-14" aria-labelledby="general-body-meetings">
     <h2
       id="general-body-meetings"
-      class="font-display text-display-sm leading-tight font-semibold tracking-[-0.015em] text-ambedkar-950"
+      class="font-display text-display-sm leading-[1.04] font-bold tracking-display text-ambedkar-950"
     >
       {meetingsHeading}
     </h2>
     <p class="mt-2 text-ambedkar-900/75">{meetingsIntro}</p>
     {
       meetingsNote && (
-        <p class="mt-4 max-w-2xl rounded-2xl border border-ambedkar-900/10 bg-white px-5 py-4 text-sm leading-6 text-ambedkar-900/80 shadow-card">
+        <p class="mt-4 max-w-2xl rounded-2xl border border-rule bg-white px-5 py-4 text-sm leading-6 text-ambedkar-900/80 shadow-card">
           {meetingsNote}
         </p>
       )
@@ -91,7 +91,7 @@ const paperLabel = (paper: GeneralBodyMeeting["data"]["papers"][number]) =>
         meetings.map((meeting) => (
           <li class="card p-6 sm:p-8">
             <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <h3 class="font-display text-xl leading-snug font-semibold tracking-[-0.01em] text-ambedkar-950 sm:text-2xl">
+              <h3 class="font-display text-xl leading-[1.18] font-semibold tracking-title text-ambedkar-950 sm:text-2xl">
                 {meetingTitle(meeting)}
               </h3>
               <p class="text-sm text-ambedkar-900/70">
@@ -106,11 +106,11 @@ const paperLabel = (paper: GeneralBodyMeeting["data"]["papers"][number]) =>
               {meeting.data.papers.map((paper) => (
                 <li>
                   <a
-                    class="inline-flex flex-wrap items-baseline gap-x-2 rounded-2xl border border-ambedkar-900/15 bg-mist px-4 py-3 font-semibold text-ambedkar-800 transition-colors hover:border-ambedkar-900/40 hover:bg-ambedkar-50 hover:text-ambedkar-950"
+                    class="inline-flex flex-wrap items-baseline gap-x-2 rounded-2xl border border-rule-strong bg-mist px-4 py-3 font-semibold text-ambedkar-800 transition-colors hover:border-ambedkar-950 hover:bg-ambedkar-50 hover:text-ambedkar-950"
                     href={paper.file}
                   >
                     {generalBodyPaperKindLabel(paper.kind)}
-                    <span class="text-sm font-normal text-ambedkar-900/65">
+                    <span class="text-sm font-normal text-ambedkar-900/70">
                       {paperLabel(paper)} &darr;
                     </span>
                   </a>

@@ -33,14 +33,10 @@ const phone =
   offset that anchored headings scroll to small enough to stay honest.
 -->{
   phone && (
-    <div class="on-dark relative isolate overflow-hidden bg-ambedkar-950 text-white">
-      <div
-        class="absolute inset-0 -z-10 grain opacity-[0.05]"
-        aria-hidden="true"
-      />
-      <Container class="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 py-2 text-sm leading-5">
-        <p class="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <span class="text-white/70">Facing casteism?</span>
+    <div class="on-dark bg-ambedkar-1000 text-white">
+      <Container class="flex flex-wrap items-center justify-between gap-x-5 gap-y-1 py-1">
+        <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.8125rem] leading-5">
+          <span class="text-white/60">Facing casteism?</span>
           <a
             class="btn btn-primary btn-sm"
             href={`${helplineNavigation.href}/`}
@@ -50,10 +46,10 @@ const phone =
           </a>
         </p>
         <a
-          class="py-1 font-semibold whitespace-nowrap text-accent-300 underline decoration-accent-300/40 decoration-2 underline-offset-4 transition-colors hover:decoration-accent-300"
+          class="inline-flex min-h-11 items-center font-display text-[0.8125rem] font-semibold tracking-[0.02em] whitespace-nowrap text-accent-300"
           href={phone.href}
         >
-          Call 1-844-66-UNITE
+          <span class="link-underline">Call 1-844-66-UNITE</span>
         </a>
       </Container>
     </div>
@@ -61,11 +57,11 @@ const phone =
 }
 
 <header
-  class="sticky top-0 z-50 border-b border-ambedkar-900/10 bg-mist/95 backdrop-blur-md"
+  class="sticky top-0 z-50 border-b border-rule bg-mist/88 backdrop-blur-xl"
 >
-  <Container class="flex items-center justify-between gap-4 py-2.5">
+  <Container class="flex items-center justify-between gap-4">
     <a
-      class="inline-flex shrink-0 rounded-xl"
+      class="inline-flex shrink-0 py-2"
       href="/"
       aria-label="AKSC USA home"
       aria-current={isHome ? "page" : undefined}
@@ -76,7 +72,7 @@ const phone =
         width={160}
         format="webp"
         quality={90}
-        class="size-14 object-contain sm:size-16"
+        class="size-12 object-contain sm:size-13"
       />
     </a>
     <DesktopNav currentPath={currentPath} />
