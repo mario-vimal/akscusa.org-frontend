@@ -23,7 +23,7 @@ _Court Rejects Spurious Right-Wing Argument that Caste Protections Violate Relig
 
 ![Savera aksc joint](https://akscusa.org/wp-content/uploads/2024/12/savera-aksc-joint.png)
 
-_The following statement, written by_ [_Ambedkar King Study Circle_](https://akscusa.org/)_, California, is released with the support of all the members of the_ [_Savera_](https://www.wearesavera.org/) _coalition._
+_The following statement, written by_ [_Ambedkar King Study Circle_](/)_, California, is released with the support of all the members of the_ [_Savera_](https://www.wearesavera.org/) _coalition._
 
 **U.S Federal Court Upholds CSU’s Policy Protecting Discrimination Based on Caste**\
 _Court Rejects Spurious Right-Wing Argument that Caste Protections Violate Religious Practice_

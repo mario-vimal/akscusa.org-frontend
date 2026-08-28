@@ -13,7 +13,7 @@ featured: false
 draft: false
 ---
 
-[![Cropped cropped aksc logo2 0 blue facing right](https://akscusa.org/wp-content/uploads/2020/07/cropped-cropped-aksc-logo2.0-blue-facing-right.png)](https://akscusa.org)
+[![Cropped cropped aksc logo2 0 blue facing right](https://akscusa.org/wp-content/uploads/2020/07/cropped-cropped-aksc-logo2.0-blue-facing-right.png)](/)
 
 Ambedkar King Study Circle (AKSC) welcomes the 50-3 vote in favor of SB 403 by the California Assembly which has added caste as a protected category under the definition of ancestry.
 

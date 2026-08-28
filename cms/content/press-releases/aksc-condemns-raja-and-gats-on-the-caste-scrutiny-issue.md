@@ -20,7 +20,7 @@ draft: false
 
 ![Logo of the Ambedkar King Study Circle (AKSC) featuring illustrations of Dr. B.R. Ambedkar and Dr. Martin Luther King Jr. against a blue background.](https://akscusa.org/wp-content/uploads/2026/02/Final_logo_JPG_AKSC_LOGO_2.0_2025.jpg)
 
-_The following statement, written by_ [_Ambedkar King Study Circle_](https://akscusa.org/)_, California, and released on_ Feb 22, 2026
+_The following statement, written by_ [_Ambedkar King Study Circle_](/)_, California, and released on_ Feb 22, 2026
 
 **Ambedkar King Study Cirle (AKSC) Condemns Pattimandram Raja and Greater Atlanta Tamil Sangam (GATS) on the caste scrutiny issue**\
 Mr. Raja, a well-known Tamil speaker and television personality, allegedly scrutinized the caste of a fellow Tamil person in the USA. This episode took place in Atlanta, Georgia, of the United States of America, on the sidelines of the event organized by the Greater Atlanta Tamil Sangam (GATS).

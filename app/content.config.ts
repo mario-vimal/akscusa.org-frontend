@@ -165,6 +165,28 @@ const organizationPageSchema = z.object({
   sourceUrl: z.url(),
 });
 
+// The constitution and membership pages are stable organization documents.
+// Their copy stays in Markdown while the shared layout owns navigation and
+// the membership page's handoff to the existing application form.
+const constitutionPageSchema = z.object({
+  pageType: z.literal("constitution"),
+  title: z.string(),
+  description: z.string(),
+  eyebrow: z.string(),
+  intro: z.string(),
+  sourceUrl: z.url(),
+});
+
+const membershipPageSchema = z.object({
+  pageType: z.literal("membership"),
+  title: z.string(),
+  description: z.string(),
+  eyebrow: z.string(),
+  intro: z.string(),
+  sourceUrl: z.url(),
+  joinUrl: z.url(),
+});
+
 // The General Body index carries a standing argument about self-dignity ahead
 // of the meetings, migrated from the WordPress documents page. That argument is
 // one-off page copy, while the meetings below it are repeating records.
@@ -192,6 +214,8 @@ const pages = defineCollection({
     contactPageSchema,
     donatePageSchema,
     organizationPageSchema,
+    constitutionPageSchema,
+    membershipPageSchema,
     generalBodyPageSchema,
   ]),
 });

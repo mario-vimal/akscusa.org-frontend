@@ -23,7 +23,7 @@ draft: false
 
 ![Logos of Savera United Against Supremacy and Ambedkar King Study Circle (AKSC), highlighting their commitment to civil rights and social justice.](https://akscusa.org/wp-content/uploads/2024/12/savera-aksc-joint.png)
 
-_The following statement, written by_ [_Ambedkar King Study Circle_](https://akscusa.org/)_, California, is released with the support of all the members of the_ [_Savera_](https://www.wearesavera.org/) _coalition._
+_The following statement, written by_ [_Ambedkar King Study Circle_](/)_, California, is released with the support of all the members of the_ [_Savera_](https://www.wearesavera.org/) _coalition._
 
 **U.S. Federal Court Delivers Landmark Judgment Affirming Civil Rights for the Caste Oppressed**\
 _The Court dismisses HAF’s argument that caste protections infringe upon religious rights, rejects HAF’s claim of representing all Hindu Americans, and affirms legitimacy and authority of the State to protect people against caste oppression._

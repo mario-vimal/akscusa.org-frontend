@@ -1,0 +1,26 @@
+---
+import { getEntry, render } from "astro:content";
+
+import OrganizationDocumentLayout from "../../../features/organization/components/OrganizationDocumentLayout.astro";
+import SiteLayout from "../../../layouts/SiteLayout.astro";
+
+const page = await getEntry("pages", "constitution");
+
+if (!page || page.data.pageType !== "constitution") {
+  throw new Error("Constitution content is missing or invalid.");
+}
+
+const { Content } = await render(page);
+---
+
+<SiteLayout title={page.data.title} description={page.data.description}>
+  <OrganizationDocumentLayout
+    {...page.data}
+    action={{
+      label: "Membership details",
+      href: "/organization/membership/",
+    }}
+  >
+    <Content />
+  </OrganizationDocumentLayout>
+</SiteLayout>

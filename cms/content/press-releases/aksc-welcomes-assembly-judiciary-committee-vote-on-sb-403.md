@@ -14,7 +14,7 @@ featured: false
 draft: false
 ---
 
-[![Cropped cropped aksc logo2 0 blue facing right](https://akscusa.org/wp-content/uploads/2020/07/cropped-cropped-aksc-logo2.0-blue-facing-right.png)](https://akscusa.org)
+[![Cropped cropped aksc logo2 0 blue facing right](https://akscusa.org/wp-content/uploads/2020/07/cropped-cropped-aksc-logo2.0-blue-facing-right.png)](/)
 
 San Jose, CA: Ambedkar King Study Circle (AKSC) welcomes the unanimous vote in favor of SB 403 by the California Assembly Judiciary committee which has added caste as a protected category under ancestry. If this law had been in place before the 2020 Cisco caste discrimination case, the victim would have been able to obtain justice without delays. The Cisco HR department would have been more likely to settle the internal complaint from the caste oppressed employee, rather than having dismissed it with the true, but terrifying statement that “caste discrimination is not unlawful”. Explicit mentioning of caste in our civil rights laws marks the beginning of an era where the caste oppressed can begin to feel safe from the exclusion and discrimination exerted by the oppressive dominant caste forces.
 

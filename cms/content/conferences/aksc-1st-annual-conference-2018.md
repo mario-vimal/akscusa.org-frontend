@@ -183,7 +183,7 @@ References::
 
 ![image](https://akscusa.org/wp-content/uploads/2018/08/image.png)
 
-### Fund Appeal for [AKSC Annual Conference 2018](http://akscusa.org)
+### Fund Appeal for [AKSC Annual Conference 2018](/conferences/aksc-1st-annual-conference-2018/)
 
 Greetings!
 
@@ -207,7 +207,7 @@ You may choose to donate to our conference using any one of method listed below:
 
 **More detail about the conference:**
 
-- [AKSC Conference 2018 Home](https://akscusa.org)
+- [AKSC Conference 2018 Home](/conferences/aksc-1st-annual-conference-2018/)
 - [Invitation](/conferences/aksc-1st-annual-conference-2018/)
 - [Conference Speakers and Session](/conferences/aksc-1st-annual-conference-2018/)
 - [Conference RSVP/Registration](https://tinyurl.com/ClickAKSC2018)

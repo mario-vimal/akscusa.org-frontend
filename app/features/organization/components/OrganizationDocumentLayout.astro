@@ -1,0 +1,119 @@
+---
+import Container from "../../../components/ui/Container.astro";
+import PageMasthead from "../../../components/ui/PageMasthead.astro";
+import ProseContent from "../../editorial/components/ProseContent.astro";
+
+interface Action {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+interface Props {
+  title: string;
+  eyebrow: string;
+  intro: string;
+  sourceUrl: string;
+  action?: Action;
+}
+
+const { title, eyebrow, intro, sourceUrl, action } = Astro.props;
+---
+
+<article>
+  <PageMasthead {eyebrow} {title} description={intro} />
+
+  <Container class="pt-12 pb-20 sm:pt-16 sm:pb-28">
+    <div
+      class="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-14"
+    >
+      <div class="min-w-0">
+        <ProseContent>
+          <slot />
+        </ProseContent>
+
+        <p class="mt-10 max-w-3xl text-sm wrap-break-word text-ambedkar-900/60">
+          Originally published at{" "}
+          <a
+            class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+            href={sourceUrl}
+          >
+            {sourceUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+          </a>
+          .
+        </p>
+      </div>
+
+      <aside
+        class="grid gap-5 lg:sticky lg:top-24"
+        aria-label="Organization links"
+      >
+        {
+          action && (
+            <section class="on-dark card h-auto bg-ambedkar-950 p-6 text-white">
+              <p class="eyebrow eyebrow-light">Take part</p>
+              <h2 class="mt-4 font-display text-2xl font-semibold">
+                Join AKSC
+              </h2>
+              <p class="mt-3 leading-7 text-white/75">
+                Help build collective power against caste and every form of
+                oppression.
+              </p>
+              <a
+                class="btn btn-primary mt-5"
+                href={action.href}
+                target={action.external ? "_blank" : undefined}
+                rel={action.external ? "noreferrer" : undefined}
+              >
+                {action.label}
+                {action.external && <span aria-hidden="true"> &nearr;</span>}
+              </a>
+            </section>
+          )
+        }
+
+        <section class="card h-auto p-6">
+          <p class="eyebrow">Organization</p>
+          <h2
+            class="mt-4 font-display text-2xl font-semibold text-ambedkar-950"
+          >
+            AKSC records
+          </h2>
+          <nav class="mt-4" aria-label="Organization records">
+            <ul class="grid gap-3">
+              <li>
+                <a class="link-underline font-semibold" href="/organization/">
+                  Organization overview
+                </a>
+              </li>
+              <li>
+                <a
+                  class="link-underline font-semibold"
+                  href="/organization/constitution/"
+                >
+                  Constitution
+                </a>
+              </li>
+              <li>
+                <a
+                  class="link-underline font-semibold"
+                  href="/organization/membership/"
+                >
+                  Membership
+                </a>
+              </li>
+              <li>
+                <a
+                  class="link-underline font-semibold"
+                  href="/organization/general-body/"
+                >
+                  General Body
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </section>
+      </aside>
+    </div>
+  </Container>
+</article>

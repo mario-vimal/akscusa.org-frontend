@@ -13,7 +13,7 @@ featured: false
 draft: false
 ---
 
-[![Cropped cropped aksc logo2 0 blue facing right](https://akscusa.org/wp-content/uploads/2020/07/cropped-cropped-aksc-logo2.0-blue-facing-right.png)](https://akscusa.org)
+[![Cropped cropped aksc logo2 0 blue facing right](https://akscusa.org/wp-content/uploads/2020/07/cropped-cropped-aksc-logo2.0-blue-facing-right.png)](/)
 
 Dear Governor Mr. Newsom,
 

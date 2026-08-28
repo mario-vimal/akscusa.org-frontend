@@ -18,7 +18,7 @@ draft: false
 
 ![Savera aksc joint](https://akscusa.org/wp-content/uploads/2024/12/savera-aksc-joint.png)
 
-_The following statement, written by_ [_Ambedkar King Study Circle_](https://akscusa.org/)_, California, is released with the support of all the members of the_ [_Savera_](https://www.wearesavera.org/) _coalition._
+_The following statement, written by_ [_Ambedkar King Study Circle_](/)_, California, is released with the support of all the members of the_ [_Savera_](https://www.wearesavera.org/) _coalition._
 
 **The Office of Labor Relations at Rutgers University is taking a significant step toward unleashing the potential of the caste-oppressed community**
 

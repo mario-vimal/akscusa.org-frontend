@@ -22,7 +22,7 @@ draft: false
 
 ![Savera aksc joint](https://akscusa.org/wp-content/uploads/2024/12/savera-aksc-joint.png)
 
-_The following statement, written by_ [_Ambedkar King Study Circle_](https://akscusa.org/)_, California, is released with the support of all the members of the_ [_Savera_](https://www.wearesavera.org/) _coalition._
+_The following statement, written by_ [_Ambedkar King Study Circle_](/)_, California, is released with the support of all the members of the_ [_Savera_](https://www.wearesavera.org/) _coalition._
 
 **Major Victory for the Indian Americans in Caste Discrimination Case Against Cisco in Discovery Process**\
 The Civil Rights Department (CRD) achieved a significant milestone in its lawsuit against Cisco Systems for alleged caste discrimination. Initially filed in [the summer of 2020](https://calcivilrights.ca.gov/wp-content/uploads/sites/32/2020/06/Cisco_2020.06.30.pdf), the CRD’s efforts to obtain documents during the discovery process were paused when Cisco sought arbitration. However, in [August 2022](https://calcivilrights.ca.gov/wp-content/uploads/sites/32/2022/08/Cisco2022.08.08-PR-Appellate.pdf), the appellate court ruled in favor of the CRD, allowing the litigation to proceed. This decision revived the discovery process in December 2022.

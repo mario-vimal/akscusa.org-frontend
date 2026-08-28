@@ -58,12 +58,17 @@ const { title, eyebrow, intro, sourceUrl } = Astro.props;
             General Body
           </h2>
           <p class="mt-3 leading-7 text-ambedkar-900/75">
-            Read annual reports and the resolutions adopted by AKSC's General
-            Body.
+            Read AKSC's constitution, annual reports, and resolutions adopted by
+            the General Body.
           </p>
-          <a class="btn btn-outline mt-5" href="/organization/general-body/">
-            View General Body records
-          </a>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <a class="btn btn-outline" href="/organization/constitution/">
+              Read the constitution
+            </a>
+            <a class="btn btn-outline" href="/organization/general-body/">
+              General Body records
+            </a>
+          </div>
         </section>
 
         <section class="on-dark card h-auto bg-ambedkar-950 p-6 text-white">
@@ -75,11 +80,8 @@ const { title, eyebrow, intro, sourceUrl } = Astro.props;
             Ask about membership or help organize programs, meetings,
             demonstrations, workshops, and conferences.
           </p>
-          <a
-            class="btn btn-primary mt-5"
-            href="mailto:ec@akscusa.org?subject=AKSC%20membership"
-          >
-            Email AKSC
+          <a class="btn btn-primary mt-5" href="/organization/membership/">
+            Membership details
           </a>
         </section>
       </aside>

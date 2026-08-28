@@ -204,7 +204,7 @@ Modi’s relationship to BAPS is often on display in the performance of his offi
 
    and
 
-  [AKSC](https://akscusa.org/)
+  [AKSC](/)
 
    (and
 
