@@ -12,29 +12,27 @@ Last reconciled: **2026-08-27**
 
 | Group                                      | Count  |
 | ------------------------------------------ | ------ |
-| WordPress — migrated                       | 73     |
-| WordPress — route exists, placeholder copy | 1      |
-| WordPress — to migrate                     | 5      |
+| WordPress — migrated                       | 75     |
+| WordPress — route exists, placeholder copy | 0      |
+| WordPress — to migrate                     | 4      |
 | WordPress — not migrating                  | 13     |
 | **WordPress total**                        | **92** |
 | Squarespace — migrated                     | 6      |
 | Squarespace — to migrate                   | 2      |
 | Squarespace — needs a decision             | 9      |
 
-**73 of 92** WordPress URLs are done (79%), with **6** still to work through.
+**75 of 92** WordPress URLs are done (82%), with **4** still to work through.
 
 ## WordPress — to migrate
 
 Ordered by priority, and covering both groups still to be done: pages with no route at all, and routes that exist but still render placeholder copy. `Area` is the section the page should end up in.
 
-| Priority | Area          | Source path                               | Title                                    | Status            | Notes                                                                               |
-| -------- | ------------- | ----------------------------------------- | ---------------------------------------- | ----------------- | ----------------------------------------------------------------------------------- |
-| High     | Organization  | `/constitution/`                          | Constitution                             | Not started       | Long governing document; needs its own route.                                       |
-| High     | Organization  | `/membership/`                            | Membership                               | Not started       | Includes a join flow to rebuild.                                                    |
-| High     | Donate        | `/donate/`                                | Donate                                   | Placeholder route | Replace placeholder copy; payment flow is a separate task.                          |
-| High     | Programs      | `/programs/`                              | Programs                                 | Partial route     | Generated route lists this batch; the older historical index still needs migration. |
-| Medium   | Interventions | `/lets-read-ambedkar-10-lectures-series/` | Let’s Read Ambedkar – 10 Lectures Series | Not started       | Lecture series; suits an education intervention.                                    |
-| Medium   | Organization  | `/annual-report-2017-2018/`               | Annual Report 2017 – 2018                | Not started       | Long report; predates the 1st General Body meeting, so it needs its own home.       |
+| Priority | Area         | Source path                 | Title                     | Status        | Notes                                                                               |
+| -------- | ------------ | --------------------------- | ------------------------- | ------------- | ----------------------------------------------------------------------------------- |
+| High     | Organization | `/constitution/`            | Constitution              | Not started   | Long governing document; needs its own route.                                       |
+| High     | Organization | `/membership/`              | Membership                | Not started   | Includes a join flow to rebuild.                                                    |
+| High     | Programs     | `/programs/`                | Programs                  | Partial route | Generated route lists this batch; the older historical index still needs migration. |
+| Medium   | Organization | `/annual-report-2017-2018/` | Annual Report 2017 – 2018 | Not started   | Long report; predates the 1st General Body meeting, so it needs its own home.       |
 
 ## WordPress — migrated
 
@@ -68,7 +66,10 @@ Ordered by priority, and covering both groups still to be done: pages with no ro
 | `/aksc2024conf/`                                                                                                     | AKSC 5th Annual Conference 2024                                                                                                                     | `/conferences/aksc-5th-annual-conference-2024/`                                                     | Migrated as its own entry.                                                                                       |
 | `/conference2024-resolutions/`                                                                                       | Conference2024 Resolutions                                                                                                                          | `/conferences/aksc-5th-annual-conference-2024/`                                                     | Folded into the conference entry as a section.                                                                   |
 | `/aksc2024conf-2/`                                                                                                   | AKSC 6th Annual Conference 2025                                                                                                                     | `/conferences/aksc-6th-annual-conference-2025/`                                                     | Migrated as its own entry.                                                                                       |
-| `/interventions/`                                                                                                    | Interventions                                                                                                                                       | `/interventions/`                                                                                   | Replaced by the generated index.                                                                                 |     | `/agrarian-crisis-discussion-series/` | Agrarian Crisis: Discussion Series | `/interventions/agrarian-crisis-discussion-series/` | Migrated as its own entry. |
+| `/interventions/`                                                                                                    | Interventions                                                                                                                                       | `/interventions/`                                                                                   | Replaced by the generated index.                                                                                 |
+| `/agrarian-crisis-discussion-series/`                                                                                | Agrarian Crisis: Discussion Series                                                                                                                  | `/interventions/agrarian-crisis-discussion-series/`                                                 | Migrated as its own entry.                                                                                       |
+| `/lets-read-ambedkar-10-lectures-series/`                                                                            | Let’s Read Ambedkar – 10 Lectures Series                                                                                                            | `/interventions/lets-read-ambedkar-10-lectures-series/`                                             | Migrated as a concluded education intervention.                                                                  |
+| `/donate/`                                                                                                           | Donate                                                                                                                                              | `/donate/`                                                                                          | Replaced placeholder copy with a static page; the external donation flow remains separate.                       |
 | `/cisco-caste-discrimination-news-coverage-list/`                                                                    | Cisco Caste Discrimination – News coverage list                                                                                                     | `/interventions/cisco-caste-discrimination-news-coverage/`                                          | Migrated as its own entry.                                                                                       |
 | `/deep-dive-caste-litigation-in-the-usa/`                                                                            | Deep Dive: Caste Litigation in the USA                                                                                                              | `/interventions/deep-dive-caste-litigation-in-the-usa/`                                             | Migrated as its own entry.                                                                                       |
 | `/faq-about-the-baps-case/`                                                                                          | FAQ about the BAPS Case                                                                                                                             | `/interventions/faq-about-the-baps-case/`                                                           | Migrated as its own entry.                                                                                       |
@@ -179,10 +180,10 @@ Every one of those links dies with it. Counted across `cms/content/` and
 
 | Kind                                               | Occurrences | What needs to happen                                                                                                                                   |
 | -------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Media under `/wp-content/uploads/` (jpg, png, pdf) | 182         | Download and commit under `cms/public/media/`, then point entries at `/media/...`.                                                                     |
-| Page links that already have a destination         | 54          | Rewrite as site-relative paths. 30 already resolve as-is, 16 are the bare home page, and 8 are old paths the migrated table below maps to a new route. |
-| Page links with no destination yet                 | 3           | Resolve as those pages are migrated: `/lets-read-ambedkar-10-lectures-series/` (2), `/who-said-what/` (1).                                             |
-| `sourceUrl` frontmatter (both source sites)        | 65          | Nothing. This records where copy came from and is meant to name the old site.                                                                          |
+| Media under `/wp-content/uploads/` (jpg, png, pdf) | 194         | Download and commit under `cms/public/media/`, then point entries at `/media/...`.                                                                     |
+| Page links that already have a destination         | 30          | Rewrite as site-relative paths. 12 already resolve as-is, 16 are the bare home page, and 2 are old paths the migrated table below maps to a new route. |
+| Page links with no destination yet                 | 1           | Resolve `/who-said-what/` when that page is migrated or its content is placed elsewhere.                                                               |
+| `sourceUrl` frontmatter (both source sites)        | 67          | Nothing. This records where copy came from and is meant to name the old site.                                                                          |
 
 Decision taken with the documents batch: **media is committed as a static asset
 under `cms/public/media/`, not uploaded to R2.** `publicDir` is `cms/public`, so
@@ -238,4 +239,5 @@ extending to the editorial collections when their images are brought over.
 - **Dropped 2020 Zoom link.** The monthly reading page carried a standing Zoom
   URL from 2020. It was not migrated, since publishing a dead meeting link
   would mislead readers.
-- **Two unresolved links.** `/programs` and `/lets-read-ambedkar-10-lectures-series/` are linked from migrated entries but have no destination yet, so those links still point at WordPress. `/who-said-what/` is a third, reached from the SB 403 intervention.
+- **One unresolved link.** `/who-said-what/` is linked from the SB 403
+  intervention but has no destination yet.

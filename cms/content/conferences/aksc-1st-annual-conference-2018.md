@@ -115,11 +115,11 @@ This slideshow requires JavaScript.
 
 ![aksc-annual-conference-2018-QR-code](https://akscusa.org/wp-content/uploads/2018/08/aksc-annual-conference-2018-qr-code.png)
 
-Web URL: https://akscusa.org/aksc-annual-conference-2018/
+Web URL: /conferences/aksc-1st-annual-conference-2018/
 
 ---
 
-[![Conf-Schedule-Button](https://akscusa.org/wp-content/uploads/2018/08/conf-schedule-button.png)](https://akscusa.org/conferences/aksc-2nd-annual-conference-2019/)
+[![Conf-Schedule-Button](https://akscusa.org/wp-content/uploads/2018/08/conf-schedule-button.png)](/conferences/aksc-1st-annual-conference-2018/)
 
 ---
 
@@ -139,7 +139,7 @@ Phone: 831-200-3282, 415-683-0525 and 408-307-8913
 
 Thank you for all your overwhelming support for AKSC activities and programs for the past two years. We hold an annual conference to debate and discuss and formulate the right strategy and tactics to advance our program in the coming years.
 
-### [AKSC Annual Conference 2018 Registration Page](https://akscusa.org/conferences/aksc-1st-annual-conference-2018/)
+### [AKSC Annual Conference 2018 Registration Page](/conferences/aksc-1st-annual-conference-2018/)
 
 This conference is taking place against a very important backdrop. While the right-wing forces across the globe, and especially in the United States and in India, are growing bolder and stronger, there is also a strong resistance growing against them. In the USA anti-fascist and anti big corporate monopolies especially in banking & insurance and health care with the slogan of ‘free health care and free education to all’ are challenging the ideological bankruptcy within the Democratic Party. This has led to the rise of young [progressive democratic socialists](https://www.nytimes.com/2018/06/30/opinion/democratic-socialists-progressive-democratic-party-trump.html) such as **Alexandria Ocasio-Cortez** (28), **Summer Lee** (30), and **Sara Innamorato** (32) and others who are supported and endorsed by [Democratic Socialists of America](https://www.dsausa.org/). Democrats who defy corporate money organize themselves as [Justice Democrats](https://www.justicedemocrats.com/home).
 
@@ -159,7 +159,7 @@ Email: akscsfba@gmail.com
 
 Call: 831-200-3282 , 415-683-0525 and 408-307-8913
 
-Speaker and Session page: [https://akscusa.org/aksc-annual-conference-2018](https://akscusa.org/conferences/aksc-1st-annual-conference-2018/)
+Speaker and Session page: [AKSC Annual Conference 2018](/conferences/aksc-1st-annual-conference-2018/)
 
 Conference Registration page: [https://akscsfba.wixsite.com/aksc-conf-2018-reg](https://akscsfba.wixsite.com/aksc-conf-2018-reg)
 
@@ -187,13 +187,13 @@ References::
 
 Greetings!
 
-Ambedkar King Study Circle (AKSC), California is organizing her 1st annual conference on **Saturday,** **Sep 8th,2018** in **Cupertino, California** from **9:00 AM** to **6:00 PM** against a [very important backdrop](https://akscusa.org/conferences/aksc-1st-annual-conference-2018/). AKSC believes that “_the struggle and liberation of one oppressed group are tightly coupled with struggle and liberation of all oppressed groups hence our programs and activities are towards building such united struggle_“.
+Ambedkar King Study Circle (AKSC), California is organizing her 1st annual conference on **Saturday,** **Sep 8th,2018** in **Cupertino, California** from **9:00 AM** to **6:00 PM** against a [very important backdrop](/conferences/aksc-1st-annual-conference-2018/). AKSC believes that “_the struggle and liberation of one oppressed group are tightly coupled with struggle and liberation of all oppressed groups hence our programs and activities are towards building such united struggle_“.
 
 We are appealing to all like-minded people like you to donate generously to build a society with just and equity. We don’t accept any corporate funding or funding from any organizations who accept corporate funding.
 
 Also, we would like to mention that a few of AKSC’s supporters and sympathizers came forward and have agreed to match the fund raised from general appeal hence your contribution will be doubled! They are individual donors again NOT corporate matching.
 
-Please visit [AKSC Past Programs](https://akscusa.org/programs) and [AKSC General Body Report](https://akscusa.org/wp-content/uploads/2018/03/aksc_1st_gb_report_final.pdf) to get know more about AKSC’s past and recent activities and interventions.
+Please visit [AKSC Past Programs](/programs/) and [AKSC General Body Report](https://akscusa.org/wp-content/uploads/2018/03/aksc_1st_gb_report_final.pdf) to get know more about AKSC’s past and recent activities and interventions.
 
 You may choose to donate to our conference using any one of method listed below:
 
@@ -208,8 +208,8 @@ You may choose to donate to our conference using any one of method listed below:
 **More detail about the conference:**
 
 - [AKSC Conference 2018 Home](https://akscusa.org)
-- [Invitation](https://akscusa.org/conferences/aksc-1st-annual-conference-2018/)
-- [Conference Speakers and Session](https://akscusa.org/conferences/aksc-2nd-annual-conference-2019/)
+- [Invitation](/conferences/aksc-1st-annual-conference-2018/)
+- [Conference Speakers and Session](/conferences/aksc-1st-annual-conference-2018/)
 - [Conference RSVP/Registration](https://tinyurl.com/ClickAKSC2018)
 
 Thank you for your contribution!
@@ -226,8 +226,8 @@ The AKSC Conference 2018 have received overwhelmed support and participation fro
 
 Click on each resolution below for more detail:
 
-1. ### [Conduct Bay Area Annual Conference with Fraternal and likeminded Organizations](http://akscusa.org/conf-2018-resolution1/)
-2. ### [Introducing Babasaheb Dr. Ambedkar to the Universities and the Colleges in the USA by instituting Dr. Ambedkar Chairs](http://akscusa.org/conf-2018-resolution2/)
+1. ### [Conduct Bay Area Annual Conference with Fraternal and likeminded Organizations](/conferences/aksc-1st-annual-conference-2018/#resolution-1-bay-area-annual-conference-with-fraternal-and-likeminded-organizations)
+2. ### [Introducing Babasaheb Dr. Ambedkar to the Universities and the Colleges in the USA by instituting Dr. Ambedkar Chairs](/conferences/aksc-1st-annual-conference-2018/#resolution-2-introducing-ambedkar-to-the-universities-and-the-colleges-in-the-usa-by-instituting-dr-ambedkar-chairs)
 
 ![A3-size--FRONTonly-AKSC-Conf-2018-Flier-Final-ver3](https://akscusa.org/wp-content/uploads/2018/09/a3-size-frontonly-aksc-conf-2018-flier-final-ver3.jpg)
 

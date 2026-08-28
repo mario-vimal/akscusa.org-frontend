@@ -32,11 +32,11 @@ Cisco said it would “vigorously defend itself” and in a statement, it said �
 **Discriminating on the basis of caste is not inclusivity and it should never be defined as such. We need laws to protect our people because equality is a human right.**
 
 The **Black Lives Matter** ([BLM](https://blacklivesmatter.com/)) movement has led many of us to become aware of the inhumane, unethical treatment of African Americans. Many of us have realized that we have an obligation to fight for Black people, and so we have. Let’s fight against caste discrimination. Let’s fight for our own people as well.\
-Organizations such as [Ambedkar King Study Circle](http://www.akscusa.org) (AKSC) and [Equality Labs](http://www.equalitylabs.org) (EQL) are working to bring awareness to the issue. AKSC website is riddled with emotional testimonies and hard facts. In one such [testimony](https://akscusa.org/testimonies-of-practice-of-caste-in-the-usa/) from A.G Ramya from Cupertino, CA. it states, “_When I took my daughter to music class, the teacher explained that **only certain sects of people have the ability to learn master music** and then proceeded to inquire about our caste._”\
+Organizations such as [Ambedkar King Study Circle](http://www.akscusa.org) (AKSC) and [Equality Labs](http://www.equalitylabs.org) (EQL) are working to bring awareness to the issue. AKSC website is riddled with emotional testimonies and hard facts. In one such [testimony](/testimonies-of-practice-of-caste-in-the-usa/) from A.G Ramya from Cupertino, CA. it states, “_When I took my daughter to music class, the teacher explained that **only certain sects of people have the ability to learn master music** and then proceeded to inquire about our caste._”\
 Furthermore, We should personally work to bring attention to caste discrimination in the US ourselves, as the average American is not even aware of it. Bring it up in conversations when given the chance. Unlearn your own prejudices and educate your friends and family. in order to gain traction and incite change. Have an idea or thought? Voice it! Use your voice to help those who can’t. It can make a world of difference.
 
 **Additional Resources:**\
 [http://www.columbia.edu/itc/mealac/pritchett/00ambedkar/txt\_ambedkar\_castes.html](http://www.columbia.edu/itc/mealac/pritchett/00ambedkar/txt_ambedkar_castes.html)\
-[https://akscusa.org/lets-read-ambedkar-10-lectures-series/](https://akscusa.org/lets-read-ambedkar-10-lectures-series/)\
+[Let’s Read Ambedkar: 10 Lectures](/interventions/lets-read-ambedkar-10-lectures-series/)\
 [https://www.equalitylabs.org/caste-in-the-united-states](https://www.equalitylabs.org/caste-in-the-united-states)\
-[https://akscusa.org/Testimonies-of-Practice-of-Caste-in-the-USA](https://akscusa.org/testimonies-of-practice-of-caste-in-the-usa/)
+[Testimonies of Caste in the USA](/testimonies-of-practice-of-caste-in-the-usa/)

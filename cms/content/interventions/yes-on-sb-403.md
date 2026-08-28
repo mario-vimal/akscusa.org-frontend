@@ -80,7 +80,7 @@ Help ban discrimination based on caste and be part of this legacy!
 
 [**SB403 Misrepresentations vs Facts:**](https://akscusa.org/interventions/misrepresentation-of-sb-403-explained/)Find answers to top lies spread by the bill’s opponents
 
-[**Caste Discrimination/Practices Testimonies**](https://akscusa.org/testimonies-of-practice-of-caste-in-the-usa/) Read the real voices of caste discriminated in the land of free
+[**Caste Discrimination/Practices Testimonies**](/testimonies-of-practice-of-caste-in-the-usa/) Read the real voices of caste discriminated in the land of free
 
 [**Do you want share your caste discrimination testimony with us?**](https://akscusa.org/interventions/share-your-testimonies-about-everyday-casteism/)**_(your real identity will be protected_**)
 

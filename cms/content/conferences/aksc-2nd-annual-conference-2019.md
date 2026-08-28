@@ -140,7 +140,7 @@ Works with racial justice organizers to fight against Islamophobia. Ms. Basrai i
 ![QR-Conf2019](https://akscusa.org/wp-content/uploads/2019/08/qr-conf2019-1.png)
 
 Register: **[https://tinyurl.com/AKSC-Conf2019](https://tinyurl.com/AKSC-Conf2019)**\
-Go to top:  **[https://akscusa.org/aksc-conference-2019/](https://akscusa.org/conferences/aksc-2nd-annual-conference-2019/)**
+Go to top: **[AKSC Annual Conference 2019](/conferences/aksc-2nd-annual-conference-2019/)**
 
 ---
 
@@ -148,7 +148,7 @@ Go to top:  **[https://akscusa.org/aksc-conference-2019/](https://akscusa.org/co
 
 ---
 
-[![Conf-Schedule-Button](https://akscusa.org/wp-content/uploads/2018/08/conf-schedule-button.png)](https://akscusa.org/conferences/aksc-2nd-annual-conference-2019/)\
+[![Conf-Schedule-Button](https://akscusa.org/wp-content/uploads/2018/08/conf-schedule-button.png)](/conferences/aksc-2nd-annual-conference-2019/)\
 Click above to view the full schedule
 
 ### Highlights

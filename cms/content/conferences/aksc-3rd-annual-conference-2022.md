@@ -29,7 +29,7 @@ The Ambedkar King Study Circle (AKSC) has been organising to challenge caste and
 
 - South Asians in general, and the Hindus in particular continue to be caste-conscious and practice caste in the USA. This has been demonstrated by
 
-  [testimonies collected by AKSC](https://akscusa.org/testimonies-of-practice-of-caste-in-the-usa/)
+  [testimonies collected by AKSC](/testimonies-of-practice-of-caste-in-the-usa/)
 
   and independent surveys have confirmed the same. The
 

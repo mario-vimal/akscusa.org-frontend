@@ -140,6 +140,19 @@ const contactPageSchema = z.object({
   socialIntro: z.string(),
 });
 
+// Donation copy is one stable page. The payment provider remains an external
+// action until a first-party payment flow is designed separately.
+const donatePageSchema = z.object({
+  pageType: z.literal("donate"),
+  title: z.string(),
+  description: z.string(),
+  eyebrow: z.string(),
+  intro: z.string(),
+  donationLabel: z.string(),
+  donationUrl: z.url(),
+  sourceUrl: z.url(),
+});
+
 // The organization overview is one stable page, not a stream of records. Its
 // long-form argument and FAQ stay in Markdown while the component owns the
 // page navigation and calls to action.
@@ -177,6 +190,7 @@ const pages = defineCollection({
     testimoniesPageSchema,
     bookReadingsPageSchema,
     contactPageSchema,
+    donatePageSchema,
     organizationPageSchema,
     generalBodyPageSchema,
   ]),

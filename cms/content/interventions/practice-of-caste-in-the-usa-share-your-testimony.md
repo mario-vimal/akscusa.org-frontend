@@ -13,7 +13,7 @@ featured: false
 draft: false
 ---
 
-[![Testimonies of practice of caste in usa 4](https://akscusa.org/wp-content/uploads/2020/07/testimonies-of-practice-of-caste-in-usa-4.png) **Click to View All Testimonies Collected so far**](https://akscusa.org/testimonies-of-practice-of-caste-in-the-usa/)
+[![Testimonies of practice of caste in usa 4](https://akscusa.org/wp-content/uploads/2020/07/testimonies-of-practice-of-caste-in-usa-4.png) **Click to View All Testimonies Collected so far**](/testimonies-of-practice-of-caste-in-the-usa/)
 
 ---
 

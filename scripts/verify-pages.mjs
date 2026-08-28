@@ -24,6 +24,10 @@ const routes = new Map([
   ],
   ["/interventions/", "Interventions"],
   ["/interventions/yes-on-sb-403/", "YES on SB 403"],
+  [
+    "/interventions/lets-read-ambedkar-10-lectures-series/",
+    "About the instructor",
+  ],
   ["/interventions/kind/legislative/", "Legislative"],
   ["/book-readings/", "Book Readings"],
   ["/conferences/", "Conferences"],
