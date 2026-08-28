@@ -1,4 +1,5 @@
 ---
+import ambedkarPortrait from "../../assets/shared/leaders/ambedkar-portrait-public-domain.jpg";
 import EditorialIndex from "../../features/editorial/components/EditorialIndex.astro";
 import EntryCard from "../../features/editorial/components/EntryCard.astro";
 import {
@@ -28,6 +29,9 @@ const articles = await loadEditorialEntries("articles");
     filtersLabel="Filter articles by category"
     empty={section.empty}
     isEmpty={articles.length === 0}
+    backgroundImage={ambedkarPortrait}
+    backgroundLabel="B. R. Ambedkar"
+    backgroundPosition="portrait"
   >
     {
       articles.map((article) => (

@@ -9,36 +9,52 @@ interface Props {
 const { closing } = Astro.props;
 ---
 
-<section class="bg-accent-300 text-ambedkar-950">
-  <Container
-    class="grid gap-8 py-16 sm:py-20 lg:grid-cols-[1fr_auto] lg:items-end"
-  >
-    <div class="max-w-3xl">
-      <p class="text-sm font-bold tracking-[0.18em] uppercase">
-        {closing.eyebrow}
-      </p>
-      <h2
-        class="mt-3 text-4xl font-bold tracking-[-0.04em] text-balance sm:text-6xl"
+<section class="bg-haze">
+  <Container class="py-16 sm:py-24">
+    <!--
+      The closing ask is a panel rather than a full-bleed band, so it reads as
+      one object on the page instead of merging into the footer directly below.
+    -->
+    <div
+      class="on-dark reveal relative isolate overflow-hidden rounded-4xl bg-ambedkar-900 px-6 py-12 text-white shadow-soft sm:px-12 sm:py-16"
+    >
+      <div
+        class="absolute inset-0 -z-10 bg-[radial-gradient(85%_120%_at_100%_0%,var(--color-accent-800),transparent_58%),radial-gradient(70%_100%_at_0%_100%,var(--color-ambedkar-950),transparent_60%)]"
+        aria-hidden="true"
       >
-        {closing.title}
-      </h2>
-      <p class="mt-5 max-w-2xl text-lg leading-8 text-ambedkar-950/75">
-        {closing.description}
-      </p>
-    </div>
-    <div class="flex flex-col gap-3 sm:flex-row">
-      <a
-        class="rounded-full bg-ambedkar-950 px-6 py-3 text-center font-bold text-white transition hover:bg-ambedkar-700"
-        href={closing.primaryAction.href}
+      </div>
+      <div
+        class="absolute inset-0 -z-10 pattern-dots mask-[radial-gradient(60%_80%_at_85%_20%,black,transparent)] text-white/10"
+        aria-hidden="true"
       >
-        {closing.primaryAction.label}
-      </a>
-      <a
-        class="rounded-full border border-ambedkar-950/30 px-6 py-3 text-center font-bold transition hover:bg-white/55"
-        href={closing.secondaryAction.href}
+      </div>
+      <div
+        class="absolute inset-0 -z-10 grain opacity-[0.06]"
+        aria-hidden="true"
       >
-        {closing.secondaryAction.label}
-      </a>
+      </div>
+
+      <div class="grid gap-10 lg:grid-cols-[1.4fr_auto] lg:items-end">
+        <div class="max-w-2xl">
+          <p class="eyebrow eyebrow-light">{closing.eyebrow}</p>
+          <h2
+            class="mt-5 font-display text-display-md leading-[1.05] font-semibold tracking-[-0.02em] text-balance"
+          >
+            {closing.title}
+          </h2>
+          <p class="mt-6 text-lg leading-8 text-white/78">
+            {closing.description}
+          </p>
+        </div>
+        <div class="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
+          <a class="btn btn-primary" href={closing.primaryAction.href}>
+            {closing.primaryAction.label}
+          </a>
+          <a class="btn btn-outline-light" href={closing.secondaryAction.href}>
+            {closing.secondaryAction.label}
+          </a>
+        </div>
+      </div>
     </div>
   </Container>
 </section>

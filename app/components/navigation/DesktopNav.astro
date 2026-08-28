@@ -9,8 +9,13 @@ interface Props {
 const { currentPath } = Astro.props;
 ---
 
-<nav class="hidden items-center gap-1 lg:flex" aria-label="Primary navigation">
-  <ul class="flex items-center gap-1">
+<!--
+  The bar carries eight sections plus the donate action, which only has room to
+  breathe from 1280px up. Below that the sheet in MobileNav takes over, so the
+  links are never squeezed to the point of being hard to hit or read.
+-->
+<nav class="hidden items-center gap-6 xl:flex" aria-label="Primary navigation">
+  <ul class="flex items-center gap-5">
     {
       primaryNavigation.map((item) => (
         <li>
@@ -19,7 +24,5 @@ const { currentPath } = Astro.props;
       ))
     }
   </ul>
-  <div class="ml-3">
-    <NavLink {...donateNavigation} currentPath={currentPath} variant="action" />
-  </div>
+  <NavLink {...donateNavigation} currentPath={currentPath} variant="action" />
 </nav>

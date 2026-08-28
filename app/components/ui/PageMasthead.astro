@@ -1,0 +1,171 @@
+---
+import type { ImageMetadata } from "astro";
+
+import Container from "./Container.astro";
+import ResponsiveImage from "./ResponsiveImage.astro";
+
+interface ImageCredit {
+  creator: string;
+  sourceHref: string;
+  license: string;
+  licenseHref: string;
+}
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  description?: string;
+  /** Printed beside the description, for example "38 entries". */
+  meta?: string;
+  /** Widens the measure for pages whose title is a full sentence. */
+  size?: "default" | "large";
+  /** Optional decorative photograph behind the masthead content. */
+  backgroundImage?: ImageMetadata;
+  /** Identifies people shown in an archival background image. */
+  backgroundLabel?: string;
+  /** Required attribution for a Creative Commons background image. */
+  backgroundCredit?: ImageCredit;
+  /** Keeps a tightly framed portrait's face inside the wide masthead crop. */
+  backgroundPosition?: "center" | "portrait";
+  class?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  description,
+  meta,
+  size = "default",
+  backgroundImage,
+  backgroundLabel,
+  backgroundCredit,
+  backgroundPosition = "center",
+  class: className,
+} = Astro.props;
+
+const hasAbove = Astro.slots.has("above");
+const backgroundPositionClass =
+  backgroundPosition === "portrait" ? "object-[center_36%]" : "object-center";
+---
+
+<!--
+  The masthead every page opens with. It is the one place the Ambedkar blue runs
+  at full strength, so the brand colour leads each page rather than only edging
+  it. Optional photographs remain decorative and are returned to the palette by
+  the blue tint; the dark gradient protects the text across every image crop.
+-->
+<div
+  class:list={[
+    "on-dark relative isolate overflow-hidden bg-ambedkar-950 text-white",
+    className,
+  ]}
+>
+  {
+    backgroundImage ? (
+      <>
+        <ResponsiveImage
+          src={backgroundImage}
+          alt=""
+          class={`absolute inset-0 -z-30 size-full object-cover duotone ${backgroundPositionClass}`}
+          loading="eager"
+          sizes="100vw"
+          widths={[640, 960, 1280, 1600]}
+        />
+        <div
+          class="absolute inset-0 -z-20 bg-ambedkar-800 mix-blend-color"
+          aria-hidden="true"
+        />
+        <div
+          class="absolute inset-0 -z-10 bg-linear-to-r from-ambedkar-1000/95 via-ambedkar-950/88 to-ambedkar-900/82"
+          aria-hidden="true"
+        />
+        <div
+          class="absolute inset-0 -z-10 bg-linear-to-t from-ambedkar-1000/55 via-transparent to-ambedkar-950/20"
+          aria-hidden="true"
+        />
+      </>
+    ) : (
+      <div
+        class="absolute inset-0 -z-10 bg-[radial-gradient(115%_125%_at_86%_-15%,var(--color-ambedkar-700),transparent_56%),radial-gradient(75%_95%_at_-5%_110%,var(--color-accent-950),transparent_58%)]"
+        aria-hidden="true"
+      />
+    )
+  }
+  <div
+    class="absolute inset-0 -z-10 pattern-dots mask-[linear-gradient(to_bottom,black,transparent_78%)] text-white/12"
+    aria-hidden="true"
+  >
+  </div>
+  <div class="absolute inset-0 -z-10 grain opacity-[0.045]" aria-hidden="true">
+  </div>
+
+  <Container class="pt-12 pb-14 sm:pt-16 sm:pb-20">
+    <slot name="above" />
+
+    <div
+      class:list={[
+        size === "large" ? "max-w-4xl" : "max-w-3xl",
+        hasAbove && "mt-9",
+      ]}
+    >
+      <p class="eyebrow eyebrow-light">{eyebrow}</p>
+      <h1
+        class="mt-5 font-display text-display-lg leading-[1.04] font-semibold tracking-[-0.02em] text-balance"
+      >
+        {title}
+      </h1>
+      {
+        description && (
+          <p class="mt-6 max-w-2xl text-lg leading-8 text-white/78 sm:text-xl">
+            {description}
+          </p>
+        )
+      }
+      {
+        meta && (
+          <p class="mt-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-white/85 ring-1 ring-white/15 ring-inset">
+            {meta}
+          </p>
+        )
+      }
+    </div>
+
+    <slot />
+  </Container>
+
+  {
+    backgroundImage && (backgroundLabel || backgroundCredit) && (
+      <div class="absolute right-4 bottom-3 max-w-[calc(100%-2rem)] rounded-xl bg-ambedkar-1000/70 px-3 py-1.5 text-right text-[0.6875rem] leading-4 text-white/80 ring-1 ring-white/15 ring-inset sm:right-6 sm:bottom-4">
+        {backgroundLabel && (
+          <p class="font-semibold">Pictured: {backgroundLabel}</p>
+        )}
+        {backgroundCredit && (
+          <p class="text-white/65">
+            Image:{" "}
+            <a
+              class="underline decoration-white/30 underline-offset-2 hover:text-white"
+              href={backgroundCredit.sourceHref}
+            >
+              {backgroundCredit.creator}
+            </a>{" "}
+            ·{" "}
+            <a
+              class="underline decoration-white/30 underline-offset-2 hover:text-white"
+              href={backgroundCredit.licenseHref}
+              rel="license"
+            >
+              {backgroundCredit.license}
+            </a>{" "}
+            · cropped and recolored
+          </p>
+        )}
+      </div>
+    )
+  }
+
+  <div
+    class="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-accent-600 via-accent-300/70 to-transparent"
+    aria-hidden="true"
+  >
+  </div>
+</div>

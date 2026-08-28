@@ -1,41 +1,129 @@
 ---
-import { donateNavigation, primaryNavigation } from "../../config/navigation";
+import {
+  donateNavigation,
+  primaryNavigation,
+  secondaryNavigation,
+} from "../../config/navigation";
+import { socialLinks } from "../../config/social";
 import NavLink from "./NavLink.astro";
 
 interface Props {
   currentPath: string;
 }
-
 const { currentPath } = Astro.props;
 ---
 
-<details class="group relative lg:hidden">
+<!--
+  A sheet rather than a dropdown, so the whole of a long menu is reachable on a
+  small screen. `details` keeps it working with no JavaScript at all: the script
+  below only adds the conveniences a reader expects once it is open.
+-->
+<details class="group xl:hidden" data-mobile-nav>
   <summary
-    class="cursor-pointer list-none rounded-full border border-ambedkar-900/15 px-4 py-2 text-sm font-semibold text-ambedkar-900 marker:content-none"
+    class="flex size-12 cursor-pointer list-none items-center justify-center rounded-full border border-ambedkar-900/15 bg-white text-ambedkar-900 transition-colors marker:content-none hover:border-ambedkar-900/35 hover:text-ambedkar-950"
+    aria-label="Open menu"
   >
-    <span class="group-open:hidden">Menu</span>
-    <span class="hidden group-open:inline">Close</span>
+    <svg
+      class="size-6 group-open:hidden"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <path d="M3.5 7h17M3.5 12h17M3.5 17h17"></path>
+    </svg>
+    <svg
+      class="hidden size-6 group-open:block"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <path d="M6 6l12 12M18 6L6 18"></path>
+    </svg>
   </summary>
 
-  <nav
-    class="absolute top-[calc(100%+0.75rem)] right-0 w-72 rounded-2xl border border-ambedkar-900/10 bg-mist p-3 shadow-soft"
-    aria-label="Mobile navigation"
+  <div
+    class="absolute inset-x-0 top-full max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain border-b border-ambedkar-900/10 bg-mist shadow-soft"
   >
-    <ul class="space-y-1">
-      {
-        primaryNavigation.map((item) => (
-          <li>
-            <NavLink {...item} currentPath={currentPath} variant="mobile" />
-          </li>
-        ))
-      }
-      <li class="pt-2">
-        <NavLink
-          {...donateNavigation}
-          currentPath={currentPath}
-          variant="action"
-        />
-      </li>
-    </ul>
-  </nav>
+    <div class="mx-auto w-full max-w-6xl px-5 py-6 sm:px-6">
+      <nav aria-label="Mobile navigation">
+        <ul class="grid gap-1 sm:grid-cols-2">
+          {
+            [...primaryNavigation, ...secondaryNavigation].map((item) => (
+              <li>
+                <NavLink {...item} currentPath={currentPath} variant="mobile" />
+              </li>
+            ))
+          }
+        </ul>
+        <div class="mt-5">
+          <NavLink
+            {...donateNavigation}
+            currentPath={currentPath}
+            variant="action"
+          />
+        </div>
+      </nav>
+
+      <p
+        class="mt-8 text-xs font-bold tracking-[0.16em] text-ambedkar-700 uppercase"
+      >
+        Follow
+      </p>
+      <ul class="mt-3 flex flex-wrap gap-2">
+        {
+          socialLinks.map((item) => (
+            <li>
+              <a
+                class="inline-flex rounded-full border border-ambedkar-900/15 bg-white px-4 py-2 text-sm font-semibold text-ambedkar-800 transition-colors hover:border-ambedkar-900/40 hover:text-ambedkar-950"
+                href={item.href}
+                rel="me"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
 </details>
+
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>("[data-mobile-nav]");
+
+  if (menu) {
+    const summary = menu.querySelector("summary");
+
+    // The sheet covers the page, so the page behind it should not scroll.
+    menu.addEventListener("toggle", () => {
+      document.documentElement.style.overflow = menu.open ? "hidden" : "";
+      summary?.setAttribute(
+        "aria-label",
+        menu.open ? "Close menu" : "Open menu",
+      );
+    });
+
+    document.addEventListener("pointerdown", (event) => {
+      if (
+        menu.open &&
+        event.target instanceof Node &&
+        !menu.contains(event.target)
+      ) {
+        menu.open = false;
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menu.open) {
+        menu.open = false;
+        summary?.focus();
+      }
+    });
+  }
+</script>

@@ -1,5 +1,15 @@
 ---
+import type { ImageMetadata } from "astro";
+
 import Container from "./Container.astro";
+import PageMasthead from "./PageMasthead.astro";
+
+interface ImageCredit {
+  creator: string;
+  sourceHref: string;
+  license: string;
+  licenseHref: string;
+}
 
 interface SectionItem {
   title: string;
@@ -13,44 +23,41 @@ interface Props {
   title: string;
   description: string;
   items: readonly SectionItem[];
+  backgroundImage?: ImageMetadata;
+  backgroundLabel?: string;
+  backgroundCredit?: ImageCredit;
+  backgroundPosition?: "center" | "portrait";
 }
 
-const { eyebrow, title, description, items } = Astro.props;
+const {
+  eyebrow,
+  title,
+  description,
+  items,
+  backgroundImage,
+  backgroundLabel,
+  backgroundCredit,
+  backgroundPosition,
+} = Astro.props;
 ---
 
-<section class="relative isolate overflow-hidden">
-  <div
-    class="absolute inset-x-0 top-0 -z-10 h-[28rem] bg-[radial-gradient(circle_at_top_right,rgba(127,224,210,0.2),transparent_48%),radial-gradient(circle_at_top_left,rgba(31,98,170,0.18),transparent_42%)]"
-    aria-hidden="true"
-  >
-  </div>
+<section>
+  <PageMasthead
+    eyebrow={eyebrow}
+    title={title}
+    description={description}
+    backgroundImage={backgroundImage}
+    backgroundLabel={backgroundLabel}
+    backgroundCredit={backgroundCredit}
+    backgroundPosition={backgroundPosition}
+  />
 
-  <Container class="py-20 sm:py-28">
-    <div class="max-w-3xl">
-      <p
-        class="text-sm font-bold tracking-[0.18em] text-ambedkar-700 uppercase"
-      >
-        {eyebrow}
-      </p>
-      <h1
-        class="mt-4 text-5xl leading-none font-semibold tracking-[-0.05em] text-balance text-ambedkar-950 sm:text-7xl"
-      >
-        {title}
-      </h1>
-      <p
-        class="mt-7 max-w-2xl text-lg leading-8 text-ambedkar-900/75 sm:text-xl"
-      >
-        {description}
-      </p>
-    </div>
-
-    <div
-      class="mt-16 grid gap-px overflow-hidden rounded-3xl border border-ambedkar-900/10 bg-ambedkar-900/10 md:grid-cols-3"
-    >
+  <Container class="pt-14 pb-20 sm:pt-16 sm:pb-28">
+    <ul class="reveal-children grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {
         items.map((item) => (
-          <article class="group relative bg-mist p-7 sm:p-8">
-            <h2 class="text-xl font-semibold tracking-tight text-ambedkar-950">
+          <li class="card group p-7 sm:p-8">
+            <h2 class="font-display text-[1.375rem] leading-[1.2] font-semibold tracking-[-0.015em] text-balance text-ambedkar-950">
               {item.href ? (
                 <a class="after:absolute after:inset-0" href={item.href}>
                   {item.title}
@@ -64,18 +71,18 @@ const { eyebrow, title, description, items } = Astro.props;
             </p>
             {item.href && (
               <p
-                class="mt-4 text-sm font-semibold text-ambedkar-700 group-hover:text-ambedkar-900"
+                class="mt-auto flex items-center gap-2 pt-6 text-sm font-bold tracking-[0.06em] text-ambedkar-700 uppercase group-hover:text-ambedkar-900"
                 aria-hidden="true"
               >
-                View{" "}
-                <span class="inline-block transition group-hover:translate-x-1">
+                View
+                <span class="inline-block transition-transform duration-300 group-hover:translate-x-1">
                   &rarr;
                 </span>
               </p>
             )}
-          </article>
+          </li>
         ))
       }
-    </div>
+    </ul>
   </Container>
 </section>

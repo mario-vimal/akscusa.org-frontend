@@ -26,8 +26,12 @@ const {
 } = Astro.props;
 ---
 
+<!--
+  The crimson is spent here and on the testimonies content note, and nowhere
+  else, so that seeing it on this site still means something is urgent.
+-->
 <section
-  class="border-b border-alert-950/10 bg-alert-50 text-alert-950"
+  class="border-b-2 border-alert-600/25 bg-alert-50 text-alert-950"
   aria-label="Emergency information"
 >
   <Container
@@ -49,29 +53,25 @@ const {
 </section>
 
 <section aria-labelledby="helpline-title">
-  <div class="mx-auto w-full max-w-[85rem] px-4 pt-8 sm:px-6 sm:pt-12 lg:px-8">
+  <Container size="wide" class="pt-8 sm:pt-12">
     <ResponsiveImage
       src={helplineBanner}
       alt={bannerAlt}
-      class="w-full rounded-2xl border border-ambedkar-900/10 shadow-soft"
+      class="w-full rounded-3xl shadow-lift"
       loading="eager"
-      sizes="(min-width: 1360px) 1296px, calc(100vw - 2rem)"
+      sizes="(min-width: 1360px) 1296px, calc(100vw - 2.5rem)"
     />
-  </div>
+  </Container>
 
-  <Container class="pt-12 pb-8 sm:pb-12">
+  <Container class="pt-12 pb-16 sm:pb-20">
     <div
-      class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,26rem)] lg:items-start"
+      class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start"
     >
-      <div>
-        <p
-          class="text-sm font-bold tracking-[0.18em] text-ambedkar-700 uppercase"
-        >
-          {eyebrow}
-        </p>
+      <div class="min-w-0">
+        <p class="eyebrow">{eyebrow}</p>
         <h1
           id="helpline-title"
-          class="mt-4 text-4xl leading-tight font-semibold tracking-[-0.04em] text-balance text-ambedkar-950 sm:text-6xl"
+          class="mt-5 font-display text-display-lg leading-[1.04] font-semibold tracking-[-0.02em] text-balance text-ambedkar-950"
         >
           {title}
         </h1>
@@ -79,9 +79,9 @@ const {
         <ul class="mt-8 space-y-4 text-lg leading-8 text-ambedkar-900/80">
           {
             supportQuestions.map((question) => (
-              <li class="flex gap-3">
+              <li class="flex gap-4">
                 <span
-                  class="mt-3 size-2 shrink-0 rounded-full bg-accent-600"
+                  class="mt-3.5 size-2 shrink-0 rounded-full bg-accent-600"
                   aria-hidden="true"
                 />
                 <span>{question}</span>
@@ -91,21 +91,32 @@ const {
         </ul>
 
         <div
-          class="mt-10 rounded-3xl bg-ambedkar-900 p-6 text-white shadow-soft sm:p-8"
+          class="on-dark relative isolate mt-10 overflow-hidden rounded-3xl bg-ambedkar-950 p-6 text-white shadow-soft sm:p-8"
           aria-labelledby="contact-title"
         >
-          <h2 id="contact-title" class="text-2xl font-semibold">
+          <div
+            class="absolute inset-0 -z-10 bg-[radial-gradient(100%_130%_at_100%_0%,var(--color-accent-900),transparent_60%),radial-gradient(80%_110%_at_0%_100%,var(--color-ambedkar-800),transparent_58%)]"
+            aria-hidden="true"
+          >
+          </div>
+          <div
+            class="absolute inset-0 -z-10 pattern-dots mask-[radial-gradient(60%_80%_at_90%_10%,black,transparent)] text-white/10"
+            aria-hidden="true"
+          >
+          </div>
+
+          <h2 id="contact-title" class="font-display text-2xl font-semibold">
             Contact the helpline
           </h2>
           <div class="mt-5 flex flex-col gap-3">
             <a
-              class="w-fit text-xl font-semibold text-accent-300 underline decoration-2 underline-offset-4 sm:text-2xl"
+              class="w-fit text-xl font-bold text-accent-300 underline decoration-accent-300/40 decoration-2 underline-offset-4 transition-colors hover:decoration-accent-300 sm:text-2xl"
               href={phone.href}
             >
               {phone.display}
             </a>
             <a
-              class="w-fit text-lg font-semibold break-all text-accent-300 underline decoration-2 underline-offset-4 sm:text-xl"
+              class="w-fit text-lg font-bold break-all text-accent-300 underline decoration-accent-300/40 decoration-2 underline-offset-4 transition-colors hover:decoration-accent-300 sm:text-xl"
               href={`mailto:${email}`}
             >
               {email}
@@ -117,20 +128,18 @@ const {
         </div>
 
         <div
-          class="helpline-content mt-10 text-base leading-8 text-ambedkar-900/75"
+          class="helpline-content mt-10 text-base leading-8 text-ambedkar-900/78"
         >
           <slot />
         </div>
       </div>
 
-      <figure
-        class="rounded-3xl border border-ambedkar-900/10 bg-white p-3 shadow-soft sm:p-4"
-      >
+      <figure class="card p-3 sm:p-4 lg:sticky lg:top-24">
         <ResponsiveImage
           src={helplineFlyer}
           alt={flyerAlt}
           class="w-full rounded-2xl"
-          sizes="(min-width: 1024px) 416px, calc(100vw - 5rem)"
+          sizes="(min-width: 1024px) 380px, calc(100vw - 5rem)"
           widths={[320, 640, 960]}
         />
         <figcaption
@@ -156,6 +165,11 @@ const {
 
   .helpline-content :global(li + li) {
     margin-top: 0.75rem;
+  }
+
+  .helpline-content :global(li::marker) {
+    color: var(--color-accent-600);
+    font-weight: 700;
   }
 
   .helpline-content :global(strong) {

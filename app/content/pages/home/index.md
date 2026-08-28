@@ -6,25 +6,38 @@ hero:
   eyebrow: Ambedkar King Study Circle
   title: Educate. Agitate. Organize.
   description: Caste has no place—in India, in America, or anywhere. Together, we can end caste discrimination and build a just world.
-  imageAlt: San Francisco's Painted Ladies and skyline in warm evening light.
+  imageAlt: San Francisco's Painted Ladies and skyline, tinted in a single deep blue.
   primaryAction:
     label: Get helpline support
     href: /anti-caste-helpline
   secondaryAction:
     label: Annual Conference 2026
     href: /conferences
-statements:
-  - Caste Has No Place — In India. In America. Anywhere.
-  - End Caste Discrimination. Build a Just World.
-  - Facing Casteism? You Are Not Alone. Call 1-844-66-UNITE.
-  - Support Anti-Caste Movements. Join AKSC Today.
-  - Dignity. Equality. Liberation for All.
-  - Change Begins When We Speak. Act. Unite.
 quotes:
-  - text: Injustice anywhere is a threat to justice everywhere.
-    author: Martin Luther King, Jr.
-  - text: So long as you do not achieve social liberty, whatever freedom is provided by the law is of no avail to you.
+  - text: So learn and break the chains of caste. Throw away the Brahman’s scriptures fast.
+    author: Savitribai Phule
+    source: Go, Get Education (English translation)
+  - text: We want freedom by any means necessary. We want justice by any means necessary. We want equality by any means necessary.
+    author: Malcolm X
+    source: Founding Rally of the Organization of Afro-American Unity, 1964
+  - text: It is our duty to fight for our freedom. It is our duty to win.
+    author: Assata Shakur
+    source: Assata — An Autobiography
+  - text: Turn in any direction you like, caste is the monster that crosses your path.
     author: Dr. B. R. Ambedkar
+    source: Annihilation of Caste, 1936
+  - text: If Black women were free, it would mean that everyone else would have to be free since our freedom would necessitate the destruction of all the systems of oppression.
+    author: Combahee River Collective
+    source: The Combahee River Collective Statement, 1977
+  - text: There should be no castes. None should call himself as high or low because of birth.
+    author: Periyar E. V. Ramasamy
+    source: Collected Works of Periyar E.V.R.
+  - text: Prisons do not disappear social problems, they disappear human beings.
+    author: Angela Y. Davis
+    source: Masked Racism, 1998
+  - text: The master’s tools will never dismantle the master’s house.
+    author: Audre Lorde
+    source: The Master’s Tools Will Never Dismantle the Master’s House, 1979
 closing:
   eyebrow: Forging an egalitarian society
   title: Support anti-caste movements.

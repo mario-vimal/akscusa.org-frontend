@@ -1,5 +1,6 @@
 ---
 import EditorialIndex from "../../editorial/components/EditorialIndex.astro";
+import libraryShelves from "../assets/library-shelves-2jivbogleho.jpg";
 import { bookHref, loadBooksWithReadings } from "../queries/books";
 import BookCard from "./BookCard.astro";
 
@@ -13,6 +14,7 @@ const entries = await loadBooksWithReadings();
   count={`${entries.length} ${entries.length === 1 ? "book" : "books"}`}
   empty="No books have been published yet."
   isEmpty={entries.length === 0}
+  backgroundImage={libraryShelves}
 >
   {
     entries.map(({ book, readings }) => (

@@ -29,12 +29,12 @@ const homePageSchema = z.object({
     primaryAction: actionSchema,
     secondaryAction: actionSchema,
   }),
-  statements: z.array(z.string()).min(1),
   quotes: z
     .array(
       z.object({
         text: z.string(),
         author: z.string(),
+        source: z.string(),
       }),
     )
     .min(1),

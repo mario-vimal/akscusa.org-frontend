@@ -1,6 +1,7 @@
 ---
 import EditorialIndex from "../../editorial/components/EditorialIndex.astro";
 import EntryCard from "../../editorial/components/EntryCard.astro";
+import conferenceAudience from "../assets/conference-audience-6vajp0pscx0.jpg";
 import {
   editorialSections,
   entryHref,
@@ -20,6 +21,7 @@ const conferences = await loadEditorialEntries("conferences");
   count={`${conferences.length} ${conferences.length === 1 ? "conference" : "conferences"}`}
   empty={section.empty}
   isEmpty={conferences.length === 0}
+  backgroundImage={conferenceAudience}
 >
   {
     conferences.map((conference) => (

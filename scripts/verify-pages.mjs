@@ -141,7 +141,25 @@ try {
     }
   }
 
-  console.log(`Wrangler Pages verified ${routes.size} routes.`);
+  // A PDF has no HTML head, so its tab icon comes from this conventional root
+  // path. Verify the built Pages output rather than only the source file:
+  // otherwise an incorrect publicDir could silently put the icon elsewhere.
+  const favicon = await fetch(`${origin}/favicon.ico`, {
+    signal: AbortSignal.timeout(5_000),
+  });
+  const icon = Buffer.from(await favicon.arrayBuffer());
+
+  if (!favicon.ok) {
+    throw new Error(`/favicon.ico returned HTTP ${favicon.status}.`);
+  }
+
+  if (icon.readUInt16LE(0) !== 0 || icon.readUInt16LE(2) !== 1) {
+    throw new Error("/favicon.ico is not a valid icon resource.");
+  }
+
+  console.log(
+    `Wrangler Pages verified ${routes.size} routes and the root favicon.`,
+  );
 } catch (error) {
   console.error(output);
   throw error;

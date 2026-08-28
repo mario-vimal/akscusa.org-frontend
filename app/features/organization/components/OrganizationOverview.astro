@@ -1,5 +1,6 @@
 ---
 import SectionLanding from "../../../components/ui/SectionLanding.astro";
+import kingPortrait from "../../../assets/shared/leaders/martin-luther-king-jr-public-domain.jpg";
 
 const contentAreas = [
   {
@@ -31,4 +32,7 @@ const contentAreas = [
   title="Organization"
   description="Learn about our mission, leadership, history, chapters, and opportunities to participate."
   items={contentAreas}
+  backgroundImage={kingPortrait}
+  backgroundLabel="Martin Luther King Jr."
+  backgroundPosition="portrait"
 />

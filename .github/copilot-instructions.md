@@ -12,12 +12,30 @@
   banner and content notes. Do not use it decoratively; a red that appears
   everywhere stops carrying a warning. Keep it crimson rather than vermillion
   so it never reads as saffron.
-- Use the self-hosted Cabin variable font through the global `font-sans` token.
+- Set body copy and interface text in the self-hosted Cabin variable font
+  through the global `font-sans` token. Set page titles, section headings,
+  card titles, pull quotes, and Markdown headings in Source Serif 4 through
+  `font-display`. The shift between the two carries the hierarchy, so do not
+  make a heading a heading with size alone.
 - Consume named theme tokens in components; do not introduce isolated hex
   colors or untracked font declarations.
+- Reuse the shared classes in `global.css` before writing new utilities:
+  `eyebrow`, `btn` with its variants, `card`, `tag`, `link-underline`, the
+  `pattern-dots`, `pattern-grid`, `grain`, and `duotone` surfaces, and the
+  `reveal` and `reveal-children` entrance animations.
+- Open every page with `PageMasthead`, so the brand blue leads a page rather
+  than only edging it. Mark any dark panel with `on-dark` so the focus ring
+  switches to the light end of the accent scale.
+- Prefer `translate` over `transform` for hover lifts. A scroll-driven reveal
+  animation owns `transform`, and an animated property always beats a hover
+  rule.
+- Reduce photography to the brand blue with `duotone`; leave AKSC's own
+  posters and flyers in their original colours, because their colour carries
+  information.
 - Check contrast when changing a colour token. Body and interactive text needs
   at least 4.5:1, and a focus indicator at least 3:1 against every background it
-  can land on, including the dark blue sections.
+  can land on, including the dark blue sections. Check tinted text against the
+  lightest point of the gradient behind it, not against the section's base.
 
 ## Responsive design
 

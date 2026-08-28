@@ -11,46 +11,59 @@ interface Props {
 const { hero } = Astro.props;
 ---
 
-<section class="relative isolate min-h-[38rem] overflow-hidden bg-ambedkar-950">
+<section
+  class="on-dark relative isolate flex min-h-136 flex-col justify-end overflow-hidden bg-ambedkar-950 sm:min-h-160 lg:min-h-184"
+>
   <ResponsiveImage
     src={organizeHero}
     alt={hero.imageAlt}
-    class="absolute inset-0 -z-20 size-full object-cover"
+    class="absolute inset-0 -z-30 size-full object-cover duotone"
     loading="eager"
     sizes="100vw"
     widths={[640, 960, 1280, 1500]}
   />
+  <!--
+    Three layers over the photograph rather than one. The first returns the
+    brand blue that `duotone` stripped out, the second darkens the corner the
+    text sits in, and the third lifts the far edge so the picture does not go
+    flat where nothing is written over it.
+  -->
   <div
-    class="absolute inset-0 -z-10 bg-gradient-to-r from-ambedkar-950 via-ambedkar-950/85 to-ambedkar-900/25"
+    class="absolute inset-0 -z-20 bg-ambedkar-800 mix-blend-color"
     aria-hidden="true"
   >
   </div>
-  <Container
-    class="flex min-h-[38rem] items-end py-16 sm:py-24 lg:min-h-[44rem]"
+  <div
+    class="absolute inset-0 -z-10 bg-[linear-gradient(to_top,var(--color-ambedkar-950)_4%,rgb(16_35_62/0.86)_34%,rgb(16_35_62/0.5)_66%,rgb(16_35_62/0.72)_100%),radial-gradient(70%_90%_at_100%_100%,rgb(13_143_136/0.35),transparent_60%)]"
+    aria-hidden="true"
   >
+  </div>
+  <div
+    class="absolute inset-0 -z-10 pattern-dots mask-[linear-gradient(to_top,black,transparent_55%)] text-white/10"
+    aria-hidden="true"
+  >
+  </div>
+  <div class="absolute inset-0 -z-10 grain opacity-[0.06]" aria-hidden="true">
+  </div>
+
+  <Container class="pt-24 pb-14 sm:pt-32 sm:pb-20">
     <div class="max-w-4xl">
-      <p class="text-sm font-bold tracking-[0.2em] text-accent-300 uppercase">
-        {hero.eyebrow}
-      </p>
+      <p class="eyebrow eyebrow-light">{hero.eyebrow}</p>
       <h1
-        class="mt-5 text-5xl leading-[0.94] font-bold tracking-[-0.05em] text-balance text-white sm:text-7xl lg:text-8xl"
+        class="mt-6 font-display text-display-xl leading-[0.98] font-bold tracking-[-0.025em] text-balance text-white"
       >
         {hero.title}
       </h1>
-      <p class="mt-7 max-w-2xl text-lg leading-8 text-white/82 sm:text-xl">
+      <p
+        class="mt-7 max-w-2xl border-l-2 border-accent-300/70 pl-5 text-lg leading-8 text-white/85 sm:text-xl"
+      >
         {hero.description}
       </p>
-      <div class="mt-9 flex flex-col gap-3 sm:flex-row">
-        <a
-          class="rounded-full bg-accent-300 px-6 py-3 text-center font-bold text-ambedkar-950 transition hover:bg-accent-400"
-          href={hero.primaryAction.href}
-        >
+      <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <a class="btn btn-primary" href={hero.primaryAction.href}>
           {hero.primaryAction.label}
         </a>
-        <a
-          class="rounded-full border border-white/40 bg-white/10 px-6 py-3 text-center font-bold text-white transition hover:bg-white hover:text-ambedkar-950"
-          href={hero.secondaryAction.href}
-        >
+        <a class="btn btn-outline-light" href={hero.secondaryAction.href}>
           {hero.secondaryAction.label}
         </a>
       </div>

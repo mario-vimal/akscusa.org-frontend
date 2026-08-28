@@ -5,10 +5,6 @@ export interface NavigationItem {
 
 export const primaryNavigation = [
   {
-    label: "Anti-Caste Helpline",
-    href: "/anti-caste-helpline",
-  },
-  {
     label: "Interventions",
     href: "/interventions",
   },
@@ -41,6 +37,18 @@ export const primaryNavigation = [
 export const donateNavigation = {
   label: "Donate",
   href: "/donate",
+} as const satisfies NavigationItem;
+
+/**
+ * The helpline sits in the strip above the header rather than in the primary
+ * bar. Someone who needs it is not browsing the site, and the strip can carry
+ * the phone number and the "facing casteism?" question that a bar of section
+ * names cannot. The footer remains its secondary route once the strip scrolls
+ * away.
+ */
+export const helplineNavigation = {
+  label: "Anti-Caste Helpline",
+  href: "/anti-caste-helpline",
 } as const satisfies NavigationItem;
 
 /**

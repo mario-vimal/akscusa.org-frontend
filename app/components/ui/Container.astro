@@ -1,11 +1,21 @@
 ---
 interface Props {
   class?: string;
+  /** `wide` is for full-bleed media and the header bar. */
+  size?: "default" | "wide" | "narrow";
 }
 
-const { class: className } = Astro.props;
+const { class: className, size = "default" } = Astro.props;
+
+const widths = {
+  narrow: "max-w-4xl",
+  default: "max-w-6xl",
+  wide: "max-w-340",
+};
 ---
 
-<div class:list={["mx-auto w-full max-w-6xl px-6 lg:px-8", className]}>
+<div
+  class:list={["mx-auto w-full px-5 sm:px-6 lg:px-8", widths[size], className]}
+>
   <slot />
 </div>

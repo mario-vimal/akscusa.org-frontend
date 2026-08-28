@@ -5,6 +5,7 @@ import {
   loadEditorialEntries,
 } from "../../editorial/entries";
 import { loadReadingBooks } from "../../books/queries/books";
+import readingGathering from "../assets/reading-gathering-dgxogexaxm8.jpg";
 import { bookReadingRows } from "../presenters";
 import BookReadingsTable from "./BookReadingsTable.astro";
 
@@ -35,12 +36,13 @@ const rows = bookReadingRows(readings, await loadReadingBooks());
   empty={section.empty}
   isEmpty={readings.length === 0}
   list={false}
+  backgroundImage={readingGathering}
 >
-  <div slot="intro" class="mt-12 grid gap-6 lg:grid-cols-2">
-    <section
-      class="rounded-3xl border border-ambedkar-900/10 bg-white p-6 sm:p-8"
-    >
-      <h2 class="text-lg font-semibold tracking-tight text-ambedkar-950">
+  <div slot="intro" class="grid gap-6 lg:grid-cols-2">
+    <section class="card p-6 sm:p-8">
+      <h2
+        class="font-display text-xl font-semibold tracking-[-0.01em] text-ambedkar-950"
+      >
         {practicalitiesHeading}
       </h2>
       <dl class="mt-5 space-y-4">
@@ -60,9 +62,11 @@ const rows = bookReadingRows(readings, await loadReadingBooks());
     </section>
 
     <section
-      class="rounded-3xl border border-ambedkar-900/10 bg-mist p-6 sm:p-8"
+      class="card border-ambedkar-900/10 bg-linear-to-br from-ambedkar-50 to-mist p-6 sm:p-8"
     >
-      <h2 class="text-lg font-semibold tracking-tight text-ambedkar-950">
+      <h2
+        class="font-display text-xl font-semibold tracking-[-0.01em] text-ambedkar-950"
+      >
         {strandsHeading}
       </h2>
       <ul class="mt-5 space-y-5">

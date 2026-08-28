@@ -1,7 +1,9 @@
 ---
 import { Image } from "astro:assets";
+import { getEntry } from "astro:content";
 
 import logo from "../../assets/brand/aksc-logo.webp";
+import { helplineNavigation } from "../../config/navigation";
 import Container from "../ui/Container.astro";
 import DesktopNav from "./DesktopNav.astro";
 import MobileNav from "./MobileNav.astro";
@@ -12,14 +14,58 @@ interface Props {
 
 const { currentPath } = Astro.props;
 const isHome = currentPath === "/";
+const onHelpline = currentPath.replace(/\/+$/, "") === helplineNavigation.href;
+
+// Read from the helpline page rather than restating the number here, so the
+// strip and the helpline itself can never drift apart.
+const helpline = await getEntry("pages", "anti-caste-helpline");
+const phone =
+  helpline?.data.pageType === "helpline" ? helpline.data.phone : undefined;
 ---
 
+<!--
+  The strip carries the helpline instead of the primary bar. Someone who needs
+  it is not browsing section names, so it gets the question, the page, and the
+  number, all above everything else.
+
+  The strip scrolls away and only the bar below it sticks. Keeping the sticky
+  element short leaves more of the page visible while reading, and keeps the
+  offset that anchored headings scroll to small enough to stay honest.
+-->{
+  phone && (
+    <div class="on-dark relative isolate overflow-hidden bg-ambedkar-950 text-white">
+      <div
+        class="absolute inset-0 -z-10 grain opacity-[0.05]"
+        aria-hidden="true"
+      />
+      <Container class="flex flex-wrap items-center justify-between gap-x-5 gap-y-2 py-2 text-sm leading-5">
+        <p class="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span class="text-white/70">Facing casteism?</span>
+          <a
+            class="btn btn-primary btn-sm"
+            href={`${helplineNavigation.href}/`}
+            aria-current={onHelpline ? "page" : undefined}
+          >
+            {helplineNavigation.label}
+          </a>
+        </p>
+        <a
+          class="py-1 font-semibold whitespace-nowrap text-accent-300 underline decoration-accent-300/40 decoration-2 underline-offset-4 transition-colors hover:decoration-accent-300"
+          href={phone.href}
+        >
+          Call 1-844-66-UNITE
+        </a>
+      </Container>
+    </div>
+  )
+}
+
 <header
-  class="sticky top-0 z-40 border-b border-ambedkar-900/10 bg-white/95 backdrop-blur"
+  class="sticky top-0 z-50 border-b border-ambedkar-900/10 bg-mist/95 backdrop-blur-md"
 >
-  <Container class="flex items-center justify-between py-2">
+  <Container class="flex items-center justify-between gap-4 py-2.5">
     <a
-      class="inline-flex rounded-xl"
+      class="inline-flex shrink-0 rounded-xl"
       href="/"
       aria-label="AKSC USA home"
       aria-current={isHome ? "page" : undefined}
@@ -27,10 +73,10 @@ const isHome = currentPath === "/";
       <Image
         src={logo}
         alt=""
-        width={112}
+        width={160}
         format="webp"
         quality={90}
-        class="size-14 object-contain"
+        class="size-14 object-contain sm:size-16"
       />
     </a>
     <DesktopNav currentPath={currentPath} />

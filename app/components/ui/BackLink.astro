@@ -1,0 +1,29 @@
+---
+interface Props {
+  href: string;
+  /** `light` is for the dark masthead, `dark` for a light page. */
+  tone?: "light" | "dark";
+}
+
+const { href, tone = "dark" } = Astro.props;
+
+const toneClasses = {
+  light:
+    "border-white/25 bg-white/10 text-white/90 hover:border-white/60 hover:bg-white/20 hover:text-white",
+  dark: "border-ambedkar-900/15 bg-white text-ambedkar-800 hover:border-ambedkar-900/40 hover:text-ambedkar-950",
+};
+---
+
+<a
+  class:list={[
+    "group inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+    toneClasses[tone],
+  ]}
+  href={href}
+>
+  <span
+    class="inline-block transition-transform duration-300 group-hover:-translate-x-1"
+    aria-hidden="true">&larr;</span
+  >
+  <slot />
+</a>
