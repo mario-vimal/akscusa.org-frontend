@@ -2,15 +2,15 @@
 import type { GetStaticPaths } from "astro";
 import { render } from "astro:content";
 
-import ConferenceSpeakers from "../../features/conferences/components/ConferenceSpeakers.astro";
-import { loadConferenceSpeakers } from "../../features/conferences/queries/speakers";
-import EntryLayout from "../../features/editorial/components/EntryLayout.astro";
-import { loadEditorialEntries } from "../../features/editorial/entries";
+import ConferenceSpeakers from "~/features/conferences/components/ConferenceSpeakers.astro";
+import { loadConferenceSpeakers } from "~/features/conferences/queries/speakers";
+import EntryLayout from "~/features/editorial/components/EntryLayout.astro";
+import { loadEditorialEntries } from "~/features/editorial/queries/entries";
 import {
   conferenceBadge,
   conferenceDetails,
-} from "../../features/editorial/presenters";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+} from "~/features/editorial/presenters";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 export const getStaticPaths = (async () => {
   const conferences = await loadEditorialEntries("conferences");

@@ -1,5 +1,5 @@
 ---
-import { topicLabel, type EditorialTopic } from "../taxonomy";
+import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
 
 interface Badge {
   label: string;
@@ -39,11 +39,7 @@ const badgeClasses =
   {
     (eyebrow || badge) && (
       <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-        {eyebrow && (
-          <p class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase">
-            {eyebrow}
-          </p>
-        )}
+        {eyebrow && <p class="label text-ambedkar-700">{eyebrow}</p>}
         {badge && (
           <span
             class:list={[

@@ -1,25 +1,14 @@
 ---
-import Container from "../../../components/ui/Container.astro";
-import PageMasthead from "../../../components/ui/PageMasthead.astro";
-import ContributeCallout from "../../artwork/components/ContributeCallout.astro";
-import type { SizedPanel } from "../../artwork/panels";
-import ProseContent from "../../editorial/components/ProseContent.astro";
+import Container from "~/components/ui/Container.astro";
+import PageMasthead from "~/components/ui/PageMasthead.astro";
+import ContributeCallout from "~/features/artwork/components/ContributeCallout.astro";
+import ProseContent from "~/features/editorial/components/ProseContent.astro";
+import type { ComicSummary } from "~/features/comics/queries/comics";
 import ComicCard from "./ComicCard.astro";
 
 interface Action {
   label: string;
   href: string;
-}
-
-export interface ComicSummary {
-  href: string;
-  title: string;
-  summary: string;
-  /** The comic's title panel, used as its cover. */
-  cover: SizedPanel;
-  credit: string;
-  panelCount: string;
-  contentNote?: string;
 }
 
 interface Props {

@@ -2,11 +2,11 @@
 import type { GetStaticPaths } from "astro";
 import { render } from "astro:content";
 
-import EntryLayout from "../../features/editorial/components/EntryLayout.astro";
-import { loadEditorialEntries } from "../../features/editorial/entries";
-import { articleDetails } from "../../features/editorial/presenters";
-import { articleCategoryLabel } from "../../features/editorial/taxonomy";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+import EntryLayout from "~/features/editorial/components/EntryLayout.astro";
+import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import { articleDetails } from "~/features/editorial/presenters";
+import { articleCategoryLabel } from "~/features/editorial/taxonomy";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 export const getStaticPaths = (async () => {
   const articles = await loadEditorialEntries("articles");

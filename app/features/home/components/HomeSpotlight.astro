@@ -1,7 +1,7 @@
 ---
-import Container from "../../../components/ui/Container.astro";
-import { isoDate } from "../../editorial/entries";
-import type { Spotlight } from "../featured";
+import Container from "~/components/ui/Container.astro";
+import { isoDate } from "~/lib/dates";
+import type { Spotlight } from "~/features/home/queries/featured";
 
 interface Props {
   spotlight: Spotlight;
@@ -62,9 +62,7 @@ const weekday = part({ weekday: "long" });
       </div>
 
       <div>
-        <p
-          class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-accent-700 uppercase"
-        >
+        <p class="label text-accent-700">
           {spotlight.section}
         </p>
         <h2
@@ -89,9 +87,7 @@ const weekday = part({ weekday: "long" });
         {
           spotlight.location && (
             <dl class="mt-8">
-              <dt class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase">
-                Where
-              </dt>
+              <dt class="label text-ambedkar-700">Where</dt>
               <dd class="mt-1 max-w-md text-ambedkar-900/80">
                 {spotlight.location}
               </dd>

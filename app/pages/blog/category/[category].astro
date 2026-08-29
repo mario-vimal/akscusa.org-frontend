@@ -1,39 +1,29 @@
 ---
 import type { GetStaticPaths } from "astro";
 
-import EditorialIndex from "../../../features/editorial/components/EditorialIndex.astro";
-import EntryCard from "../../../features/editorial/components/EntryCard.astro";
-import {
-  editorialSections,
-  entryHref,
-  formatDate,
-  loadEditorialEntries,
-} from "../../../features/editorial/entries";
-import {
-  articleFilters,
-  articleMeta,
-} from "../../../features/editorial/presenters";
-import { articleCategories } from "../../../features/editorial/taxonomy";
-import SiteLayout from "../../../layouts/SiteLayout.astro";
+import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
+import EntryCard from "~/features/editorial/components/EntryCard.astro";
+import { editorialSections, entryHref } from "~/features/editorial/sections";
+import { groupByTerm } from "~/features/editorial/queries/entries";
+import { formatDate } from "~/lib/dates";
+import { articleFilters, articleMeta } from "~/features/editorial/presenters";
+import { articleCategories } from "~/features/editorial/taxonomy";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 export const getStaticPaths = (async () => {
-  const articles = await loadEditorialEntries("articles");
+  const groups = await groupByTerm(
+    "articles",
+    articleCategories,
+    (article) => article.data.category,
+  );
 
-  return articleCategories
-    .map((category) => ({
-      category,
-      articles: articles.filter(
-        (article) => article.data.category === category.id,
-      ),
-    }))
-    .filter((group) => group.articles.length > 0)
-    .map((group) => ({
-      params: { category: group.category.id },
-      props: { ...group, allArticles: articles },
-    }));
+  return groups.map((group) => ({
+    params: { category: group.term.id },
+    props: group,
+  }));
 }) satisfies GetStaticPaths;
 
-const { category, articles, allArticles } = Astro.props;
+const { term: category, entries: articles, all: allArticles } = Astro.props;
 const section = editorialSections.articles;
 const title = `${category.label} — ${section.title}`;
 ---

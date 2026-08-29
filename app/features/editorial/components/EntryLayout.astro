@@ -1,28 +1,20 @@
 ---
-import BackLink from "../../../components/ui/BackLink.astro";
-import Container from "../../../components/ui/Container.astro";
-import PageMasthead from "../../../components/ui/PageMasthead.astro";
-import { editorialSections, type EditorialCollection } from "../entries";
-import { topicLabel, type EditorialTopic } from "../taxonomy";
+import BackLink from "~/components/ui/BackLink.astro";
+import Container from "~/components/ui/Container.astro";
+import PageMasthead from "~/components/ui/PageMasthead.astro";
+import {
+  editorialSections,
+  type EditorialCollection,
+} from "~/features/editorial/sections";
+import type { Badge, Detail, LinkItem } from "~/features/editorial/presenters";
+import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
 import ProseContent from "./ProseContent.astro";
-
-interface Detail {
-  term: string;
-  description: string;
-  /** Turns the description into a link, used for contacts and registration. */
-  href?: string;
-}
-
-interface LinkItem {
-  label: string;
-  url: string;
-}
 
 interface Props {
   section: EditorialCollection;
   title: string;
   summary: string;
-  badge?: { label: string; tone?: "accent" | "muted" };
+  badge?: Badge;
   details?: readonly Detail[];
   /** Set apart from the body, used for an intervention's outcome. */
   callout?: { heading: string; text: string };
@@ -86,9 +78,7 @@ const badgeClasses =
         <dl class="max-w-3xl border-t border-ambedkar-950 sm:grid sm:grid-cols-2 sm:gap-x-10">
           {details.map((detail) => (
             <div class="border-b border-rule py-4">
-              <dt class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase">
-                {detail.term}
-              </dt>
+              <dt class="label text-ambedkar-700">{detail.term}</dt>
               <dd class="mt-1.5 leading-7 text-ambedkar-900/80">
                 {detail.href ? (
                   <a

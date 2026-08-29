@@ -1,15 +1,12 @@
 ---
-import ayyankaliMemorial from "../../assets/shared/leaders/ayyankali-memorial-cc-by-sa-3.jpg";
-import EditorialIndex from "../../features/editorial/components/EditorialIndex.astro";
-import EntryCard from "../../features/editorial/components/EntryCard.astro";
-import {
-  editorialSections,
-  entryHref,
-  formatDate,
-  loadEditorialEntries,
-} from "../../features/editorial/entries";
-import { pressReleaseMeta } from "../../features/editorial/presenters";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+import ayyankaliMemorial from "~/assets/shared/leaders/ayyankali-memorial-cc-by-sa-3.jpg";
+import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
+import EntryCard from "~/features/editorial/components/EntryCard.astro";
+import { editorialSections, entryHref } from "~/features/editorial/sections";
+import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import { formatDate } from "~/lib/dates";
+import { pressReleaseMeta } from "~/features/editorial/presenters";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 const section = editorialSections.pressReleases;
 const releases = await loadEditorialEntries("pressReleases");

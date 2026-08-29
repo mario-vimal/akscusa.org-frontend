@@ -242,10 +242,21 @@ export type GeneralBodyPaperKind = Ids<typeof generalBodyPaperKinds>;
 
 /**
  * Zod's `enum` needs a non-empty tuple of literals, which `.map()` cannot
- * produce on its own, so the cast preserves the literal ids from the lists.
+ * produce on its own. Rather than assert the shape and hope, the emptiness is
+ * checked here: an empty vocabulary would otherwise reach Zod as a broken enum
+ * and fail somewhere much less obvious.
  */
-const idsOf = <const T extends readonly TaxonomyTerm[]>(terms: T) =>
-  terms.map((term) => term.id) as unknown as [Ids<T>, ...Ids<T>[]];
+const idsOf = <const T extends readonly TaxonomyTerm[]>(
+  terms: T,
+): [Ids<T>, ...Ids<T>[]] => {
+  const [first, ...rest] = terms.map((term) => term.id as Ids<T>);
+
+  if (first === undefined) {
+    throw new Error("A taxonomy list must define at least one term.");
+  }
+
+  return [first, ...rest];
+};
 
 export const editorialTopicIds = idsOf(editorialTopics);
 export const articleCategoryIds = idsOf(articleCategories);

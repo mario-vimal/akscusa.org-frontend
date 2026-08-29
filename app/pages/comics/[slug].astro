@@ -2,15 +2,15 @@
 import type { GetStaticPaths } from "astro";
 import { getEntry } from "astro:content";
 
-import { sizePanels } from "../../features/artwork/panels";
-import ComicReader from "../../features/comics/components/ComicReader.astro";
+import { sizePanels } from "~/features/artwork/panels";
+import ComicReader from "~/features/comics/components/ComicReader.astro";
 import {
   comicHref,
   loadComics,
   neighbours,
-} from "../../features/comics/queries/comics";
-import { formatDate } from "../../features/editorial/entries";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+} from "~/features/comics/queries/comics";
+import { formatDate } from "~/lib/dates";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 export const getStaticPaths = (async () => {
   const comics = await loadComics();

@@ -5,11 +5,9 @@
  */
 import {
   editorialSections,
-  formatDate,
-  formatDateRange,
-  ordinal,
   type EditorialEntry,
-} from "./entries";
+} from "~/features/editorial/sections";
+import { formatDate, formatDateRange, ordinal } from "~/lib/dates";
 import {
   articleCategories,
   conferenceFormatLabel,
@@ -28,7 +26,14 @@ export interface Badge {
 export interface Detail {
   term: string;
   description: string;
+  /** Turns the description into a link, used for contacts and registration. */
   href?: string;
+}
+
+/** A named link, as stored by `linkSchema` and printed by an entry page. */
+export interface LinkItem {
+  label: string;
+  url: string;
 }
 
 interface Filter {

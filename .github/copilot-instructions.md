@@ -1,5 +1,37 @@
 # Repository conventions
 
+## Code structure
+
+- Import with the `~/` alias, which resolves to `app/`. Only a sibling keeps a
+  relative path. Never write a `../` import.
+- Anything that reads a content collection goes in
+  `app/features/<feature>/queries/`. Turning an entry into the strings a page
+  prints goes in that feature's `presenters.ts`. A pure helper that touches no
+  content is a plain module in the feature root.
+- Put a helper more than one feature needs in `app/lib/`. `lib/collections.ts`
+  owns the draft rule and the sort comparators, and `lib/dates.ts` owns every
+  date format. Do not re-implement either; a second copy of the draft rule is
+  how two parts of the site come to disagree about what is published.
+- Read a collection through `loadPublished(collection, compare)`. The
+  comparator is deliberately required, so the order of a list is stated where
+  the list is loaded.
+- Content collection schemas live in `app/schemas/`, one file per domain.
+  `app/content.config.ts` only lists the collections, because Astro requires
+  that; it is not where content modelling happens.
+- A route in `app/pages/` reads as a list of sections. If its frontmatter
+  filters, groups, joins, or reduces, move that into the feature's `queries/`
+  module and have the page call one function.
+- Give a component a view model, not a raw `CollectionEntry`, wherever one
+  exists. Export the view-model type from the module that builds it rather than
+  declaring it in the component that receives it.
+- Move more than a few lines of browser JavaScript out of `<script>` into a
+  `.ts` module the script imports, so it is type-checked and linted.
+- Prefer making an invalid state unrepresentable over asserting it away. There
+  are no `any` types and no `as unknown as` casts in `app/`; if a cast seems
+  necessary, carry the information that makes it unnecessary instead.
+- Comments explain why, not what. Record a constraint, a rejected alternative,
+  or the browser behaviour that forced the shape of the code.
+
 ## Visual system
 
 - Use the Ambedkar blue scale in `app/styles/global.css` as the primary brand
@@ -26,10 +58,12 @@
   reserve `shadow-soft` for genuinely floating layers such as the mobile nav
   sheet.
 - Reuse the shared classes in `global.css` before writing new utilities:
-  `eyebrow`, `section-head`, `rule-draw`, `index-figure`, `btn` with its
-  variants, `card` and `card-title`, `tag`, `link-underline`, the `grain` and
-  `duotone` surfaces, and the `reveal`, `reveal-children`, and `rise` entrance
-  animations.
+  `eyebrow` for a section label and `label` / `label-sm` for a field name,
+  column heading, or card tag; `section-head`, `rule-draw`, `index-figure`,
+  `btn` with its variants, `card` and `card-title`, `tag`, `link-underline`,
+  the `grain` and `duotone` surfaces, and the `reveal`, `reveal-children`, and
+  `rise` entrance animations. `label` sets no colour and no display on purpose,
+  so it can be used on a dark panel and inside a table header.
 - Keep one idea about lines. A rule on the page is the 2px accent rule that
   draws itself in on scroll — `section-head` carries it, and `rule-draw` is the
   same rule for a section that opens on something other than a label and a

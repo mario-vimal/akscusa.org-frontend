@@ -1,9 +1,8 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
-import {
-  loadEditorialEntries,
-  type EditorialEntry,
-} from "../../editorial/entries";
+import { type EditorialEntry } from "~/features/editorial/sections";
+import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import { isPublished } from "~/lib/collections";
 
 export type Book = CollectionEntry<"books">;
 export type Reading = EditorialEntry<"bookReadings">;
@@ -13,9 +12,6 @@ export interface BookWithReadings {
   book: Book;
   readings: Reading[];
 }
-
-const isPublished = (entry: { data: { draft: boolean } }) =>
-  import.meta.env.DEV || !entry.data.draft;
 
 const byTitle = (a: Book, b: Book) =>
   a.data.title.localeCompare(b.data.title, "en", { sensitivity: "base" });

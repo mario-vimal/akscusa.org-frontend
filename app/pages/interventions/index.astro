@@ -1,19 +1,16 @@
 ---
-import periyarAndAnnadurai from "../../assets/shared/leaders/periyar-annadurai-public-domain.jpg";
-import EditorialIndex from "../../features/editorial/components/EditorialIndex.astro";
-import EntryCard from "../../features/editorial/components/EntryCard.astro";
-import {
-  editorialSections,
-  entryHref,
-  loadEditorialEntries,
-} from "../../features/editorial/entries";
+import periyarAndAnnadurai from "~/assets/shared/leaders/periyar-annadurai-public-domain.jpg";
+import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
+import EntryCard from "~/features/editorial/components/EntryCard.astro";
+import { editorialSections, entryHref } from "~/features/editorial/sections";
+import { loadEditorialEntries } from "~/features/editorial/queries/entries";
 import {
   interventionBadge,
   interventionEyebrow,
   interventionFilters,
   interventionMeta,
-} from "../../features/editorial/presenters";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+} from "~/features/editorial/presenters";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 const section = editorialSections.interventions;
 const interventions = await loadEditorialEntries("interventions");

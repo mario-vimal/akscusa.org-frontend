@@ -1,40 +1,37 @@
 ---
 import type { GetStaticPaths } from "astro";
 
-import EditorialIndex from "../../../features/editorial/components/EditorialIndex.astro";
-import EntryCard from "../../../features/editorial/components/EntryCard.astro";
-import {
-  editorialSections,
-  entryHref,
-  loadEditorialEntries,
-} from "../../../features/editorial/entries";
+import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
+import EntryCard from "~/features/editorial/components/EntryCard.astro";
+import { editorialSections, entryHref } from "~/features/editorial/sections";
+import { groupByTerm } from "~/features/editorial/queries/entries";
 import {
   interventionBadge,
   interventionEyebrow,
   interventionFilters,
   interventionMeta,
-} from "../../../features/editorial/presenters";
-import { interventionKinds } from "../../../features/editorial/taxonomy";
-import SiteLayout from "../../../layouts/SiteLayout.astro";
+} from "~/features/editorial/presenters";
+import { interventionKinds } from "~/features/editorial/taxonomy";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 export const getStaticPaths = (async () => {
-  const interventions = await loadEditorialEntries("interventions");
+  const groups = await groupByTerm(
+    "interventions",
+    interventionKinds,
+    (intervention) => intervention.data.kind,
+  );
 
-  return interventionKinds
-    .map((kind) => ({
-      kind,
-      interventions: interventions.filter(
-        (intervention) => intervention.data.kind === kind.id,
-      ),
-    }))
-    .filter((group) => group.interventions.length > 0)
-    .map((group) => ({
-      params: { kind: group.kind.id },
-      props: { ...group, allInterventions: interventions },
-    }));
+  return groups.map((group) => ({
+    params: { kind: group.term.id },
+    props: group,
+  }));
 }) satisfies GetStaticPaths;
 
-const { kind, interventions, allInterventions } = Astro.props;
+const {
+  term: kind,
+  entries: interventions,
+  all: allInterventions,
+} = Astro.props;
 const section = editorialSections.interventions;
 const title = `${kind.label} — ${section.title}`;
 ---

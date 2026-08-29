@@ -1,7 +1,7 @@
 ---
-import ResponsiveImage from "../../../components/ui/ResponsiveImage.astro";
-import { topicLabel, type EditorialTopic } from "../../editorial/taxonomy";
-import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "../covers";
+import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
+import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
+import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
 
 interface Props {
   href: string;
@@ -57,9 +57,7 @@ const sessionLabel =
     }
 
     <div class="min-w-0">
-      <p
-        class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase"
-      >
+      <p class="label text-ambedkar-700">
         {authors}
       </p>
       <h2

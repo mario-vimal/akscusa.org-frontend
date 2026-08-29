@@ -1,19 +1,13 @@
 ---
-import ambedkarPortrait from "../../assets/shared/leaders/ambedkar-portrait-public-domain.jpg";
-import EditorialIndex from "../../features/editorial/components/EditorialIndex.astro";
-import EntryCard from "../../features/editorial/components/EntryCard.astro";
-import {
-  editorialSections,
-  entryHref,
-  formatDate,
-  loadEditorialEntries,
-} from "../../features/editorial/entries";
-import {
-  articleFilters,
-  articleMeta,
-} from "../../features/editorial/presenters";
-import { articleCategoryLabel } from "../../features/editorial/taxonomy";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+import ambedkarPortrait from "~/assets/shared/leaders/ambedkar-portrait-public-domain.jpg";
+import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
+import EntryCard from "~/features/editorial/components/EntryCard.astro";
+import { editorialSections, entryHref } from "~/features/editorial/sections";
+import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import { formatDate } from "~/lib/dates";
+import { articleFilters, articleMeta } from "~/features/editorial/presenters";
+import { articleCategoryLabel } from "~/features/editorial/taxonomy";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 const section = editorialSections.articles;
 const articles = await loadEditorialEntries("articles");

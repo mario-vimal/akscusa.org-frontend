@@ -1,4 +1,4 @@
-import { getCollection, type CollectionEntry } from "astro:content";
+import { type CollectionEntry } from "astro:content";
 
 /**
  * The six collections that share the editorial base schema. They are listed,
@@ -85,80 +85,5 @@ export const editorialSections = {
   },
 } as const satisfies Record<EditorialCollection, SectionDefinition>;
 
-/**
- * Drafts are visible while writing and hidden from the built site, so an
- * unfinished entry can be previewed without being published.
- */
-const isPublished = (entry: { data: { draft: boolean } }) =>
-  import.meta.env.DEV || !entry.data.draft;
-
-const byNewestFirst = (
-  a: { data: { date: Date } },
-  b: { data: { date: Date } },
-) => b.data.date.getTime() - a.data.date.getTime();
-
-export async function loadEditorialEntries<C extends EditorialCollection>(
-  collection: C,
-): Promise<EditorialEntry<C>[]> {
-  const entries = await getCollection(collection);
-  return entries.filter(isPublished).sort(byNewestFirst);
-}
-
 export const entryHref = (collection: EditorialCollection, id: string) =>
   `${editorialSections[collection].path}/${id}/`;
-
-const dayFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "long",
-  timeZone: "UTC",
-});
-
-const monthFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "long",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
-export const formatDate = (date: Date) => dayFormatter.format(date);
-export const formatMonth = (date: Date) => monthFormatter.format(date);
-
-// A reading is scheduled at a time of day, not just on a date, and the circle
-// keeps Pacific time wherever members join from.
-const pacificDayFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "long",
-  timeZone: "America/Los_Angeles",
-});
-
-const pacificTimeFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "long",
-  day: "numeric",
-  year: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-  timeZoneName: "short",
-  timeZone: "America/Los_Angeles",
-});
-
-export const formatPacificDate = (date: Date) =>
-  pacificDayFormatter.format(date);
-export const formatPacificTime = (date: Date) =>
-  pacificTimeFormatter.format(date);
-
-/** ISO date without the time part, for a `<time datetime>` attribute. */
-export const isoDate = (date: Date) => date.toISOString().slice(0, 10);
-
-export function formatDateRange(start: Date, end?: Date) {
-  if (!end || isoDate(end) === isoDate(start)) {
-    return formatDate(start);
-  }
-  return `${formatDate(start)} – ${formatDate(end)}`;
-}
-
-/** "1st", "2nd", "3rd", "4th" — used for conference editions. */
-export function ordinal(value: number) {
-  const remainderOfTen = value % 10;
-  const remainderOfHundred = value % 100;
-  if (remainderOfTen === 1 && remainderOfHundred !== 11) return `${value}st`;
-  if (remainderOfTen === 2 && remainderOfHundred !== 12) return `${value}nd`;
-  if (remainderOfTen === 3 && remainderOfHundred !== 13) return `${value}rd`;
-  return `${value}th`;
-}

@@ -1,7 +1,7 @@
 ---
-import type { EditorialTopic } from "../../editorial/taxonomy";
-import type { Badge, ProgramPoster } from "../../editorial/presenters";
-import { topicLabel } from "../../editorial/taxonomy";
+import type { EditorialTopic } from "~/features/editorial/taxonomy";
+import type { Badge, ProgramPoster } from "~/features/editorial/presenters";
+import { topicLabel } from "~/features/editorial/taxonomy";
 
 interface Props {
   href: string;
@@ -59,9 +59,7 @@ const badgeClasses =
   <div class="flex flex-1 p-6 sm:p-8">
     <div class="flex min-w-0 flex-1 flex-col">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <p
-          class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase"
-        >
+        <p class="label text-ambedkar-700">
           {eyebrow}
         </p>
         <span

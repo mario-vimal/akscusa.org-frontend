@@ -1,10 +1,9 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
+import { isPublished } from "~/lib/collections";
+
 type Conference = CollectionEntry<"conferences">;
 export type Speaker = CollectionEntry<"speakers">;
-
-const isPublished = (speaker: Speaker) =>
-  import.meta.env.DEV || !speaker.data.draft;
 
 export async function loadConferenceSpeakers(
   conference: Conference,

@@ -1,7 +1,10 @@
 ---
-import EditorialIndex from "../../editorial/components/EditorialIndex.astro";
-import libraryShelves from "../assets/library-shelves-2jivbogleho.jpg";
-import { bookHref, loadBooksWithReadings } from "../queries/books";
+import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
+import libraryShelves from "~/features/books/assets/library-shelves-2jivbogleho.jpg";
+import {
+  bookHref,
+  loadBooksWithReadings,
+} from "~/features/books/queries/books";
 import BookCard from "./BookCard.astro";
 
 const entries = await loadBooksWithReadings();

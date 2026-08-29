@@ -1,19 +1,13 @@
 ---
 import { getEntry } from "astro:content";
 
-import HomeCallToAction from "../features/home/components/HomeCallToAction.astro";
-import HomeHero from "../features/home/components/HomeHero.astro";
-import HomeLatest from "../features/home/components/HomeLatest.astro";
-import HomeQuotes from "../features/home/components/HomeQuotes.astro";
-import HomeSpotlight from "../features/home/components/HomeSpotlight.astro";
-import {
-  loadLatestBook,
-  loadReading,
-  loadRecentWork,
-  loadSpotlight,
-  loadWriting,
-} from "../features/home/featured";
-import SiteLayout from "../layouts/SiteLayout.astro";
+import HomeCallToAction from "~/features/home/components/HomeCallToAction.astro";
+import HomeHero from "~/features/home/components/HomeHero.astro";
+import HomeLatest from "~/features/home/components/HomeLatest.astro";
+import HomeQuotes from "~/features/home/components/HomeQuotes.astro";
+import HomeSpotlight from "~/features/home/components/HomeSpotlight.astro";
+import { loadHomeFeatures } from "~/features/home/queries/featured";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 const home = await getEntry("pages", "home");
 
@@ -21,29 +15,18 @@ if (!home || home.data.pageType !== "home") {
   throw new Error("Home content is missing or invalid.");
 }
 
-// Everything below the hero is the newest entry of each kind, read from the
-// collections at build time. The homepage owns no copy of its own beyond the
-// hero, the quotes, and the closing call, which stay in app/content.
-const spotlight = await loadSpotlight();
-const { lead, more } = await loadWriting();
-const reading = await loadReading();
-const book = await loadLatestBook();
-const recent = await loadRecentWork(
-  [
-    spotlight?.href,
-    lead?.href,
-    reading?.href,
-    ...more.map((entry) => entry.href),
-  ].filter((href): href is string => Boolean(href)),
-);
+// The hero, the quotes, and the closing call are the homepage's own copy and
+// live in app/content. Everything between them is the newest entry of each
+// kind, chosen in features/home/featured.ts.
+const { spotlight, writing, reading, book, recent } = await loadHomeFeatures();
 ---
 
 <SiteLayout description={home.data.description}>
   <HomeHero hero={home.data.hero} />
   {spotlight && <HomeSpotlight spotlight={spotlight} />}
   <HomeLatest
-    lead={lead}
-    more={more}
+    lead={writing.lead}
+    more={writing.more}
     reading={reading}
     book={book}
     recent={recent}

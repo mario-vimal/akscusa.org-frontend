@@ -1,11 +1,11 @@
 ---
-import BackLink from "../../../components/ui/BackLink.astro";
-import Container from "../../../components/ui/Container.astro";
-import PageMasthead from "../../../components/ui/PageMasthead.astro";
-import ContributeCallout from "../../artwork/components/ContributeCallout.astro";
-import PanelSequence from "../../artwork/components/PanelSequence.astro";
-import type { SizedPanel } from "../../artwork/panels";
-import { topicLabel, type EditorialTopic } from "../../editorial/taxonomy";
+import BackLink from "~/components/ui/BackLink.astro";
+import Container from "~/components/ui/Container.astro";
+import PageMasthead from "~/components/ui/PageMasthead.astro";
+import ContributeCallout from "~/features/artwork/components/ContributeCallout.astro";
+import PanelSequence from "~/features/artwork/components/PanelSequence.astro";
+import type { SizedPanel } from "~/features/artwork/panels";
+import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
 
 interface Action {
   label: string;
@@ -83,9 +83,7 @@ const total = panels.length;
 
     <dl class="mt-9 flex flex-wrap gap-x-10 gap-y-5 text-sm">
       <div>
-        <dt
-          class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-accent-300 uppercase"
-        >
+        <dt class="label text-accent-300">
           {credits.length === 1 ? "Credit" : "Credits"}
         </dt>
         <dd class="mt-1.5 leading-6 text-white/85">
@@ -114,11 +112,7 @@ const total = panels.length;
       </div>
 
       <div>
-        <dt
-          class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-accent-300 uppercase"
-        >
-          Length
-        </dt>
+        <dt class="label text-accent-300">Length</dt>
         <dd class="mt-1.5 leading-6 text-white/85">
           {total}
           {total === 1 ? "panel" : "panels"}
@@ -126,11 +120,7 @@ const total = panels.length;
       </div>
 
       <div>
-        <dt
-          class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-accent-300 uppercase"
-        >
-          Published
-        </dt>
+        <dt class="label text-accent-300">Published</dt>
         <dd class="mt-1.5 leading-6 text-white/85">{published}</dd>
       </div>
     </dl>

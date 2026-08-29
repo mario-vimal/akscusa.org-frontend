@@ -1,17 +1,12 @@
 ---
-import EditorialIndex from "../../editorial/components/EditorialIndex.astro";
-import ProseContent from "../../editorial/components/ProseContent.astro";
-import {
-  formatDate,
-  formatMonth,
-  isoDate,
-  ordinal,
-} from "../../editorial/entries";
-import { generalBodyPaperKindLabel } from "../../editorial/taxonomy";
+import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
+import ProseContent from "~/features/editorial/components/ProseContent.astro";
+import { formatDate, formatMonth, isoDate, ordinal } from "~/lib/dates";
+import { generalBodyPaperKindLabel } from "~/features/editorial/taxonomy";
 import {
   loadGeneralBodyMeetings,
   type GeneralBodyMeeting,
-} from "../queries/general-body";
+} from "~/features/organization/queries/general-body";
 
 interface Props {
   eyebrow: string;

@@ -1,14 +1,14 @@
 ---
-import Container from "../../../components/ui/Container.astro";
-import ResponsiveImage from "../../../components/ui/ResponsiveImage.astro";
-import { COVER_ALT, COVER_WIDTHS } from "../../books/covers";
-import { formatDate, isoDate } from "../../editorial/entries";
+import Container from "~/components/ui/Container.astro";
+import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
+import { COVER_ALT, COVER_WIDTHS } from "~/features/books/covers";
+import { formatDate, isoDate } from "~/lib/dates";
 import type {
   BookFeature,
   FeaturedRef,
   LeadArticle,
   ReadingFeature,
-} from "../featured";
+} from "~/features/home/queries/featured";
 
 interface Props {
   lead?: LeadArticle;
@@ -44,9 +44,7 @@ const { lead, more, reading, book, recent } = Astro.props;
         {
           lead && (
             <article>
-              <p class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-accent-700 uppercase">
-                {lead.section}
-              </p>
+              <p class="label text-accent-700">{lead.section}</p>
               <h3 class="mt-4 font-display text-3xl leading-[1.08] font-bold tracking-title text-balance text-ambedkar-950 sm:text-[2.375rem]">
                 <a class="link-underline" href={lead.href}>
                   {lead.title}
@@ -68,9 +66,7 @@ const { lead, more, reading, book, recent } = Astro.props;
         {
           more.length > 0 && (
             <div class="mt-12">
-              <p class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-900/70 uppercase">
-                More writing
-              </p>
+              <p class="label text-ambedkar-900/70">More writing</p>
               <ul class="mt-4 border-t border-rule">
                 {more.map((item) => (
                   <li class="group relative border-b border-rule">
@@ -105,9 +101,7 @@ const { lead, more, reading, book, recent } = Astro.props;
         {
           (book || reading) && (
             <article>
-              <p class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-accent-700 uppercase">
-                Reading circle
-              </p>
+              <p class="label text-accent-700">Reading circle</p>
 
               {book && (
                 <div class="mt-5 flex gap-5">
@@ -123,7 +117,7 @@ const { lead, more, reading, book, recent } = Astro.props;
                     </a>
                   )}
                   <div class="min-w-0">
-                    <p class="font-display text-[0.625rem] font-semibold tracking-[0.14em] text-ambedkar-900/70 uppercase">
+                    <p class="label label-sm text-ambedkar-900/70">
                       Latest book read
                     </p>
                     <h3 class="mt-2 font-display text-xl leading-[1.16] font-bold tracking-title text-balance text-ambedkar-950">
@@ -149,7 +143,7 @@ const { lead, more, reading, book, recent } = Astro.props;
 
               {reading && (
                 <div class="mt-7 border-t border-rule pt-6">
-                  <p class="font-display text-[0.625rem] font-semibold tracking-[0.14em] text-ambedkar-900/70 uppercase">
+                  <p class="label label-sm text-ambedkar-900/70">
                     {reading.upcoming ? "Next session" : "Last met"}
                   </p>
                   <h3 class="mt-2 font-display text-lg leading-[1.25] font-bold tracking-title text-balance text-ambedkar-950">
@@ -178,9 +172,7 @@ const { lead, more, reading, book, recent } = Astro.props;
         {
           recent.length > 0 && (
             <div>
-              <p class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-accent-700 uppercase">
-                Also recently
-              </p>
+              <p class="label text-accent-700">Also recently</p>
               <ul class="mt-4 border-t border-rule">
                 {recent.map((item) => (
                   <li class="group relative border-b border-rule">
@@ -188,7 +180,7 @@ const { lead, more, reading, book, recent } = Astro.props;
                       class="flex flex-col gap-1 py-4 after:absolute after:inset-0"
                       href={item.href}
                     >
-                      <span class="font-display text-[0.625rem] font-semibold tracking-[0.14em] text-ambedkar-900/70 uppercase">
+                      <span class="label label-sm text-ambedkar-900/70">
                         {item.section}
                         <span> · </span>
                         <time datetime={isoDate(item.date)}>

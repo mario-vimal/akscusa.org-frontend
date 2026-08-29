@@ -1,5 +1,5 @@
 ---
-import type { BookReadingRow } from "../presenters";
+import type { BookReadingRow } from "~/features/book-readings/presenters";
 
 interface Props {
   rows: readonly BookReadingRow[];
@@ -23,10 +23,7 @@ const columns = [
     hidden
   >
     <div role="search" class="max-w-xl">
-      <label
-        class="block font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase"
-        for="reading-search"
-      >
+      <label class="label block text-ambedkar-700" for="reading-search">
         Search readings
       </label>
       <input
@@ -71,7 +68,7 @@ const columns = [
           {
             columns.map((column) => (
               <th
-                class="px-6 py-4 font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase"
+                class="label px-6 py-4 text-ambedkar-700"
                 scope="col"
                 data-readings-column={column.key}
                 aria-sort={column.key === "date" ? "descending" : "none"}
@@ -81,7 +78,7 @@ const columns = [
             ))
           }
           <th
-            class="hidden px-6 py-4 font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase lg:table-cell"
+            class="label hidden px-6 py-4 text-ambedkar-700 lg:table-cell"
             scope="col"
           >
             Where
@@ -168,7 +165,7 @@ const columns = [
     sortRows,
     type SortKey,
     type SortState,
-  } from "../table";
+  } from "~/features/book-readings/table";
 
   const controls = document.querySelector<HTMLElement>(
     "[data-readings-controls]",
@@ -234,7 +231,7 @@ const columns = [
       const button = document.createElement("button");
       button.type = "button";
       button.className =
-        "-mx-2 -my-4 flex items-center gap-1.5 rounded-sm px-2 py-4 font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase transition hover:text-ambedkar-950";
+        "-mx-2 -my-4 flex items-center gap-1.5 rounded-sm px-2 py-4 label text-ambedkar-700 transition hover:text-ambedkar-950";
       button.textContent = header.textContent?.trim() ?? "";
 
       const arrow = document.createElement("span");

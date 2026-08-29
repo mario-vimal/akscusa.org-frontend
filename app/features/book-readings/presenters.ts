@@ -4,15 +4,11 @@
  * editorial presenters, because a reading resolves its book through the books
  * collection and the other editorial sections have no such relation.
  */
-import {
-  entryHref,
-  formatPacificDate,
-  formatPacificTime,
-  type EditorialEntry,
-} from "../editorial/entries";
-import type { Badge, Detail } from "../editorial/presenters";
-import { topicLabel } from "../editorial/taxonomy";
-import { bookHref, type Book } from "../books/queries/books";
+import { entryHref, type EditorialEntry } from "~/features/editorial/sections";
+import { formatPacificDate, formatPacificTime } from "~/lib/dates";
+import type { Badge, Detail } from "~/features/editorial/presenters";
+import { topicLabel } from "~/features/editorial/taxonomy";
+import { bookHref, type Book } from "~/features/books/queries/books";
 
 type Reading = EditorialEntry<"bookReadings">;
 

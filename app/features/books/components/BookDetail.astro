@@ -1,13 +1,13 @@
 ---
-import BackLink from "../../../components/ui/BackLink.astro";
-import Container from "../../../components/ui/Container.astro";
-import PageMasthead from "../../../components/ui/PageMasthead.astro";
-import ResponsiveImage from "../../../components/ui/ResponsiveImage.astro";
-import { formatPacificDate } from "../../editorial/entries";
-import { topicLabel } from "../../editorial/taxonomy";
-import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "../covers";
-import { openLibraryUrl } from "../isbn";
-import type { BookWithReadings } from "../queries/books";
+import BackLink from "~/components/ui/BackLink.astro";
+import Container from "~/components/ui/Container.astro";
+import PageMasthead from "~/components/ui/PageMasthead.astro";
+import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
+import { formatPacificDate } from "~/lib/dates";
+import { topicLabel } from "~/features/editorial/taxonomy";
+import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
+import { openLibraryUrl } from "~/features/books/isbn";
+import type { BookWithReadings } from "~/features/books/queries/books";
 
 interface Props {
   entry: BookWithReadings;
@@ -60,9 +60,7 @@ const facts = [
           {
             facts.map((fact) => (
               <div>
-                <dt class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase">
-                  {fact.term}
-                </dt>
+                <dt class="label text-ambedkar-700">{fact.term}</dt>
                 <dd class="mt-1 leading-7 text-ambedkar-900/80">
                   {fact.description}
                 </dd>
@@ -70,11 +68,7 @@ const facts = [
             ))
           }
           <div>
-            <dt
-              class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase"
-            >
-              ISBN
-            </dt>
+            <dt class="label text-ambedkar-700">ISBN</dt>
             <dd class="mt-1 leading-7 wrap-break-word text-ambedkar-900/80">
               <a
                 class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
@@ -137,7 +131,7 @@ const facts = [
           <ul class="mt-6 space-y-4">
             {readings.map((reading) => (
               <li class="card p-6">
-                <p class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase">
+                <p class="label text-ambedkar-700">
                   <time datetime={reading.data.date.toISOString()}>
                     {formatPacificDate(reading.data.date)}
                   </time>

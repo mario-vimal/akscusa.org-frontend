@@ -2,13 +2,10 @@
 import type { GetStaticPaths } from "astro";
 import { render } from "astro:content";
 
-import { loadEditorialEntries } from "../../features/editorial/entries";
-import {
-  programBadge,
-  programDetails,
-} from "../../features/editorial/presenters";
-import ProgramLayout from "../../features/programs/components/ProgramLayout.astro";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import { programBadge, programDetails } from "~/features/editorial/presenters";
+import ProgramLayout from "~/features/programs/components/ProgramLayout.astro";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 export const getStaticPaths = (async () => {
   const programs = await loadEditorialEntries("programs");

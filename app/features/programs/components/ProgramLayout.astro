@@ -1,11 +1,15 @@
 ---
-import BackLink from "../../../components/ui/BackLink.astro";
-import Container from "../../../components/ui/Container.astro";
-import PageMasthead from "../../../components/ui/PageMasthead.astro";
-import Poster from "../../../components/ui/Poster.astro";
-import ProseContent from "../../editorial/components/ProseContent.astro";
-import type { Badge, Detail, ProgramPoster } from "../../editorial/presenters";
-import { topicLabel, type EditorialTopic } from "../../editorial/taxonomy";
+import BackLink from "~/components/ui/BackLink.astro";
+import Container from "~/components/ui/Container.astro";
+import PageMasthead from "~/components/ui/PageMasthead.astro";
+import Poster from "~/components/ui/Poster.astro";
+import ProseContent from "~/features/editorial/components/ProseContent.astro";
+import type {
+  Badge,
+  Detail,
+  ProgramPoster,
+} from "~/features/editorial/presenters";
+import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
 
 interface LinkItem {
   label: string;
@@ -98,9 +102,7 @@ const badgeClasses =
           {
             details.map((detail) => (
               <div>
-                <dt class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase">
-                  {detail.term}
-                </dt>
+                <dt class="label text-ambedkar-700">{detail.term}</dt>
                 <dd class="mt-1 leading-7 text-ambedkar-900/80">
                   {detail.href ? (
                     <a

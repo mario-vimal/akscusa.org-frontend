@@ -1,15 +1,9 @@
 ---
 import { getEntry, render } from "astro:content";
 
-import { sizePanels } from "../../features/artwork/panels";
-import ComicsIndex from "../../features/comics/components/ComicsIndex.astro";
-import {
-  comicHref,
-  creditLine,
-  loadComics,
-  panelCount,
-} from "../../features/comics/queries/comics";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+import ComicsIndex from "~/features/comics/components/ComicsIndex.astro";
+import { loadComicsIndex } from "~/features/comics/queries/comics";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 const page = await getEntry("pages", "comics");
 
@@ -17,29 +11,7 @@ if (!page || page.data.pageType !== "comics") {
   throw new Error("Comics page content is missing or invalid.");
 }
 
-const comics = await loadComics();
-
-const summaries = await Promise.all(
-  comics.map(async (comic) => {
-    const [cover] = await sizePanels([comic.data.panels[0]]);
-
-    return {
-      href: comicHref(comic.id),
-      title: comic.data.title,
-      summary: comic.data.summary,
-      cover,
-      credit: creditLine(comic),
-      panelCount: panelCount(comic),
-      contentNote: comic.data.contentNote,
-    };
-  }),
-);
-
-const totalPanels = comics.reduce(
-  (total, comic) => total + comic.data.panels.length,
-  0,
-);
-
+const { comics, totalPanels } = await loadComicsIndex();
 const { Content } = await render(page);
 ---
 
@@ -48,7 +20,7 @@ const { Content } = await render(page);
     eyebrow={page.data.eyebrow}
     title={page.data.headline}
     intro={page.data.intro}
-    comics={summaries}
+    comics={comics}
     totalPanels={totalPanels}
     contribute={page.data.contribute}
   >

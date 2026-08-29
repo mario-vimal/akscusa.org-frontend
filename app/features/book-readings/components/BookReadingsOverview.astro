@@ -1,12 +1,10 @@
 ---
-import EditorialIndex from "../../editorial/components/EditorialIndex.astro";
-import {
-  editorialSections,
-  loadEditorialEntries,
-} from "../../editorial/entries";
-import { loadReadingBooks } from "../../books/queries/books";
-import readingGathering from "../assets/reading-gathering-dgxogexaxm8.jpg";
-import { bookReadingRows } from "../presenters";
+import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
+import { editorialSections } from "~/features/editorial/sections";
+import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import { loadReadingBooks } from "~/features/books/queries/books";
+import readingGathering from "~/features/book-readings/assets/reading-gathering-dgxogexaxm8.jpg";
+import { bookReadingRows } from "~/features/book-readings/presenters";
 import BookReadingsTable from "./BookReadingsTable.astro";
 
 interface Props {
@@ -49,9 +47,7 @@ const rows = bookReadingRows(readings, await loadReadingBooks());
         {
           practicalities.map((item) => (
             <div>
-              <dt class="font-display text-[0.6875rem] font-semibold tracking-[0.14em] text-ambedkar-700 uppercase">
-                {item.term}
-              </dt>
+              <dt class="label text-ambedkar-700">{item.term}</dt>
               <dd class="mt-1 leading-7 text-ambedkar-900/80">
                 {item.description}
               </dd>

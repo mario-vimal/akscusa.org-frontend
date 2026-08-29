@@ -1,19 +1,15 @@
-import { getCollection, type CollectionEntry } from "astro:content";
+import { type CollectionEntry } from "astro:content";
+
+import { loadPublished } from "~/lib/collections";
 
 export type GeneralBodyMeeting = CollectionEntry<"generalBodyMeetings">;
 
 /**
- * Drafts are visible while writing and hidden from the built site, matching how
- * the editorial collections behave.
+ * A meeting is identified by its edition rather than a date, so the newest is
+ * the highest number. That is the one a reader is looking for.
  */
-const isPublished = (entry: GeneralBodyMeeting) =>
-  import.meta.env.DEV || !entry.data.draft;
-
-/** Most recent meeting first, which is the one a reader is looking for. */
-const byNewestFirst = (a: GeneralBodyMeeting, b: GeneralBodyMeeting) =>
+const byLatestEdition = (a: GeneralBodyMeeting, b: GeneralBodyMeeting) =>
   b.data.edition - a.data.edition;
 
-export async function loadGeneralBodyMeetings(): Promise<GeneralBodyMeeting[]> {
-  const meetings = await getCollection("generalBodyMeetings");
-  return meetings.filter(isPublished).sort(byNewestFirst);
-}
+export const loadGeneralBodyMeetings = (): Promise<GeneralBodyMeeting[]> =>
+  loadPublished("generalBodyMeetings", byLatestEdition);

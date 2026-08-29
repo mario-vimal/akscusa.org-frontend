@@ -29,10 +29,12 @@ app/                 # Code and one-off page copy, maintained in Git
 ├── components/      # `navigation/` and reusable `ui/`
 ├── config/          # Navigation and site-wide configuration
 ├── content/pages/   # Copy for one-off pages, edited by developers
-├── content.config.ts  # Schemas for both content sources
-├── features/        # Components owned by each section
+├── content.config.ts  # Lists the collections; the schemas are in `schemas/`
+├── features/        # One directory per section of the site
 ├── layouts/         # Base document and shared site chrome
-└── pages/           # File-based routes
+├── lib/             # Cross-feature helpers that belong to no one section
+├── pages/           # File-based routes
+└── schemas/         # Content collection definitions, one file per domain
 cms/                 # Everything the CMS owns
 ├── content/         # Structured records, read by Astro, never served
 └── public/          # Astro `publicDir`, served verbatim
@@ -54,6 +56,79 @@ Feature directories use lowercase kebab-case; keep section-specific components
 with their feature. `config/navigation.ts` is the single source of truth for
 navbar links. All UI is mobile-first and verified at small, medium, and desktop
 widths.
+
+## Code conventions
+
+These exist so that the answer to "where does this go?" is the same whoever is
+asking, and so a file can be understood without reading the ten around it.
+
+### Imports
+
+`~/` resolves to `app/`. Use it for anything outside the current directory:
+
+```ts
+import Container from "~/components/ui/Container.astro";
+import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import { formatDate } from "~/lib/dates";
+```
+
+Siblings keep a relative path (`./EntryCard.astro`), because a sibling import
+says "this belongs with me" and survives the directory being moved. There are no
+`../` imports; if you find yourself writing one, use the alias.
+
+### Where things go
+
+| Kind of code                                  | Goes in                            |
+| --------------------------------------------- | ---------------------------------- |
+| Reads a content collection                    | `features/<feature>/queries/`      |
+| Turns an entry into the strings a page prints | `features/<feature>/presenters.ts` |
+| A controlled vocabulary                       | `features/editorial/taxonomy.ts`   |
+| Pure helper, no content access                | `features/<feature>/<name>.ts`     |
+| Useful to more than one feature               | `app/lib/`                         |
+| A collection's schema                         | `app/schemas/<domain>.ts`          |
+| Markup for one section                        | `features/<feature>/components/`   |
+| Markup reused across sections                 | `app/components/ui/`               |
+
+A route in `app/pages/` should read as a list of sections. If its frontmatter is
+filtering, grouping, joining, or reducing, that work belongs in the feature's
+`queries/` module and the page should call one function.
+
+### Modules worth knowing
+
+- `app/lib/collections.ts` — what counts as published and what order entries
+  come back in. `loadPublished(collection, compare)` is how a collection is
+  read; the comparator is required so a list's order is stated where the list is
+  loaded. Never re-implement the draft rule.
+- `app/lib/dates.ts` — every date format the site uses. Dates are read as UTC
+  unless the thing happens at an hour in a place, which is why a reading uses
+  the Pacific formatters and an article does not.
+- `app/features/editorial/sections.ts` — the six editorial sections, their
+  routes, and their titles. `entryHref` builds every editorial link.
+- `app/schemas/shared.ts` — schema fragments used by more than one collection,
+  including `editorialBase`, the shape those six sections share.
+
+### Components
+
+Props are typed with a `Props` interface, and a component takes a view model
+rather than a raw `CollectionEntry` wherever one exists, so a schema change
+cannot quietly reshape a page. A view-model type is exported from the module
+that builds it, not declared in the component that receives it.
+
+Anything more than a few lines of browser JavaScript moves out of `<script>`
+into a `.ts` module the script imports, so it is type-checked, linted, and
+readable on its own:
+
+```astro
+<script>
+  import { mountQuoteCarousels } from "~/features/home/quote-carousel";
+
+  mountQuoteCarousels();
+</script>
+```
+
+Comments explain why, not what. A comment that restates the code is noise; one
+that records a constraint, a rejected alternative, or a browser behaviour that
+forced the shape of the code is the reason the file is maintainable.
 
 ## Visual system
 
@@ -81,7 +156,7 @@ families.
 ## Markdown content
 
 One-off page copy lives in `app/content/pages/<feature>/index.md`, validated by
-`app/content.config.ts` so missing fields fail the build. Contributors edit copy,
+`app/schemas/pages.ts` so missing fields fail the build. Contributors edit copy,
 calls to action, and image descriptions without touching layouts. Structured
 records live in `cms/content/` and are edited in the CMS instead.
 
@@ -94,8 +169,8 @@ temporary working document; delete it once both sites are retired.
 
 ## Editorial collections
 
-Six CMS collections share one base shape, defined once in
-`app/content.config.ts` and reused by each: `title`, `date`, `summary`,
+Six CMS collections share one base shape, defined once as `editorialBase` in
+`app/schemas/shared.ts` and reused by each: `title`, `date`, `summary`,
 `topics`, `heroImage`, `sourceUrl`, `featured`, and `draft`. Each then adds only
 the fields its own kind of entry needs.
 
@@ -111,8 +186,8 @@ the fields its own kind of entry needs.
 `app/features/editorial/taxonomy.ts` is the single source of truth for every
 controlled vocabulary: shared `topics`, article categories, intervention kinds
 and statuses, conference formats, and program kinds and statuses.
-`app/content.config.ts` turns those lists into Zod enums and the pages render
-their labels. The CMS cannot import
+`app/schemas/` turns those lists into Zod enums and the pages render their
+labels. The CMS cannot import
 TypeScript, so `cms/public/admin/config.yml` repeats the options in YAML and
 `scripts/cms/config.test.ts` fails if the two drift apart.
 
@@ -183,7 +258,7 @@ Open Library has nothing for an ISBN.
 `comics` and `toolkitScenarios` are the two drawn collections. Neither takes the
 editorial base shape: a comic has no body copy, and a scenario is not dated at
 all. Both are a titled sequence of panels, so they share one panel shape defined
-once in `app/content.config.ts`.
+once in `app/schemas/artwork.ts`.
 
 | Collection         | Folder                          | Route                 | Ordered by              |
 | ------------------ | ------------------------------- | --------------------- | ----------------------- |
@@ -248,7 +323,7 @@ them would fail every pull request the CMS opens.
 ## Sveltia CMS
 
 Served at `/admin/` from `cms/public/admin/`. Collections cover the records in
-`cms/content/`, each validated against a schema in `app/content.config.ts`.
+`cms/content/`, each validated against a schema in `app/schemas/`.
 
 The GitHub backend supports token sign-in immediately. Before giving
 nontechnical editors access, deploy

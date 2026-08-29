@@ -1,15 +1,12 @@
 ---
-import EditorialIndex from "../../editorial/components/EditorialIndex.astro";
-import {
-  editorialSections,
-  entryHref,
-  loadEditorialEntries,
-} from "../../editorial/entries";
+import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
+import { editorialSections, entryHref } from "~/features/editorial/sections";
+import { loadEditorialEntries } from "~/features/editorial/queries/entries";
 import {
   programBadge,
   programEyebrow,
   programMeta,
-} from "../../editorial/presenters";
+} from "~/features/editorial/presenters";
 import ProgramCard from "./ProgramCard.astro";
 
 const section = editorialSections.programs;

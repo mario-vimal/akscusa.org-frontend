@@ -1,24 +1,14 @@
 ---
-import Container from "../../../components/ui/Container.astro";
-import PageMasthead from "../../../components/ui/PageMasthead.astro";
-import ContributeCallout from "../../artwork/components/ContributeCallout.astro";
-import type { SizedPanel } from "../../artwork/panels";
-import ProseContent from "../../editorial/components/ProseContent.astro";
+import Container from "~/components/ui/Container.astro";
+import PageMasthead from "~/components/ui/PageMasthead.astro";
+import ContributeCallout from "~/features/artwork/components/ContributeCallout.astro";
+import ProseContent from "~/features/editorial/components/ProseContent.astro";
+import type { ScenarioView } from "~/features/anti-caste-toolkit/queries/scenarios";
 import ToolkitScenario from "./ToolkitScenario.astro";
 
 interface Action {
   label: string;
   href: string;
-}
-
-export interface ScenarioView {
-  id: string;
-  title: string;
-  setting: string;
-  summary: string;
-  prompt: string;
-  panels: SizedPanel[];
-  credits: { name: string; role?: string; url?: string }[];
 }
 
 interface Props {

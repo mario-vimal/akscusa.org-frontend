@@ -2,14 +2,14 @@
 import type { GetStaticPaths } from "astro";
 import { render } from "astro:content";
 
-import { loadReadingBooks } from "../../features/books/queries/books";
+import { loadReadingBooks } from "~/features/books/queries/books";
 import {
   bookReadingBadge,
   bookReadingDetails,
-} from "../../features/book-readings/presenters";
-import EntryLayout from "../../features/editorial/components/EntryLayout.astro";
-import { loadEditorialEntries } from "../../features/editorial/entries";
-import SiteLayout from "../../layouts/SiteLayout.astro";
+} from "~/features/book-readings/presenters";
+import EntryLayout from "~/features/editorial/components/EntryLayout.astro";
+import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import SiteLayout from "~/layouts/SiteLayout.astro";
 
 export const getStaticPaths = (async () => {
   const [readings, books] = await Promise.all([
