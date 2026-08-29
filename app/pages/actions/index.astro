@@ -1,0 +1,18 @@
+---
+import SectionLanding from "~/components/ui/SectionLanding.astro";
+import { loadActionSections } from "~/features/actions/queries/sections";
+import { actionsPage } from "~/features/actions/sections";
+import SiteLayout from "~/layouts/SiteLayout.astro";
+
+const sections = await loadActionSections();
+---
+
+<SiteLayout title={actionsPage.title} description={actionsPage.description}>
+  <SectionLanding
+    eyebrow={actionsPage.eyebrow}
+    title={actionsPage.title}
+    description={actionsPage.description}
+    items={sections}
+    columns={4}
+  />
+</SiteLayout>

@@ -1,5 +1,7 @@
 ---
-import { donateNavigation, primaryNavigation } from "~/config/navigation";
+import { joinNavigation, primaryNavigation } from "~/config/navigation";
+import { isNavigationGroup } from "~/lib/navigation";
+import NavGroup from "./NavGroup.astro";
 import NavLink from "./NavLink.astro";
 
 interface Props {
@@ -10,21 +12,37 @@ const { currentPath } = Astro.props;
 ---
 
 <!--
-  The bar carries nine sections plus the donate action, which only has room to
-  breathe from 1280px up. Below that the sheet in MobileNav takes over, so the
-  links are never squeezed to the point of being hard to hit or read.
+  Six items plus the join action, where there used to be nine. Gathering the
+  four sections of AKSC's work under Actions is what brought the bar back to a
+  width that fits from 1024px up, rather than only on a desktop at 1280px.
+
+  The bar is stretched to the header's full height rather than centred in it,
+  so the rule under an item and the panel under the group both meet the
+  header's bottom edge. Centred, the panel opened seven pixels up inside the
+  bar and cut across the item that had been clicked.
+
+  The panel hangs off its own list item, so `relative` sits here and not around
+  the whole bar; anchored to the bar it would open flush against the left edge
+  of the page.
 -->
-<nav class="hidden items-stretch gap-7 xl:flex" aria-label="Primary navigation">
+<nav
+  class="hidden items-stretch gap-7 self-stretch lg:flex"
+  aria-label="Primary navigation"
+>
   <ul class="flex items-stretch gap-6">
     {
       primaryNavigation.map((item) => (
-        <li class="flex items-stretch">
-          <NavLink {...item} currentPath={currentPath} />
+        <li class="relative flex items-stretch">
+          {isNavigationGroup(item) ? (
+            <NavGroup group={item} currentPath={currentPath} />
+          ) : (
+            <NavLink {...item} currentPath={currentPath} />
+          )}
         </li>
       ))
     }
   </ul>
   <div class="flex items-center">
-    <NavLink {...donateNavigation} currentPath={currentPath} variant="action" />
+    <NavLink {...joinNavigation} currentPath={currentPath} variant="action" />
   </div>
 </nav>

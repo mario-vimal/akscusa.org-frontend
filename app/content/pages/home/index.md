@@ -40,11 +40,11 @@ quotes:
     source: The Master’s Tools Will Never Dismantle the Master’s House, 1979
 closing:
   eyebrow: Forging an egalitarian society
-  title: Support anti-caste movements.
-  description: Learn about AKSC USA, take part in our programs, and help sustain the work of dignity, equality, and liberation for all.
+  title: A movement is the people who join it.
+  description: AKSC is a membership organization. Members set its direction and carry its work, and dues start at $20 a year. If you are not eligible to join, you can still help sustain it.
   primaryAction:
     label: Join AKSC
-    href: /organization
+    href: /join
   secondaryAction:
     label: Donate
     href: /donate

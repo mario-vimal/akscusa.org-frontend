@@ -3,20 +3,26 @@ import { Image } from "astro:assets";
 
 import logo from "~/assets/brand/aksc-logo.webp";
 import {
-  donateNavigation,
   helplineNavigation,
+  joinNavigation,
   primaryNavigation,
   secondaryNavigation,
 } from "~/config/navigation";
 import { socialLinks } from "~/config/social";
+import { flattenNavigation } from "~/lib/navigation";
 import Container from "~/components/ui/Container.astro";
 
 // The helpline leads, as it does in the strip above the header. It is no
 // longer in the primary bar, so the footer is the other place it has to appear.
+//
+// The tree is flattened rather than reproduced. The header can afford to hide
+// four sections behind Actions because it has a control to open them; the
+// footer is where a reader goes when they already know what they want, so
+// every destination is one link.
 const exploreLinks = [
   helplineNavigation,
-  ...primaryNavigation,
-  donateNavigation,
+  ...flattenNavigation(primaryNavigation),
+  joinNavigation,
   ...secondaryNavigation,
 ];
 ---
@@ -100,7 +106,7 @@ const exploreLinks = [
     >
       <p>&copy; {new Date().getFullYear()} AKSC USA</p>
       <p
-        class="font-display font-semibold tracking-[0.14em] text-accent-300/90 uppercase"
+        class="font-display font-semibold tracking-label text-accent-300/90 uppercase"
       >
         Dignity. Equality. Liberation for all.
       </p>

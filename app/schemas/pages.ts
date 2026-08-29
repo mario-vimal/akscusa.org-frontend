@@ -160,9 +160,8 @@ const organizationPageSchema = z.object({
   sourceUrl: z.url(),
 });
 
-// The constitution and membership pages are stable organization documents.
-// Their copy stays in Markdown while the shared layout owns navigation and
-// the membership page's handoff to the existing application form.
+// The constitution page is a stable organization document. Its copy stays in
+// Markdown while the shared layout owns navigation.
 const constitutionPageSchema = z.object({
   pageType: z.literal("constitution"),
   title: z.string(),
@@ -172,8 +171,12 @@ const constitutionPageSchema = z.object({
   sourceUrl: z.url(),
 });
 
-const membershipPageSchema = z.object({
-  pageType: z.literal("membership"),
+// Joining is the site's primary call to action, so it has a page of its own at
+// the top level rather than a row inside the organization records. The copy is
+// the migrated eligibility and dues text; the argument for membership lives on
+// the organization page and is linked rather than repeated.
+const joinPageSchema = z.object({
+  pageType: z.literal("join"),
   title: z.string(),
   description: z.string(),
   eyebrow: z.string(),
@@ -262,7 +265,7 @@ export const pages = defineCollection({
     donatePageSchema,
     organizationPageSchema,
     constitutionPageSchema,
-    membershipPageSchema,
+    joinPageSchema,
     generalBodyPageSchema,
     comicsPageSchema,
     antiCasteToolkitPageSchema,

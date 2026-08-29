@@ -1,9 +1,9 @@
 ---
-pageType: membership
-title: Membership
-description: Eligibility, annual dues, and the application process for membership in the Ambedkar King Study Circle.
-eyebrow: Organization
-intro: Join AKSC and help create a more equitable world.
+pageType: join
+title: Join AKSC
+description: Membership eligibility, annual dues, and the application to join the Ambedkar King Study Circle.
+eyebrow: Build the movement
+intro: AKSC is a membership organization. Its strength is the number of people who commit to it, not the size of its budget.
 sourceUrl: "https://akscusa.org/membership/"
 joinUrl: "https://docs.google.com/forms/d/e/1FAIpQLSeYnrwpNNGdzrhzZqzBFf9a1_vyoASfCz6sbY3w-6t95WtfBg/viewform"
 ---

@@ -16,6 +16,8 @@ interface SectionItem {
   description: string;
   /** Set once the section has a page to send the reader to. */
   href?: string;
+  /** How much is published there, for example "16 interventions". */
+  meta?: string;
 }
 
 interface Props {
@@ -23,6 +25,13 @@ interface Props {
   title: string;
   description: string;
   items: readonly SectionItem[];
+  /**
+   * Columns at the widest breakpoint. Set it to the number of items when there
+   * are few of them: three columns holding four entries leave the fourth
+   * stranded on a row of its own, which reads as an omission rather than as a
+   * list.
+   */
+  columns?: 2 | 3 | 4;
   backgroundImage?: ImageMetadata;
   backgroundLabel?: string;
   backgroundCredit?: ImageCredit;
@@ -34,11 +43,18 @@ const {
   title,
   description,
   items,
+  columns = 3,
   backgroundImage,
   backgroundLabel,
   backgroundCredit,
   backgroundPosition,
 } = Astro.props;
+
+const columnClasses = {
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-2 lg:grid-cols-3",
+  4: "sm:grid-cols-2 lg:grid-cols-4",
+};
 ---
 
 <section>
@@ -55,16 +71,22 @@ const {
   <Container class="pt-16 pb-20 sm:pt-20 sm:pb-28">
     <!--
       A contents page rather than a tray of tiles. Each entry opens under its
-      own rule and is numbered, so the set reads as an ordered index of the
-      section instead of a grid of floating panels.
+      own rule, so the set reads as an index of the section instead of a grid
+      of floating panels.
+
+      The entries are not numbered. A figure down the side of a list says the
+      order is the point, and these four sections have no first or fourth; the
+      count each one carries is the useful thing to put in that corner.
     -->
-    <ul class="reveal-children grid gap-x-10 sm:grid-cols-2 lg:grid-cols-3">
+    <ul class:list={["reveal-children grid gap-x-10", columnClasses[columns]]}>
       {
-        items.map((item, index) => (
+        items.map((item) => (
           <li class="group relative flex flex-col border-t border-rule-strong pt-5 pb-9">
-            <span class="index-figure" aria-hidden="true">
-              {String(index + 1).padStart(2, "0")}
-            </span>
+            {item.meta && (
+              <span class="label label-sm text-ambedkar-900/55">
+                {item.meta}
+              </span>
+            )}
             <h2 class="card-title mt-4 font-display text-[1.5rem] leading-[1.12] font-semibold tracking-title text-balance text-ambedkar-950">
               {item.href ? (
                 <a

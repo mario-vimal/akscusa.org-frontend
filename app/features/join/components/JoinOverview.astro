@@ -1,0 +1,150 @@
+---
+import Container from "~/components/ui/Container.astro";
+import PageMasthead from "~/components/ui/PageMasthead.astro";
+import ProseContent from "~/features/editorial/components/ProseContent.astro";
+
+interface Props {
+  title: string;
+  eyebrow: string;
+  intro: string;
+  sourceUrl: string;
+  joinUrl: string;
+}
+
+const { title, eyebrow, intro, sourceUrl, joinUrl } = Astro.props;
+---
+
+<!--
+  The application is offered in the masthead rather than waiting at the foot of
+  the dues table. Someone who arrived here from the header has already decided;
+  making them read the eligibility rules first is a toll on the one action the
+  organisation most wants taken.
+
+  It is repeated at the end of the prose for the reader who came to find out
+  what membership costs and made up their mind on the way down.
+-->
+<section>
+  <PageMasthead {eyebrow} {title} description={intro}>
+    <div class="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <a
+        class="btn btn-primary"
+        href={joinUrl}
+        target="_blank"
+        rel="noreferrer"
+      >
+        Open membership application
+        <span aria-hidden="true">&nearr;</span>
+      </a>
+      <p class="text-[0.9375rem] leading-6 text-white/65">
+        Opens AKSC's application form. Dues start at $20 a year.
+      </p>
+    </div>
+  </PageMasthead>
+
+  <Container class="pt-12 pb-20 sm:pt-16 sm:pb-28">
+    <div
+      class="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-14"
+    >
+      <div class="min-w-0">
+        <ProseContent>
+          <slot />
+        </ProseContent>
+
+        <div class="rule-draw mt-12"></div>
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+          <a
+            class="btn btn-ink"
+            href={joinUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open membership application
+            <span aria-hidden="true">&nearr;</span>
+          </a>
+          <p class="text-[0.9375rem] leading-6 text-ambedkar-900/70">
+            Questions first? Email{" "}
+            <a
+              class="link-underline font-semibold text-ambedkar-800"
+              href="mailto:ec@akscusa.org?subject=AKSC%20membership"
+            >
+              ec@akscusa.org
+            </a>
+            .
+          </p>
+        </div>
+
+        <p class="mt-10 max-w-3xl text-sm wrap-break-word text-ambedkar-900/70">
+          Originally published at{" "}
+          <a
+            class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+            href={sourceUrl}
+          >
+            {sourceUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+          </a>
+          .
+        </p>
+      </div>
+
+      <aside
+        class="grid gap-5 lg:sticky lg:top-24"
+        aria-label="Before you join"
+      >
+        <section class="card h-auto p-6">
+          <p class="eyebrow">Before you apply</p>
+          <h2
+            class="mt-4 font-display text-2xl leading-[1.12] font-semibold tracking-title text-ambedkar-950"
+          >
+            What you are agreeing to
+          </h2>
+          <p class="mt-3 leading-7 text-ambedkar-900/75">
+            An applicant confirms they have read the constitution and will abide
+            by it. Read why AKSC organizes as a membership body rather than a
+            volunteer group.
+          </p>
+          <ul class="mt-5 grid gap-3">
+            <li>
+              <a
+                class="link-underline font-semibold"
+                href="/organization/constitution/"
+              >
+                AKSC Constitution
+              </a>
+            </li>
+            <li>
+              <a class="link-underline font-semibold" href="/organization/">
+                Why membership, not volunteering
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <!--
+          Donating is one way to take part, listed among the others rather than
+          held up as the point. AKSC is built by the people who commit to it,
+          and a page asking for that commitment should not lead with a way to
+          buy out of it.
+        -->
+        <section class="card h-auto p-6">
+          <p class="eyebrow">Other ways to take part</p>
+          <ul class="mt-4 grid gap-3">
+            <li>
+              <a class="link-underline font-semibold" href="/actions/">
+                Come to a program or conference
+              </a>
+            </li>
+            <li>
+              <a class="link-underline font-semibold" href="/book-readings/">
+                Read with the circle
+              </a>
+            </li>
+            <li>
+              <a class="link-underline font-semibold" href="/donate/">
+                Make a one-off donation
+              </a>
+            </li>
+          </ul>
+        </section>
+      </aside>
+    </div>
+  </Container>
+</section>

@@ -1,0 +1,20 @@
+---
+import { getEntry, render } from "astro:content";
+
+import JoinOverview from "~/features/join/components/JoinOverview.astro";
+import SiteLayout from "~/layouts/SiteLayout.astro";
+
+const page = await getEntry("pages", "join");
+
+if (!page || page.data.pageType !== "join") {
+  throw new Error("Join content is missing or invalid.");
+}
+
+const { Content } = await render(page);
+---
+
+<SiteLayout title={page.data.title} description={page.data.description}>
+  <JoinOverview {...page.data}>
+    <Content />
+  </JoinOverview>
+</SiteLayout>

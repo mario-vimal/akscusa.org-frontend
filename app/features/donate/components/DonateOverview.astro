@@ -41,23 +41,43 @@ const { title, eyebrow, intro, donationLabel, donationUrl, sourceUrl } =
         </p>
       </div>
 
-      <aside
-        class="on-dark card h-auto bg-ambedkar-950 p-6 text-white sm:p-8 lg:sticky lg:top-24"
-        aria-label="Donation link"
-      >
-        <p class="eyebrow eyebrow-light">Make a contribution</p>
-        <h2
-          class="mt-4 font-display text-2xl leading-[1.12] font-semibold tracking-title"
+      <aside class="grid gap-5 lg:sticky lg:top-24" aria-label="Ways to give">
+        <section
+          class="on-dark card h-auto bg-ambedkar-950 p-6 text-white sm:p-8"
         >
-          Support AKSC's work
-        </h2>
-        <p class="mt-3 leading-7 text-white/75">
-          If your employer offers matching gifts, donate through its company
-          portal. Otherwise, use AKSC's direct donation link.
-        </p>
-        <a class="btn btn-primary mt-6" href={donationUrl}>
-          {donationLabel}
-        </a>
+          <p class="eyebrow eyebrow-light">Make a contribution</p>
+          <h2
+            class="mt-4 font-display text-2xl leading-[1.12] font-semibold tracking-title"
+          >
+            Support AKSC's work
+          </h2>
+          <p class="mt-3 leading-7 text-white/75">
+            If your employer offers matching gifts, donate through its company
+            portal. Otherwise, use AKSC's direct donation link.
+          </p>
+          <a class="btn btn-primary mt-6" href={donationUrl}>
+            {donationLabel}
+          </a>
+        </section>
+
+        <!--
+          Money is the smaller half of the ask. AKSC is built by its members,
+          and a reader who has come this far intending to help should be told
+          that the more useful thing is available to them.
+        -->
+        <section class="card h-auto p-6">
+          <p class="eyebrow">A stronger commitment</p>
+          <h2
+            class="mt-4 font-display text-2xl leading-[1.12] font-semibold tracking-title text-ambedkar-950"
+          >
+            Join as a member
+          </h2>
+          <p class="mt-3 leading-7 text-ambedkar-900/75">
+            Members set AKSC's direction and carry its work. Dues start at $20 a
+            year, and a membership base is what a donation cannot buy.
+          </p>
+          <a class="btn btn-outline mt-5" href="/join/"> Join AKSC </a>
+        </section>
       </aside>
     </div>
   </Container>

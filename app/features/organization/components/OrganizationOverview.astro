@@ -50,6 +50,25 @@ const { title, eyebrow, intro, sourceUrl } = Astro.props;
         class="grid gap-5 lg:sticky lg:top-24"
         aria-label="Organization links"
       >
+        <!--
+          Membership leads the aside. The argument for it is the substance of
+          this page, so the way to act on that argument should not sit below a
+          list of documents.
+        -->
+        <section class="on-dark card h-auto bg-ambedkar-950 p-6 text-white">
+          <p class="eyebrow eyebrow-light">Join the work</p>
+          <h2
+            class="mt-4 font-display text-2xl leading-[1.12] font-semibold tracking-title"
+          >
+            Build collective power
+          </h2>
+          <p class="mt-3 leading-7 text-white/75">
+            Become a member and help organize programs, meetings,
+            demonstrations, workshops, and conferences.
+          </p>
+          <a class="btn btn-primary mt-5" href="/join/"> Join AKSC </a>
+        </section>
+
         <section class="card h-auto p-6">
           <p class="eyebrow">Records</p>
           <h2
@@ -69,22 +88,6 @@ const { title, eyebrow, intro, sourceUrl } = Astro.props;
               General Body records
             </a>
           </div>
-        </section>
-
-        <section class="on-dark card h-auto bg-ambedkar-950 p-6 text-white">
-          <p class="eyebrow eyebrow-light">Join the work</p>
-          <h2
-            class="mt-4 font-display text-2xl leading-[1.12] font-semibold tracking-title"
-          >
-            Build collective power
-          </h2>
-          <p class="mt-3 leading-7 text-white/75">
-            Ask about membership or help organize programs, meetings,
-            demonstrations, workshops, and conferences.
-          </p>
-          <a class="btn btn-primary mt-5" href="/organization/membership/">
-            Membership details
-          </a>
         </section>
       </aside>
     </div>

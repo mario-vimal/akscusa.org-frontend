@@ -1,10 +1,11 @@
 ---
 import {
-  donateNavigation,
+  joinNavigation,
   primaryNavigation,
   secondaryNavigation,
 } from "~/config/navigation";
 import { socialLinks } from "~/config/social";
+import { isNavigationGroup } from "~/lib/navigation";
 import NavLink from "./NavLink.astro";
 
 interface Props {
@@ -15,10 +16,15 @@ const { currentPath } = Astro.props;
 
 <!--
   A sheet rather than a dropdown, so the whole of a long menu is reachable on a
-  small screen. `details` keeps it working with no JavaScript at all: the script
-  below only adds the conveniences a reader expects once it is open.
+  small screen. `details` keeps it working with no JavaScript at all: the
+  shared enhancement only adds the conveniences a reader expects once it is
+  open.
+
+  A group's children are listed under it rather than folded into a second
+  disclosure. There are four of them, the sheet already scrolls, and a menu
+  inside a menu costs a reader a tap to find out what they are.
 -->
-<details class="group xl:hidden" data-mobile-nav>
+<details class="group lg:hidden" data-mobile-nav>
   <summary
     class="flex size-11 cursor-pointer list-none items-center justify-center rounded-lg border border-rule-strong bg-paper text-ambedkar-900 transition-colors marker:content-none hover:border-ambedkar-950 hover:text-ambedkar-950"
     aria-label="Open menu"
@@ -54,16 +60,42 @@ const { currentPath } = Astro.props;
       <nav aria-label="Mobile navigation">
         <ul class="grid sm:grid-cols-2 sm:gap-x-8">
           {
-            [...primaryNavigation, ...secondaryNavigation].map((item) => (
-              <li class="flex">
-                <NavLink {...item} currentPath={currentPath} variant="mobile" />
-              </li>
-            ))
+            [...primaryNavigation, ...secondaryNavigation].map((item) =>
+              isNavigationGroup(item) ? (
+                <li class="flex flex-col">
+                  <NavLink
+                    label={item.label}
+                    href={item.href}
+                    currentPath={currentPath}
+                    variant="mobile"
+                  />
+                  <ul class="flex flex-col">
+                    {item.children.map((child) => (
+                      <li class="flex">
+                        <NavLink
+                          {...child}
+                          currentPath={currentPath}
+                          variant="mobile-child"
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ) : (
+                <li class="flex">
+                  <NavLink
+                    {...item}
+                    currentPath={currentPath}
+                    variant="mobile"
+                  />
+                </li>
+              ),
+            )
           }
         </ul>
         <div class="mt-6">
           <NavLink
-            {...donateNavigation}
+            {...joinNavigation}
             currentPath={currentPath}
             variant="action"
           />
@@ -91,35 +123,11 @@ const { currentPath } = Astro.props;
 </details>
 
 <script>
-  const menu = document.querySelector<HTMLDetailsElement>("[data-mobile-nav]");
+  import { enhanceDisclosures } from "./nav-disclosure";
 
-  if (menu) {
-    const summary = menu.querySelector("summary");
-
-    // The sheet covers the page, so the page behind it should not scroll.
-    menu.addEventListener("toggle", () => {
-      document.documentElement.style.overflow = menu.open ? "hidden" : "";
-      summary?.setAttribute(
-        "aria-label",
-        menu.open ? "Close menu" : "Open menu",
-      );
-    });
-
-    document.addEventListener("pointerdown", (event) => {
-      if (
-        menu.open &&
-        event.target instanceof Node &&
-        !menu.contains(event.target)
-      ) {
-        menu.open = false;
-      }
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && menu.open) {
-        menu.open = false;
-        summary?.focus();
-      }
-    });
-  }
+  // The sheet covers the page, so the page behind it must not scroll.
+  enhanceDisclosures("[data-mobile-nav]", {
+    lockScroll: true,
+    labels: { closed: "Open menu", open: "Close menu" },
+  });
 </script>

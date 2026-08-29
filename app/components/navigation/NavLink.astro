@@ -1,25 +1,32 @@
 ---
-import type { NavigationItem } from "~/config/navigation";
+import { isCurrentPath } from "~/lib/navigation";
+import type { NavigationItem } from "~/lib/navigation";
 
 interface Props extends NavigationItem {
   currentPath: string;
-  variant?: "default" | "action" | "mobile";
+  /** `mobile-child` is a link one level down inside the mobile sheet. */
+  variant?: "default" | "action" | "mobile" | "mobile-child";
 }
 
 const { currentPath, href, label, variant = "default" } = Astro.props;
-const normalizedPath =
-  currentPath === "/" ? currentPath : currentPath.replace(/\/+$/, "");
-const isActive =
-  href === "/"
-    ? normalizedPath === href
-    : normalizedPath === href || normalizedPath.startsWith(`${href}/`);
+const isActive = isCurrentPath(currentPath, href);
+const isMobile = variant === "mobile" || variant === "mobile-child";
 
 const variantClasses = {
   default:
-    "relative rounded-xs py-4 font-display text-[0.875rem] font-medium whitespace-nowrap text-ambedkar-900/75 transition-colors hover:text-ambedkar-950 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:bg-accent-600 after:transition-transform after:duration-300 after:ease-[var(--ease-out-firm)] hover:after:scale-x-100",
+    "relative flex items-center rounded-xs py-4 font-display text-[0.875rem] font-medium whitespace-nowrap text-ambedkar-900/75 transition-colors hover:text-ambedkar-950 after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:bg-accent-600 after:transition-transform after:duration-300 after:ease-[var(--ease-out-firm)] hover:after:scale-x-100",
   action: "btn btn-ink btn-sm w-full sm:w-auto",
+  // `w-full` is what makes `justify-between` mean anything: without it the row
+  // is only as wide as its label, the arrow sits against the text, and the
+  // rule under each item stops at a different place down the sheet.
   mobile:
-    "flex items-center justify-between gap-3 border-b border-rule py-3.5 font-display text-lg font-medium text-ambedkar-900 transition-colors hover:text-ambedkar-950",
+    "flex w-full items-center justify-between gap-3 border-b border-rule py-3.5 font-display text-lg font-medium text-ambedkar-900 transition-colors hover:text-ambedkar-950",
+  // Indented and one step quieter, so the sheet shows the same subtree the
+  // header dropdown does without asking for a second tap to reveal it. The
+  // rule still runs the full width, so the indent is what marks the nesting
+  // rather than a second, shorter set of lines.
+  "mobile-child":
+    "flex w-full items-center justify-between gap-3 border-b border-rule py-3 pl-4 font-display text-base font-medium text-ambedkar-900/70 transition-colors hover:text-ambedkar-950",
 };
 ---
 
@@ -29,14 +36,14 @@ const variantClasses = {
     isActive &&
       variant === "default" &&
       "text-ambedkar-950 after:scale-x-100 after:bg-ambedkar-950",
-    isActive && variant === "mobile" && "text-ambedkar-950",
+    isActive && isMobile && "text-ambedkar-950",
   ]}
   href={href}
   aria-current={isActive ? "page" : undefined}
 >
   {label}
   {
-    variant === "mobile" && (
+    isMobile && (
       <span
         class:list={[
           "text-accent-600 transition-opacity",

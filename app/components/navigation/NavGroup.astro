@@ -1,0 +1,126 @@
+---
+import { isCurrentNode, isCurrentPath } from "~/lib/navigation";
+import type { NavigationGroup } from "~/lib/navigation";
+
+interface Props {
+  group: NavigationGroup;
+  currentPath: string;
+}
+
+const { group, currentPath } = Astro.props;
+const isActive = isCurrentNode(currentPath, group);
+---
+
+<!--
+  A disclosure, opened by a click or a keyboard, with hover as a shortcut over
+  the top. Hover cannot be the control itself: a touch screen has none, and on
+  one the first tap on a parent is the tap that navigates. `details` answers to
+  a click and to the keyboard on its own, and it works before the enhancement
+  script arrives; the script adds the mouse shortcut afterwards.
+
+  The group's own page is the last entry rather than the trigger, so the
+  trigger has one job. Following the parent link and opening the menu are two
+  different intentions, and a control that guesses between them gets it wrong
+  for whichever reader it did not expect.
+
+  The element keeps its own `display: block`. Laying a `details` out as a flex
+  container makes its panel a flex item, and a flex item is laid out whether
+  the element is open or not, so the menu would stand permanently open. The
+  summary is stretched to the bar's height instead, which is what the underline
+  needs in order to sit on the header's bottom edge, and what leaves no gap for
+  a pointer to fall through on its way down to the panel.
+-->
+<details class="group/menu h-full" data-nav-menu>
+  <summary
+    class:list={[
+      "relative flex h-full cursor-pointer list-none items-center gap-1.5 rounded-xs py-4 font-display text-[0.875rem] font-medium whitespace-nowrap transition-colors marker:content-none after:absolute after:inset-x-0 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:bg-accent-600 after:transition-transform after:duration-300 after:ease-out-firm hover:after:scale-x-100 [&::-webkit-details-marker]:hidden",
+      isActive
+        ? "text-ambedkar-950 after:scale-x-100 after:bg-ambedkar-950"
+        : "text-ambedkar-900/75 hover:text-ambedkar-950",
+    ]}
+  >
+    {group.label}
+    <svg
+      class="size-3 transition-transform duration-300 ease-out-firm group-open/menu:-rotate-180"
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2.5 4.5 6 8l3.5-3.5"></path>
+    </svg>
+  </summary>
+
+  <!--
+    The panel is pulled left by its own inset, so a child's label starts on the
+    same vertical as the trigger's. Aligned to the trigger's box instead, every
+    name in the menu sat twenty pixels to the right of the name that opened it.
+
+    It hangs from the header's hairline rather than floating below it: no top
+    border, square top corners, and `shadow-lift` rather than the wide cast
+    `shadow-soft`, which is drawn for a sheet the width of the screen and reads
+    as a smudge under something this size.
+  -->
+  <div
+    class="absolute top-[calc(100%+1px)] -left-[calc(0.75rem+1px)] w-60 max-w-[calc(100vw-2rem)] overflow-hidden rounded-b-lg border-x border-b border-rule-strong bg-paper shadow-lift"
+  >
+    <ul>
+      {
+        group.children.map((child) => {
+          const isChildActive = isCurrentPath(currentPath, child.href);
+
+          return (
+            <li>
+              {/*
+                The inset is on the row, not the list, so every hairline runs
+                the full width of the panel and the last one becomes the edge
+                the overview strip sits on. Inset rules left a ragged stack of
+                short lines inside a straight-sided box.
+
+                The rule itself is the one that grows under an item in the bar,
+                so the panel is the bar continued rather than a second idea
+                about what a section name looks like. The filled block this
+                replaces was the only rounded fill on the site.
+              */}
+              <a
+                class:list={[
+                  "relative flex items-center border-b border-rule px-3 py-3 font-display text-[0.9375rem] font-medium transition-colors after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:origin-left after:scale-x-0 after:bg-accent-600 after:transition-transform after:duration-300 after:ease-[var(--ease-out-firm)] hover:text-ambedkar-950 hover:after:scale-x-100",
+                  isChildActive
+                    ? "text-ambedkar-950 after:scale-x-100 after:bg-ambedkar-950"
+                    : "text-ambedkar-900/80",
+                ]}
+                href={`${child.href}/`}
+                aria-current={isChildActive ? "page" : undefined}
+              >
+                {child.label}
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+
+    <a
+      class="label flex items-center justify-between gap-3 bg-mist px-3 py-3.5 text-ambedkar-700 transition-colors hover:text-ambedkar-950"
+      href={`${group.href}/`}
+      aria-current={isCurrentPath(currentPath, group.href) ? "page" : undefined}
+    >
+      All {group.label.toLowerCase()}
+      <span
+        class="transition-transform duration-300 ease-[var(--ease-out-firm)] group-hover/menu:translate-x-0.5"
+        aria-hidden="true"
+      >
+        &rarr;
+      </span>
+    </a>
+  </div>
+</details>
+
+<script>
+  import { enhanceDisclosures } from "./nav-disclosure";
+
+  enhanceDisclosures("[data-nav-menu]", { openOnHover: true });
+</script>
