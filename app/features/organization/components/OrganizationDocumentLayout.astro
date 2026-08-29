@@ -1,5 +1,6 @@
 ---
 import Container from "~/components/ui/Container.astro";
+import ambedkarStatue from "~/assets/shared/leaders/ambedkar-amritsar-statue-cc-by-sa-4.jpg";
 import PageMasthead from "~/components/ui/PageMasthead.astro";
 import ProseContent from "~/features/editorial/components/ProseContent.astro";
 
@@ -21,7 +22,20 @@ const { title, eyebrow, intro, sourceUrl, action } = Astro.props;
 ---
 
 <article>
-  <PageMasthead {eyebrow} {title} description={intro} />
+  <PageMasthead
+    {eyebrow}
+    {title}
+    description={intro}
+    backgroundImage={ambedkarStatue}
+    backgroundLabel="Statue of B. R. Ambedkar holding the Constitution of India, Amritsar"
+    backgroundCredit={{
+      creator: "Kritzolina / Wikimedia Commons",
+      sourceHref:
+        "https://commons.wikimedia.org/wiki/File:Statue_of_B._R._Ambedkar_in_Amritsar_01.jpg",
+      license: "CC BY-SA 4.0",
+      licenseHref: "https://creativecommons.org/licenses/by-sa/4.0/",
+    }}
+  />
 
   <Container class="pt-12 pb-20 sm:pt-16 sm:pb-28">
     <div

@@ -3,6 +3,10 @@ import type { ImageMetadata } from "astro";
 import { coverForIsbn } from "~/features/books/covers";
 import { bookHref, loadReadingBooks } from "~/features/books/queries/books";
 import {
+  loadComicsIndex,
+  type ComicSummary,
+} from "~/features/comics/queries/comics";
+import {
   editorialSections,
   entryHref,
   type EditorialCollection,
@@ -265,6 +269,7 @@ export interface HomeFeatures {
   writing: Writing;
   reading?: ReadingFeature;
   book?: BookFeature;
+  comics: ComicSummary[];
   recent: FeaturedRef[];
 }
 
@@ -274,11 +279,12 @@ export interface HomeFeatures {
  * knows how they are chosen.
  */
 export async function loadHomeFeatures(): Promise<HomeFeatures> {
-  const [spotlight, writing, reading, book] = await Promise.all([
+  const [spotlight, writing, reading, book, drawn] = await Promise.all([
     loadSpotlight(),
     loadWriting(),
     loadReading(),
     loadLatestBook(),
+    loadComicsIndex(),
   ]);
 
   // Nothing already shown above should reappear in the closing index.
@@ -294,6 +300,9 @@ export async function loadHomeFeatures(): Promise<HomeFeatures> {
     writing,
     reading,
     book,
+    // The homepage shows the covers, not the whole shelf; the index is one
+    // click away and is the place that lists everything.
+    comics: drawn.comics.slice(0, 2),
     recent: await loadRecentWork(shown),
   };
 }

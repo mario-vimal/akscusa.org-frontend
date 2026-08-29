@@ -1,4 +1,5 @@
 ---
+import phuleTeachingSculpture from "~/assets/shared/leaders/phule-teaching-sculpture-cc-by-sa-4.jpg";
 import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
 import { editorialSections, entryHref } from "~/features/editorial/sections";
 import { loadEditorialEntries } from "~/features/editorial/queries/entries";
@@ -20,6 +21,15 @@ const programs = await loadEditorialEntries("programs");
   count={`${programs.length} ${programs.length === 1 ? "program" : "programs"}`}
   empty={section.empty}
   isEmpty={programs.length === 0}
+  backgroundImage={phuleTeachingSculpture}
+  backgroundLabel="Jyotirao and Savitribai Phule, sculpted at Phulewada in Pune"
+  backgroundCredit={{
+    creator: "Wander-earth / Wikimedia Commons",
+    sourceHref:
+      "https://commons.wikimedia.org/wiki/File:Jotirao_Phule_Savitribai_Phule_Phulewada_Pune.jpg",
+    license: "CC BY-SA 4.0",
+    licenseHref: "https://creativecommons.org/licenses/by-sa/4.0/",
+  }}
 >
   {
     programs.map((program) => (

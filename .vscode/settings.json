@@ -1,0 +1,25 @@
+{
+  // Tailwind v4 keeps the design system in CSS rather than in a JavaScript
+  // config, so `app/styles/global.css` opens with `@theme` and defines
+  // `grain` and `duotone` with `@utility`. VS Code's built-in CSS validator
+  // only knows the at-rules in the CSS specification, so it reports all three
+  // as "Unknown at rule" even though the build understands them perfectly.
+  //
+  // Handing `.css` to the Tailwind extension is Tailwind's own answer to this:
+  // it validates these files against the framework's grammar and brings
+  // completion for the theme tokens with it. The lint rule below is turned off
+  // as well so the warnings do not come back for anyone who has not installed
+  // that extension yet; both are needed, because the two settings are read by
+  // different language servers.
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "css.lint.unknownAtRules": "ignore",
+
+  // Class lists here are long enough that they are usually read through
+  // Prettier's ordering rather than by eye, so completion inside the quoted
+  // `class` attribute is worth having on.
+  "editor.quickSuggestions": {
+    "strings": "on"
+  }
+}

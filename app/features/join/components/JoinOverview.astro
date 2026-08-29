@@ -1,5 +1,6 @@
 ---
 import Container from "~/components/ui/Container.astro";
+import savitribaiBust from "~/assets/shared/leaders/savitribai-phule-bust-cc-by-sa-3.jpg";
 import PageMasthead from "~/components/ui/PageMasthead.astro";
 import ProseContent from "~/features/editorial/components/ProseContent.astro";
 
@@ -24,7 +25,20 @@ const { title, eyebrow, intro, sourceUrl, joinUrl } = Astro.props;
   what membership costs and made up their mind on the way down.
 -->
 <section>
-  <PageMasthead {eyebrow} {title} description={intro}>
+  <PageMasthead
+    {eyebrow}
+    {title}
+    description={intro}
+    backgroundImage={savitribaiBust}
+    backgroundLabel="Bust of Savitribai Phule, Maharashtra Sadan, New Delhi"
+    backgroundCredit={{
+      creator: "Ashish Bhatnagar / Wikimedia Commons",
+      sourceHref:
+        "https://commons.wikimedia.org/wiki/File:Savitribai_Phule_statue,_Maharashtra_sadan,_New_Delhi.jpg",
+      license: "CC BY-SA 3.0",
+      licenseHref: "https://creativecommons.org/licenses/by-sa/3.0/",
+    }}
+  >
     <div class="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
       <a
         class="btn btn-primary"

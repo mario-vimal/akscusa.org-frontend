@@ -1,0 +1,87 @@
+---
+import Container from "~/components/ui/Container.astro";
+import {
+  comicsPath,
+  type ComicSummary,
+} from "~/features/comics/queries/comics";
+
+interface Props {
+  comics: readonly ComicSummary[];
+}
+
+const { comics } = Astro.props;
+---
+
+<!--
+  The one band on the homepage that is mostly picture. Everything above and
+  below it is an argument set in type, and AKSC also argues by drawing: the
+  comics carry their question in the artwork itself, so they are shown at a
+  size where that question can actually be read.
+
+  It is set on ink so the panels read as posters on a wall rather than as
+  thumbnails in a list, and it sits between the two light bands so the page
+  alternates light and dark rather than running three pale sections together.
+
+  The covers are the comics' own title panels, which already letter the title
+  beside them, so each image is `alt=""` rather than described twice.
+-->
+<section
+  class="on-dark relative isolate overflow-hidden bg-ambedkar-950 text-white"
+  aria-labelledby="drawn-title"
+>
+  <div class="absolute inset-0 -z-10 grain opacity-[0.035]" aria-hidden="true">
+  </div>
+
+  <Container class="py-20 sm:py-28">
+    <div
+      class="grid gap-12 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:items-start lg:gap-16"
+    >
+      <div class="reveal">
+        <p class="eyebrow eyebrow-light">Drawn work</p>
+        <h2
+          id="drawn-title"
+          class="mt-6 font-display text-display-sm leading-[1.04] font-bold tracking-display text-balance"
+        >
+          Some arguments are better drawn.
+        </h2>
+        <p class="mt-6 max-w-md font-serif text-lg leading-[1.7] text-white/75">
+          Comics AKSC publishes with the artists it works with, on what caste
+          costs and where it still turns up. Each one is read a panel at a time,
+          with the lettering written out beneath.
+        </p>
+        <p class="mt-8">
+          <a class="btn btn-outline-light btn-sm" href={`${comicsPath}/`}>
+            Read the comics
+          </a>
+        </p>
+      </div>
+
+      <ul class="reveal-children grid gap-8 sm:grid-cols-2 sm:gap-7">
+        {
+          comics.map((comic) => (
+            <li class="group relative">
+              <img
+                class="w-full rounded-md bg-white object-cover ring-1 ring-white/15 transition-[translate] duration-300 group-hover:-translate-y-1"
+                src={comic.cover.src}
+                alt=""
+                width={comic.cover.width}
+                height={comic.cover.height}
+                loading="lazy"
+                decoding="async"
+              />
+              <h3 class="mt-5 font-display text-lg leading-[1.2] font-semibold tracking-title text-balance">
+                <a class="after:absolute after:inset-0" href={comic.href}>
+                  {comic.title}
+                </a>
+              </h3>
+              <p class="label label-sm mt-2 text-white/60">
+                {comic.panelCount}
+              </p>
+              <p class="mt-1 text-sm leading-5 text-white/55">{comic.credit}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </Container>
+</section>

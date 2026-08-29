@@ -2,6 +2,7 @@
 import { getEntry } from "astro:content";
 
 import HomeCallToAction from "~/features/home/components/HomeCallToAction.astro";
+import HomeComics from "~/features/home/components/HomeComics.astro";
 import HomeHero from "~/features/home/components/HomeHero.astro";
 import HomeLatest from "~/features/home/components/HomeLatest.astro";
 import HomeQuotes from "~/features/home/components/HomeQuotes.astro";
@@ -18,12 +19,14 @@ if (!home || home.data.pageType !== "home") {
 // The hero, the quotes, and the closing call are the homepage's own copy and
 // live in app/content. Everything between them is the newest entry of each
 // kind, chosen in features/home/featured.ts.
-const { spotlight, writing, reading, book, recent } = await loadHomeFeatures();
+const { spotlight, writing, reading, book, comics, recent } =
+  await loadHomeFeatures();
 ---
 
 <SiteLayout description={home.data.description}>
   <HomeHero hero={home.data.hero} />
   {spotlight && <HomeSpotlight spotlight={spotlight} />}
+  {comics.length > 0 && <HomeComics comics={comics} />}
   <HomeLatest
     lead={writing.lead}
     more={writing.more}

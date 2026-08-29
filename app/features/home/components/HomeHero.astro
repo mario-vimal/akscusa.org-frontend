@@ -1,7 +1,7 @@
 ---
 import Container from "~/components/ui/Container.astro";
 import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
-import organizeHero from "~/features/home/assets/organize-hero.webp";
+import logo from "~/assets/brand/aksc-logo.webp";
 import type { HomePageData } from "~/features/home/content";
 
 interface Props {
@@ -11,42 +11,70 @@ interface Props {
 const { hero } = Astro.props;
 ---
 
+<!--
+  The homepage opens on the organisation's own mark rather than on a
+  photograph. What stood here was a stock skyline, duotoned to the brand blue
+  because it arrived gold, and a picture that has to be drained of its colour
+  to belong is not carrying anything: it said "an American city", which is not
+  what AKSC is.
+
+  This is the full lockup, wordmark and all. The master file is stored trimmed
+  to its ink, so the file's edges are the artwork's edges and `bottom` means
+  the bottom of the mark rather than the bottom of a transparent margin. From
+  `lg` it sits at the bottom right and the text column is capped at just over
+  half the band, so the two no longer sit on top of each other, and the mark's
+  left edge is faded so it joins the ink rather than sitting on it as a pasted
+  rectangle. It keeps its own colours: `duotone` is for photography, and this
+  blue is the brand's.
+
+  It is decorative here. The eyebrow beneath it already names the organisation
+  and the header carries the same lockup, so describing it a third time would
+  only make a screen reader repeat itself.
+-->
 <section
-  class="on-dark relative isolate flex min-h-152 flex-col justify-end overflow-hidden bg-ambedkar-950 sm:min-h-176 lg:min-h-200"
+  class="on-dark relative isolate flex min-h-120 flex-col justify-end overflow-hidden bg-ambedkar-950 sm:min-h-136 lg:min-h-152"
 >
-  <ResponsiveImage
-    src={organizeHero}
-    alt={hero.imageAlt}
-    class="absolute inset-0 -z-30 size-full object-cover duotone"
-    loading="eager"
-    sizes="100vw"
-    widths={[640, 960, 1280, 1500]}
-  />
+  <div class="absolute inset-0 -z-20 overflow-hidden" aria-hidden="true">
+    <ResponsiveImage
+      src={logo}
+      alt=""
+      class="absolute -right-[20%] bottom-0 h-auto w-[128%] max-w-none opacity-25 sm:-right-[10%] sm:w-[105%] sm:opacity-30 lg:right-[2%] lg:bottom-[7%] lg:w-[42%] lg:[mask-image:linear-gradient(to_right,transparent_0%,black_28%)] lg:opacity-95"
+      loading="eager"
+      sizes="(min-width: 1024px) 42vw, 128vw"
+      widths={[480, 768, 1237]}
+    />
+  </div>
+
   <!--
-    Two layers over the photograph rather than four. The first returns the brand
-    blue that `duotone` stripped out; the second is a single vertical ramp that
-    carries the picture down into the ink the headline is set on. The dot field
-    and the blurred teal blob that used to sit here were doing nothing the type
-    was not already doing better.
+    The ramp follows the mark. Below `lg` the logo sits behind the type, so the
+    ink has to come up from the bottom to carry the headline. From `lg` the
+    mark has moved to the right, so the ramp turns with it: heavy under the
+    text on the left, thin on the right where the lockup has to stay legible.
+    The dot field and the blurred teal blob that used to sit here were doing
+    nothing the type was not already doing better.
   -->
   <div
-    class="absolute inset-0 -z-20 bg-ambedkar-800 mix-blend-color"
-    aria-hidden="true"
-  >
-  </div>
-  <div
-    class="absolute inset-0 -z-10 bg-[linear-gradient(to_top,var(--color-ambedkar-950)_0%,rgb(12_30_54/0.96)_44%,rgb(12_30_54/0.6)_72%,rgb(12_30_54/0.42)_100%)]"
+    class="absolute inset-0 -z-10 bg-[linear-gradient(to_top,var(--color-ambedkar-950)_0%,rgb(12_30_54/0.97)_38%,rgb(12_30_54/0.72)_66%,rgb(12_30_54/0.5)_100%)] lg:bg-[linear-gradient(to_right,var(--color-ambedkar-950)_0%,rgb(12_30_54/0.94)_40%,rgb(12_30_54/0.5)_72%,rgb(12_30_54/0.3)_100%)]"
     aria-hidden="true"
   >
   </div>
   <div class="absolute inset-0 -z-10 grain opacity-[0.04]" aria-hidden="true">
   </div>
 
-  <Container class="pt-28 pb-16 sm:pt-36 sm:pb-20">
-    <div class="rise max-w-5xl">
+  <Container class="pt-16 pb-14 sm:pt-20 sm:pb-16">
+    <div class="rise max-w-5xl lg:max-w-[54%]">
       <p class="eyebrow eyebrow-light">{hero.eyebrow}</p>
+      <!--
+        The measure is held to about eight characters from `lg` so the title
+        sets as three lines — "Educate," / "Organize" / "& Agitate" — which is
+        also how it already broke on a phone, so the shape is the same at every
+        width. The ampersand belongs to the word after it: a line that ends on
+        "&" leaves it hanging on nothing. The break is set here rather than in
+        the Markdown because where a line turns is typography, and the copy in
+        app/content should stay a sentence.
+      -->
       <h1
-        class="mt-7 font-display text-display-xl leading-[0.9] font-bold tracking-display text-balance text-white"
+        class="mt-7 font-display text-display-xl leading-[0.9] font-bold tracking-display text-balance text-white lg:max-w-[8ch] lg:text-pretty"
       >
         {hero.title}
       </h1>

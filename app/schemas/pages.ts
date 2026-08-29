@@ -22,7 +22,6 @@ const homePageSchema = z.object({
     eyebrow: z.string(),
     title: z.string(),
     description: z.string(),
-    imageAlt: z.string(),
     primaryAction: actionSchema,
     secondaryAction: actionSchema,
   }),

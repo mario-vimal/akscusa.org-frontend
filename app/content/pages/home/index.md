@@ -6,7 +6,6 @@ hero:
   eyebrow: Ambedkar King Study Circle (AKSC)
   title: Educate, Organize & Agitate
   description: Caste has no place—in India, in America, or anywhere. Together, we can end caste discrimination and build a just world.
-  imageAlt: San Francisco's Painted Ladies and skyline, tinted in a single deep blue.
   primaryAction:
     label: Get helpline support
     href: /anti-caste-helpline

@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from "astro";
 
+import emblem from "~/assets/brand/aksc-emblem.webp";
 import Container from "./Container.astro";
 import ResponsiveImage from "./ResponsiveImage.astro";
 
@@ -46,6 +47,58 @@ const {
 const hasAbove = Astro.slots.has("above");
 const backgroundPositionClass =
   backgroundPosition === "portrait" ? "object-[center_36%]" : "object-center";
+
+/*
+ * Whether the photograph is taller than it is wide, worked out from the file
+ * rather than asked of the caller.
+ *
+ * The masthead is a wide band. A landscape photograph fills it; an upright
+ * portrait cannot, and `object-cover` answers by showing a horizontal strip of
+ * one — a mouth, or a single eye blown up across the page. No amount of
+ * `object-position` fixes that, because the mismatch is the aspect ratio, not
+ * the framing.
+ *
+ * So an upright picture is not stretched across the band at all. From `lg` it
+ * is set at its own proportions, full height and flush right, and faded into
+ * the panel; below that the band is nearly square and a cover crop is honest
+ * again. Deriving it here rather than taking a prop means a caller cannot
+ * smear a portrait across the page by forgetting to say it is one.
+ */
+const isUpright = backgroundImage
+  ? backgroundImage.height / backgroundImage.width > 1.1
+  : false;
+
+/*
+ * From `lg` the picture is held to the right of the panel, because the text is
+ * set on the left and a photograph running the full width sits underneath it.
+ *
+ * An upright picture takes its own proportions, full height and flush right. A
+ * landscape one keeps a cover crop but is held to the right half of the band,
+ * which is a far gentler crop than the whole width and leaves the reading
+ * column clear. Both fade out at their left edge so the picture joins the panel
+ * rather than sitting on it as a pasted rectangle.
+ *
+ * Below `lg` the band is nearly square, so a full-bleed cover is honest again
+ * and the scrim below carries the text instead.
+ */
+const backgroundClasses = [
+  "absolute inset-0 -z-30 size-full object-cover duotone",
+  backgroundPositionClass,
+  isUpright
+    ? "lg:inset-y-0 lg:left-auto lg:h-full lg:w-auto lg:max-w-[46%] lg:object-contain lg:[mask-image:linear-gradient(to_right,transparent_0%,black_42%)]"
+    : "lg:left-1/2 lg:w-1/2 lg:[mask-image:linear-gradient(to_right,transparent_0%,black_30%)]",
+].join(" ");
+
+/*
+ * One scrim for both. It is heavy everywhere below `lg`, where the picture runs
+ * the full width behind the text, and thins out to the right from `lg`, where
+ * the picture has moved off the reading column and has to stay legible.
+ */
+const scrimClasses = [
+  "absolute inset-0 -z-10 bg-linear-to-r",
+  "from-ambedkar-1000/96 via-ambedkar-950/88 to-ambedkar-950/78",
+  "lg:from-ambedkar-1000/95 lg:from-30% lg:via-ambedkar-950/70 lg:to-ambedkar-950/25",
+].join(" ");
 ---
 
 <!--
@@ -70,25 +123,49 @@ const backgroundPositionClass =
         <ResponsiveImage
           src={backgroundImage}
           alt=""
-          class={`absolute inset-0 -z-30 size-full object-cover duotone ${backgroundPositionClass}`}
+          class={backgroundClasses}
           loading="eager"
-          sizes="100vw"
+          sizes={
+            isUpright
+              ? "(min-width: 1024px) 40vw, 100vw"
+              : "(min-width: 1024px) 50vw, 100vw"
+          }
           widths={[640, 960, 1280, 1600]}
         />
         <div
           class="absolute inset-0 -z-20 bg-ambedkar-800 mix-blend-color"
           aria-hidden="true"
         />
+        <div class={scrimClasses} aria-hidden="true" />
+      </>
+    ) : (
+      <>
         <div
-          class="absolute inset-0 -z-10 bg-linear-to-r from-ambedkar-1000/96 via-ambedkar-950/90 to-ambedkar-950/78"
+          class="absolute inset-0 -z-20 bg-linear-to-b from-ambedkar-900 to-ambedkar-1000"
+          aria-hidden="true"
+        />
+        {/*
+          A page with no photograph of its own opens on the organisation's mark
+          instead of on an empty gradient, the same way the homepage does. It is
+          anchored to the right and run past the edges so it reads as a mark the
+          masthead is printed over rather than as a logo parked in a corner, and
+          the ramp below keeps it clear of the heading it sits behind.
+        */}
+        <div class="absolute inset-0 -z-20 overflow-hidden" aria-hidden="true">
+          <ResponsiveImage
+            src={emblem}
+            alt=""
+            class="absolute top-1/2 -right-[30%] w-[118%] max-w-none -translate-y-1/2 opacity-25 sm:-right-[16%] sm:w-[80%] lg:-right-[4%] lg:w-[52%]"
+            loading="eager"
+            sizes="(min-width: 1024px) 52vw, (min-width: 640px) 80vw, 118vw"
+            widths={[480, 768, 1114]}
+          />
+        </div>
+        <div
+          class="absolute inset-0 -z-10 bg-linear-to-r from-ambedkar-1000/92 via-ambedkar-950/80 to-ambedkar-950/55"
           aria-hidden="true"
         />
       </>
-    ) : (
-      <div
-        class="absolute inset-0 -z-10 bg-linear-to-b from-ambedkar-900 to-ambedkar-1000"
-        aria-hidden="true"
-      />
     )
   }
   <div class="absolute inset-0 -z-10 grain opacity-[0.035]" aria-hidden="true">

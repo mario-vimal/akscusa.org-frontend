@@ -1,4 +1,5 @@
 ---
+import malcolmX from "~/assets/shared/leaders/malcolm-x-public-domain.jpg";
 import Container from "~/components/ui/Container.astro";
 import PageMasthead from "~/components/ui/PageMasthead.astro";
 import ContributeCallout from "~/features/artwork/components/ContributeCallout.astro";
@@ -53,6 +54,9 @@ const panelTotal = scenarios.reduce(
     title={title}
     description={description}
     size="large"
+    backgroundImage={malcolmX}
+    backgroundLabel="Malcolm X, 1964"
+    backgroundPosition="portrait"
   >
     <p class="mt-9">
       <a class="btn btn-primary" href={form.href} rel="noopener">

@@ -1,5 +1,5 @@
 ---
-import ayyankaliMemorial from "~/assets/shared/leaders/ayyankali-memorial-cc-by-sa-3.jpg";
+import mlkPressConference from "~/assets/shared/leaders/martin-luther-king-jr-press-conference-public-domain.jpg";
 import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
 import EntryCard from "~/features/editorial/components/EntryCard.astro";
 import { editorialSections, entryHref } from "~/features/editorial/sections";
@@ -20,15 +20,9 @@ const releases = await loadEditorialEntries("pressReleases");
     count={`${releases.length} ${releases.length === 1 ? "statement" : "statements"}`}
     empty={section.empty}
     isEmpty={releases.length === 0}
-    backgroundImage={ayyankaliMemorial}
-    backgroundLabel="Ayyankali memorial in Kerala"
-    backgroundCredit={{
-      creator: "Kaakkara / Wikimedia Commons",
-      sourceHref:
-        "https://commons.wikimedia.org/wiki/File:Sri_Ayyankali_-_%E0%B4%85%E0%B4%AF%E0%B5%8D%E0%B4%AF%E0%B5%BB%E0%B4%95%E0%B4%BE%E0%B4%B3%E0%B4%BF.JPG",
-      license: "CC BY-SA 3.0",
-      licenseHref: "https://creativecommons.org/licenses/by-sa/3.0/",
-    }}
+    backgroundImage={mlkPressConference}
+    backgroundLabel="Martin Luther King Jr. at a press conference, 1964"
+    backgroundPosition="portrait"
   >
     {
       releases.map((release) => (

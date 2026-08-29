@@ -1,5 +1,7 @@
 ---
+import phulePortrait from "~/assets/shared/leaders/phule-painted-portrait-cc-by-sa-4.jpg";
 import Container from "~/components/ui/Container.astro";
+import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
 import type { HomePageData } from "~/features/home/content";
 
 interface Props {
@@ -13,13 +15,19 @@ const { closing } = Astro.props;
   The closing ask is a light band between two dark ones. It used to be a dark
   rounded panel floating on a tinted strip, which put three dark surfaces in a
   row and left the page with nowhere to breathe before the footer.
+
+  The Phules sit beside the ask rather than behind it. The band is light, so a
+  full-bleed photograph would have to be washed out to carry text over it; set
+  to one side it stays a picture. They are here because they are the argument:
+  the movement they built began by enrolling people, which is what this section
+  asks a reader to do.
 -->
 <section class="bg-paper">
   <Container class="py-20 sm:py-28 lg:py-32">
     <div class="reveal section-head">
       <p class="eyebrow">{closing.eyebrow}</p>
 
-      <div class="grid gap-10 lg:grid-cols-[1.55fr_auto] lg:items-end">
+      <div class="grid gap-12 lg:grid-cols-[1.6fr_minmax(0,18rem)] lg:gap-14">
         <div>
           <h2
             class="max-w-3xl font-display text-display-md leading-[0.98] font-bold tracking-display text-balance text-ambedkar-950"
@@ -31,15 +39,54 @@ const { closing } = Astro.props;
           >
             {closing.description}
           </p>
+          <div
+            class="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
+          >
+            <a class="btn btn-primary" href={closing.primaryAction.href}>
+              {closing.primaryAction.label}
+            </a>
+            <a class="btn btn-outline" href={closing.secondaryAction.href}>
+              {closing.secondaryAction.label}
+            </a>
+          </div>
         </div>
-        <div class="flex flex-col gap-3 sm:flex-row lg:flex-col xl:flex-row">
-          <a class="btn btn-primary" href={closing.primaryAction.href}>
-            {closing.primaryAction.label}
-          </a>
-          <a class="btn btn-outline" href={closing.secondaryAction.href}>
-            {closing.secondaryAction.label}
-          </a>
-        </div>
+
+        <figure class="lg:self-end">
+          <!--
+            `duotone` only drains the colour out of a photograph. The brand blue
+            is put back by the layer over it, which is how PageMasthead does it
+            too; without that pair the picture reads as a grey rectangle on a
+            white page.
+          -->
+          <div class="relative isolate overflow-hidden rounded-md">
+            <ResponsiveImage
+              class="w-full duotone"
+              src={phulePortrait}
+              alt=""
+              sizes="(min-width: 1024px) 18rem, 100vw"
+              widths={[320, 640, 777]}
+            />
+            <div
+              class="absolute inset-0 bg-ambedkar-700 mix-blend-color"
+              aria-hidden="true"
+            >
+            </div>
+          </div>
+          <figcaption class="mt-3 text-sm leading-5 text-ambedkar-900/65">
+            Jyotirao and Savitribai Phule, who opened the first school for girls
+            run by Indians, at Phulewada in Pune. Image:{" "}
+            <a
+              class="link-underline"
+              href="https://commons.wikimedia.org/wiki/File:Savitribai_Phule_Jotiba_Jotirao_Phule_Phulewada_Pune.tif"
+              >Wander-earth / Wikimedia Commons</a
+            > ·{" "}
+            <a
+              class="link-underline"
+              href="https://creativecommons.org/licenses/by-sa/4.0/"
+              rel="license">CC BY-SA 4.0</a
+            > · cropped and recolored
+          </figcaption>
+        </figure>
       </div>
     </div>
   </Container>
