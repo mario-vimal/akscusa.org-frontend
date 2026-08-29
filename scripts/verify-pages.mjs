@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const host = "127.0.0.1";
 const routes = new Map([
-  ["/", "Educate. Agitate. Organize."],
+  ["/", "Educate, Organize &amp; Agitate"],
   ["/anti-caste-helpline/", "Anti-Caste Helpline"],
   [
     "/testimonies-of-practice-of-caste-in-the-usa/",
@@ -49,6 +49,7 @@ const routes = new Map([
   ],
   ["/join/", "Open membership application"],
   ["/organization/", "What is AKSC"],
+  ["/organization/constitution/", "Article I - Name"],
   ["/organization/general-body/", "6th General Body Meeting"],
   ["/comics/", "How to talk to your kids"],
   [

@@ -90,7 +90,7 @@ const columnClasses = {
             <h2 class="card-title mt-4 font-display text-[1.5rem] leading-[1.12] font-semibold tracking-title text-balance text-ambedkar-950">
               {item.href ? (
                 <a
-                  class="bg-[linear-gradient(to_right,currentColor,currentColor)] bg-[length:0%_1px] bg-[position:0_100%] bg-no-repeat transition-[background-size] duration-300 ease-[var(--ease-out-firm)] group-hover:bg-[length:100%_1px] after:absolute after:inset-0"
+                  class="bg-[linear-gradient(to_right,currentColor,currentColor)] bg-size-[0%_1px] bg-position-[0_100%] bg-no-repeat transition-[background-size] duration-300 ease-out-firm group-hover:bg-size-[100%_1px] after:absolute after:inset-0"
                   href={item.href}
                 >
                   {item.title}
@@ -108,7 +108,7 @@ const columnClasses = {
                 aria-hidden="true"
               >
                 View
-                <span class="inline-block transition-transform duration-300 ease-[var(--ease-out-firm)] group-hover:translate-x-1">
+                <span class="inline-block transition-transform duration-300 ease-out-firm group-hover:translate-x-1">
                   &rarr;
                 </span>
               </p>

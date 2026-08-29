@@ -23,7 +23,18 @@ export interface NavigationItem {
  */
 export interface NavigationGroup extends NavigationItem {
   readonly children: readonly NavigationItem[];
+  /**
+   * What the menu's link to the group's own page says, where "All actions"
+   * does not read. The fallback suits a group named for a plural of the
+   * things beneath it; "All organization" is the sentence that made this
+   * optional rather than derived.
+   */
+  readonly overviewLabel?: string;
 }
+
+/** The menu's link back to a group's own page. */
+export const overviewLabelFor = (group: NavigationGroup): string =>
+  group.overviewLabel ?? `All ${group.label.toLowerCase()}`;
 
 export type NavigationNode = NavigationItem | NavigationGroup;
 

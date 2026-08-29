@@ -5,6 +5,7 @@ import {
   isCurrentNode,
   isCurrentPath,
   isNavigationGroup,
+  overviewLabelFor,
   type NavigationGroup,
   type NavigationItem,
   type NavigationNode,
@@ -89,5 +90,22 @@ describe("isNavigationGroup", () => {
   it("tells a group from a plain item", () => {
     expect(isNavigationGroup(actions)).toBe(true);
     expect(isNavigationGroup(comics)).toBe(false);
+  });
+});
+
+describe("overviewLabelFor", () => {
+  it("names the group's own page after the group by default", () => {
+    expect(overviewLabelFor(actions)).toBe("All actions");
+  });
+
+  it("prefers a label the group states for itself", () => {
+    const organization: NavigationGroup = {
+      label: "Organization",
+      href: "/organization",
+      overviewLabel: "About AKSC",
+      children: [comics],
+    };
+
+    expect(overviewLabelFor(organization)).toBe("About AKSC");
   });
 });

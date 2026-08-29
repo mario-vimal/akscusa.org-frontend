@@ -38,6 +38,40 @@ export const actionsNavigation = {
   children: actionCollections.map(sectionLink),
 } as const satisfies NavigationGroup;
 
+/**
+ * AKSC itself: what it is, what governs it, how it meets, and the two ways a
+ * reader acts on the organisation rather than on its work.
+ *
+ * The constitution and the general body were reachable only from the
+ * organisation page and a footer list respectively, which asked a reader to
+ * already know they existed. Contact and Donate join them because both are
+ * approaches to the organisation, and a reader looking for either was reading
+ * to the bottom of the page to find it.
+ */
+export const organizationNavigation = {
+  label: "Organization",
+  href: "/organization",
+  overviewLabel: "About AKSC",
+  children: [
+    {
+      label: "Contact",
+      href: "/contact",
+    },
+    {
+      label: "Constitution",
+      href: "/organization/constitution",
+    },
+    {
+      label: "General Body",
+      href: "/organization/general-body",
+    },
+    {
+      label: "Donate",
+      href: "/donate",
+    },
+  ],
+} as const satisfies NavigationGroup;
+
 export const primaryNavigation = [
   actionsNavigation,
   {
@@ -50,10 +84,7 @@ export const primaryNavigation = [
     label: "Comics",
     href: "/comics",
   },
-  {
-    label: "Organization",
-    href: "/organization",
-  },
+  organizationNavigation,
 ] as const satisfies readonly NavigationNode[];
 
 /**
@@ -64,8 +95,9 @@ export const primaryNavigation = [
  * "the eradication of caste requires extensive mobilization, achievable by
  * establishing a lasting base from the masses through membership"; a site
  * whose single highlighted action was Donate asked every reader for the one
- * thing the organisation says is not the point. Donating is still offered, in
- * the footer and from the join page, as one way to take part among several.
+ * thing the organisation says is not the point. Donating is still offered,
+ * under Organization and from the join page, as one way to take part among
+ * several; it is a link in a menu rather than the button the bar ends on.
  */
 export const joinNavigation = {
   label: "Join AKSC",
@@ -90,24 +122,14 @@ export const helplineNavigation = {
  * from the comics and from the testimonies as well, because both readers
  * arrive at it wanting the same thing: something to say next time.
  *
- * Donate is here rather than in the bar. Someone who has decided to give will
- * look for it; nobody needs it held in front of them on every page.
+ * General Body, Donate, and Contact were here until they became children of
+ * Organization. The footer flattens the tree, so all three are still one link
+ * from the bottom of every page; listing them twice would only make the
+ * footer's own column disagree with itself about where they live.
  */
 export const secondaryNavigation = [
   {
     label: "Anti-caste Toolkit",
     href: "/anti-caste-toolkit",
-  },
-  {
-    label: "General Body",
-    href: "/organization/general-body",
-  },
-  {
-    label: "Donate",
-    href: "/donate",
-  },
-  {
-    label: "Contact",
-    href: "/contact",
   },
 ] as const satisfies readonly NavigationItem[];

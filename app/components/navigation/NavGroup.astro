@@ -1,5 +1,9 @@
 ---
-import { isCurrentNode, isCurrentPath } from "~/lib/navigation";
+import {
+  isCurrentNode,
+  isCurrentPath,
+  overviewLabelFor,
+} from "~/lib/navigation";
 import type { NavigationGroup } from "~/lib/navigation";
 
 interface Props {
@@ -58,6 +62,8 @@ const isActive = isCurrentNode(currentPath, group);
     The panel is pulled left by its own inset, so a child's label starts on the
     same vertical as the trigger's. Aligned to the trigger's box instead, every
     name in the menu sat twenty pixels to the right of the name that opened it.
+    That inset is the trigger's `px-3` padding plus this panel's 1px border,
+    which is the 3.25 spacing units of `-left-3.25`.
 
     It hangs from the header's hairline rather than floating below it: no top
     border, square top corners, and `shadow-lift` rather than the wide cast
@@ -65,7 +71,7 @@ const isActive = isCurrentNode(currentPath, group);
     as a smudge under something this size.
   -->
   <div
-    class="absolute top-[calc(100%+1px)] -left-[calc(0.75rem+1px)] w-60 max-w-[calc(100vw-2rem)] overflow-hidden rounded-b-lg border-x border-b border-rule-strong bg-paper shadow-lift"
+    class="absolute top-[calc(100%+1px)] -left-3.25 w-60 max-w-[calc(100vw-2rem)] overflow-hidden rounded-b-lg border-x border-b border-rule-strong bg-paper shadow-lift"
   >
     <ul>
       {
@@ -87,7 +93,7 @@ const isActive = isCurrentNode(currentPath, group);
               */}
               <a
                 class:list={[
-                  "relative flex items-center border-b border-rule px-3 py-3 font-display text-[0.9375rem] font-medium transition-colors after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:origin-left after:scale-x-0 after:bg-accent-600 after:transition-transform after:duration-300 after:ease-[var(--ease-out-firm)] hover:text-ambedkar-950 hover:after:scale-x-100",
+                  "relative flex items-center border-b border-rule px-3 py-3 font-display text-[0.9375rem] font-medium transition-colors after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:origin-left after:scale-x-0 after:bg-accent-600 after:transition-transform after:duration-300 after:ease-out-firm hover:text-ambedkar-950 hover:after:scale-x-100",
                   isChildActive
                     ? "text-ambedkar-950 after:scale-x-100 after:bg-ambedkar-950"
                     : "text-ambedkar-900/80",
@@ -108,9 +114,9 @@ const isActive = isCurrentNode(currentPath, group);
       href={`${group.href}/`}
       aria-current={isCurrentPath(currentPath, group.href) ? "page" : undefined}
     >
-      All {group.label.toLowerCase()}
+      {overviewLabelFor(group)}
       <span
-        class="transition-transform duration-300 ease-[var(--ease-out-firm)] group-hover/menu:translate-x-0.5"
+        class="transition-transform duration-300 ease-out-firm group-hover/menu:translate-x-0.5"
         aria-hidden="true"
       >
         &rarr;

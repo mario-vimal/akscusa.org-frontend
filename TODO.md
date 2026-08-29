@@ -32,8 +32,23 @@ does not look like AKSC and offers them nowhere to go.
       installed and `site` is already set in `astro.config.mjs`, so this is one
       integration plus a `Sitemap:` line.
 
+## Temporary links
+
+- [ ] **Home hero: Annual Conference 2026.** The hero's secondary action in
+      `app/content/pages/home/index.md` points off-site to
+      `https://akscusa.squarespace.com/conf-26` for the duration of the
+      migration, rather than at the migrated on-site route
+      `/conferences/aksc-7th-annual-conference-2026/`. Point it back at the
+      on-site route once the migration is complete, and delete this row. The
+      spotlight band lower down the same page already links to the on-site
+      conference, so the two disagree until this is undone.
+      `MIGRATION-TRACKER.md` records the same dependency against `/conf-26`;
+      neither that file nor the Squarespace site can be retired while this
+      link is live.
+
 ## Notes
 
-- Every one of these is static rendering, not a CMS collection: one page each,
-  changing only when the design changes. Keep the copy in the component or in
-  `app/content/pages/`, and do not model an error page as a collection entry.
+- Every system page above is static rendering, not a CMS collection: one page
+  each, changing only when the design changes. Keep the copy in the component
+  or in `app/content/pages/`, and do not model an error page as a collection
+  entry.

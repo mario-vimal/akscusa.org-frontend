@@ -1,10 +1,10 @@
 ---
 pageType: home
 title: Ambedkar King Study Circle
-description: AKSC USA educates, agitates, and organizes to end caste discrimination and build an egalitarian society.
+description: AKSC USA educates, organizes, and agitates to end caste discrimination and build an egalitarian society.
 hero:
-  eyebrow: Ambedkar King Study Circle
-  title: Educate. Agitate. Organize.
+  eyebrow: Ambedkar King Study Circle (AKSC)
+  title: Educate, Organize & Agitate
   description: Caste has no place—in India, in America, or anywhere. Together, we can end caste discrimination and build a just world.
   imageAlt: San Francisco's Painted Ladies and skyline, tinted in a single deep blue.
   primaryAction:
@@ -12,7 +12,7 @@ hero:
     href: /anti-caste-helpline
   secondaryAction:
     label: Annual Conference 2026
-    href: /conferences
+    href: "https://akscusa.squarespace.com/conf-26"
 quotes:
   - text: So learn and break the chains of caste. Throw away the Brahman’s scriptures fast.
     author: Savitribai Phule
