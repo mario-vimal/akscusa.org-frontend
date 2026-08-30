@@ -35,7 +35,6 @@ interface Props {
   backgroundImage?: ImageMetadata;
   backgroundLabel?: string;
   backgroundCredit?: ImageCredit;
-  backgroundPosition?: "center" | "portrait";
 }
 
 const {
@@ -47,7 +46,6 @@ const {
   backgroundImage,
   backgroundLabel,
   backgroundCredit,
-  backgroundPosition,
 } = Astro.props;
 
 const columnClasses = {
@@ -65,7 +63,6 @@ const columnClasses = {
     backgroundImage={backgroundImage}
     backgroundLabel={backgroundLabel}
     backgroundCredit={backgroundCredit}
-    backgroundPosition={backgroundPosition}
   />
 
   <Container class="pt-16 pb-20 sm:pt-20 sm:pb-28">
