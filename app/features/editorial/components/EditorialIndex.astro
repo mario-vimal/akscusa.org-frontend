@@ -32,7 +32,6 @@ interface Props {
   backgroundImage?: ImageMetadata;
   backgroundLabel?: string;
   backgroundCredit?: ImageCredit;
-  backgroundPosition?: "center" | "portrait";
   /**
    * Whether to wrap the default slot in the shared card grid. Set false when a
    * section renders its own body, such as the book readings table.
@@ -52,7 +51,6 @@ const {
   backgroundImage,
   backgroundLabel,
   backgroundCredit,
-  backgroundPosition,
   list = true,
 } = Astro.props;
 ---
@@ -66,7 +64,6 @@ const {
     backgroundImage={backgroundImage}
     backgroundLabel={backgroundLabel}
     backgroundCredit={backgroundCredit}
-    backgroundPosition={backgroundPosition}
   >
     {
       filters.length > 0 && (

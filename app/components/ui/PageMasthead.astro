@@ -26,8 +26,6 @@ interface Props {
   backgroundLabel?: string;
   /** Required attribution for a Creative Commons background image. */
   backgroundCredit?: ImageCredit;
-  /** Keeps a tightly framed portrait's face inside the wide masthead crop. */
-  backgroundPosition?: "center" | "portrait";
   class?: string;
 }
 
@@ -40,59 +38,49 @@ const {
   backgroundImage,
   backgroundLabel,
   backgroundCredit,
-  backgroundPosition = "center",
   class: className,
 } = Astro.props;
 
 const hasAbove = Astro.slots.has("above");
-const backgroundPositionClass =
-  backgroundPosition === "portrait" ? "object-[center_36%]" : "object-center";
 
 /*
  * Whether the photograph is taller than it is wide, worked out from the file
- * rather than asked of the caller.
- *
- * The masthead is a wide band. A landscape photograph fills it; an upright
- * portrait cannot, and `object-cover` answers by showing a horizontal strip of
- * one — a mouth, or a single eye blown up across the page. No amount of
- * `object-position` fixes that, because the mismatch is the aspect ratio, not
- * the framing.
- *
- * So an upright picture is not stretched across the band at all. From `lg` it
- * is set at its own proportions, full height and flush right, and faded into
- * the panel; below that the band is nearly square and a cover crop is honest
- * again. Deriving it here rather than taking a prop means a caller cannot
- * smear a portrait across the page by forgetting to say it is one.
+ * rather than asked of the caller. It decides only how much of the band an
+ * upright picture may take from `lg`.
  */
 const isUpright = backgroundImage
   ? backgroundImage.height / backgroundImage.width > 1.1
   : false;
 
 /*
- * From `lg` the picture is held to the right of the panel, because the text is
- * set on the left and a photograph running the full width sits underneath it.
+ * The picture keeps its own proportions at every width: full height, automatic
+ * width, flush to the right edge of the band.
  *
- * An upright picture takes its own proportions, full height and flush right. A
- * landscape one keeps a cover crop but is held to the right half of the band,
- * which is a far gentler crop than the whole width and leaves the reading
- * column clear. Both fade out at their left edge so the picture joins the panel
- * rather than sitting on it as a pasted rectangle.
+ * Stretching it across the band with `object-cover` meant the band enlarged the
+ * picture until it filled a shape the picture does not have, which on a phone
+ * showed a mouth or a single eye blown up across the screen. No amount of
+ * `object-position` fixes that, because the mismatch is the aspect ratio and
+ * not the framing.
  *
- * Below `lg` the band is nearly square, so a full-bleed cover is honest again
- * and the scrim below carries the text instead.
+ * Full height with an automatic width never enlarges past the band, so nothing
+ * is zoomed. An upright picture ends up occupying the right third or so and the
+ * ink carries the rest; a landscape one is wider than the band and loses its
+ * left edge, which is where the reading column sits anyway. From `lg` it is
+ * held to roughly half the band so the text column stays clear of it. It fades
+ * out at its left edge so the picture joins the panel rather than sitting on it
+ * as a pasted rectangle.
  */
 const backgroundClasses = [
-  "absolute inset-0 -z-30 size-full object-cover duotone",
-  backgroundPositionClass,
-  isUpright
-    ? "lg:inset-y-0 lg:left-auto lg:h-full lg:w-auto lg:max-w-[46%] lg:object-contain lg:[mask-image:linear-gradient(to_right,transparent_0%,black_42%)]"
-    : "lg:left-1/2 lg:w-1/2 lg:[mask-image:linear-gradient(to_right,transparent_0%,black_30%)]",
+  "absolute inset-y-0 right-0 -z-30 h-full w-auto max-w-full object-cover object-center duotone",
+  "[mask-image:linear-gradient(to_right,transparent_0%,black_34%)]",
+  isUpright ? "lg:max-w-[46%]" : "lg:max-w-[58%]",
 ].join(" ");
 
 /*
- * One scrim for both. It is heavy everywhere below `lg`, where the picture runs
- * the full width behind the text, and thins out to the right from `lg`, where
- * the picture has moved off the reading column and has to stay legible.
+ * One scrim for both. It is heavy everywhere below `lg`, where the band is
+ * narrow enough that the text runs across the picture, and thins out to the
+ * right from `lg`, where the picture has moved off the reading column and has
+ * to stay legible.
  */
 const scrimClasses = [
   "absolute inset-0 -z-10 bg-linear-to-r",
@@ -127,8 +115,8 @@ const scrimClasses = [
           loading="eager"
           sizes={
             isUpright
-              ? "(min-width: 1024px) 40vw, 100vw"
-              : "(min-width: 1024px) 50vw, 100vw"
+              ? "(min-width: 1024px) 46vw, 100vw"
+              : "(min-width: 1024px) 58vw, 100vw"
           }
           widths={[640, 960, 1280, 1600]}
         />
