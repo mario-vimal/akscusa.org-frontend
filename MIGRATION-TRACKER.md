@@ -285,10 +285,12 @@ extending to the editorial collections when their images are brought over.
   repeating record in `cms/content/book-readings/`, because organisers add
   sessions regularly and should not need a developer to do it.
 - **Books.** One book carries several sessions, so book metadata was pulled out
-  into a `books` collection served at `/books/`, keyed by the ISBN-13 of the
-  edition read. A reading references its book by ISBN, and the build fails on an
-  invalid check digit or an ISBN with no matching book. The two ISBNs recorded
-  so far are the Navayana editions, confirmed against Open Library.
+  into a `books` collection served at `/books/`, identified by the ISBN-13 of
+  the edition read. A reading references its book by the book entry's stable
+  slug rather than its ISBN, so correcting an ISBN afterwards cannot break the
+  link; the build still fails on an invalid ISBN check digit, two books
+  sharing an ISBN, or a reading naming a slug no book claims. The two ISBNs
+  recorded so far are the Navayana editions, confirmed against Open Library.
 - **Book reading images.** Three images on the Palestine reading list are still
   hosted on WordPress: the Pixabay header and the two event flyers. They were
   left out rather than hotlinked, so they need committing under

@@ -181,7 +181,7 @@ the fields its own kind of entry needs.
 | `interventions` | `cms/content/interventions`  | `/interventions`  | `kind`, `status`, `concludedDate`, `outcome`, `resources` |
 | `conferences`   | `cms/content/conferences`    | `/conferences`    | `edition`, `location`, `format`, speaker references       |
 | `programs`      | `cms/content/programs`       | `/programs`       | `kind`, `status`, `schedule`, `location`, `posters`       |
-| `bookReadings`  | `cms/content/book-readings`  | `/book-readings`  | `location`, `isbn`, `participants`, `registrationUrl`     |
+| `bookReadings`  | `cms/content/book-readings`  | `/book-readings`  | `location`, `book`, `participants`, `registrationUrl`     |
 
 `app/features/editorial/taxonomy.ts` is the single source of truth for every
 controlled vocabulary: shared `topics`, article categories, intervention kinds
@@ -213,22 +213,24 @@ draft, or misspelled references fail the build rather than silently dropping a
 speaker. Portraits are optional R2 URLs, so the same biography and image can be
 reused by future conferences without copying either.
 
-### Books, linked by ISBN
+### Books, linked by stable id
 
 `books` is another collection outside that base shape, because a book has no
 publication date of its own here and never appears in a dated index. It lives in
 `cms/content/books` and is served at `/books/` and `/books/<slug>/`.
 
 One book usually carries several readings, so the metadata is stored once and
-referenced. A reading names the edition it worked through in its `isbn` field,
-the CMS offers that as a relation to the books collection, and
-`app/features/books/queries/books.ts` resolves it at build time. Two checks keep
-the link honest and fail the build rather than degrading quietly:
+referenced. A reading names the book it worked through in its `book` field, by
+the book entry's stable content id (its slug) rather than its ISBN, the CMS
+offers that as a relation to the books collection, and
+`app/features/books/queries/books.ts` resolves it at build time. Referencing
+the slug rather than the ISBN means correcting a book's ISBN afterwards cannot
+sever every reading that names it. Two checks keep the link honest and fail
+the build rather than degrading quietly:
 
 - an ISBN-13 must pass its check digit, so a typo cannot slip through
-  (`app/features/books/isbn.ts`);
-- a reading may not reference an ISBN that no book entry claims, and no two
-  books may claim the same ISBN.
+  (`app/features/books/isbn.ts`), and no two books may claim the same ISBN;
+- a reading may not reference a book slug that no book entry claims.
 
 A book page lists every session that read it, and `/book-readings/` renders a
 sortable, searchable table whose Book column links back to the book. A reading

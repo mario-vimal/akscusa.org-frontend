@@ -13,7 +13,7 @@ const entries = await loadBooksWithReadings();
 <EditorialIndex
   eyebrow="Reading and Discussions"
   title="Books"
-  description="Every book the reading circle has worked through, with the sessions that covered it. Each entry is identified by the ISBN of the edition we read."
+  description="Every book the reading circle has worked through, with the sessions that covered it. Each entry names the ISBN of the edition we read."
   count={`${entries.length} ${entries.length === 1 ? "book" : "books"}`}
   empty="No books have been published yet."
   isEmpty={entries.length === 0}

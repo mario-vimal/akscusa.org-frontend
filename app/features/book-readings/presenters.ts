@@ -91,7 +91,14 @@ export function bookReadingRows(
   books: ReadonlyMap<string, Book>,
 ): BookReadingRow[] {
   return readings.map((reading) => {
-    const { title, summary, date, location, topics, isbn } = reading.data;
+    const {
+      title,
+      summary,
+      date,
+      location,
+      topics,
+      book: bookId,
+    } = reading.data;
     const dateLabel = formatPacificDate(date);
     const book = books.get(reading.id);
     const authors = book ? list(book.data.authors) : undefined;
@@ -124,7 +131,7 @@ export function bookReadingRows(
         book && authors
           ? { title: book.data.title, authors, href: bookHref(book) }
           : undefined,
-      readsArticles: !isbn,
+      readsArticles: !bookId,
       bookKey: book?.data.title.toLowerCase() ?? "",
       titleKey: title.toLowerCase(),
       location,
