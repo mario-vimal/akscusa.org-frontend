@@ -10,6 +10,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { isValidIsbn13, normalizeIsbn } from "../../app/features/books/isbn.ts";
+import { isBlank } from "./fields.ts";
 import { readFrontmatter } from "./frontmatter.ts";
 
 const projectRoot = fileURLToPath(new URL("../..", import.meta.url));
@@ -58,7 +59,9 @@ export async function readBookEntries(): Promise<BookEntry[]> {
         label,
         file,
         isbn,
-        title: typeof data.title === "string" ? data.title : label,
+        // An entry saved from its ISBN alone has no title to be named by yet,
+        // so a message about it names the file instead of saying nothing.
+        title: isBlank(data.title) ? label : String(data.title),
         source,
         data,
         cover: path.join(COVERS_DIR, `${isbn}.jpg`),

@@ -482,10 +482,10 @@ collections:
     label_singular: Book
     icon: book_2
     description: >-
-      One record per book the circle reads, identified by ISBN. Give the title
-      and the ISBN; the cover art, subtitle, authors, publisher and years are
-      fetched from the ISBN after you save, so you can leave every other field
-      blank and nothing needs uploading here.
+      One record per book the circle reads, identified by ISBN. The ISBN is the
+      only field you have to fill: the title, cover art, subtitle, authors,
+      publisher and years are all fetched from it after you save, and nothing
+      needs uploading here.
     folder: cms/content/books
     create: true
     slug: "{{slug}}"
@@ -495,7 +495,8 @@ collections:
       - name: title
         label: Title
         widget: string
-        hint: "Names the page's web address, which is fixed when you save, so it is the one thing worth typing yourself."
+        required: false
+        hint: "Leave blank to take the title listed for this ISBN. The page's web address is named from the title either way, so type it here if you want to choose that address yourself."
       - name: subtitle
         label: Subtitle
         widget: string

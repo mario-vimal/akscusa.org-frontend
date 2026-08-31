@@ -32,11 +32,13 @@ export const books = defineCollection({
   }),
   schema: z.object({
     /**
-     * The one field the CMS still asks for besides the ISBN, because it names
-     * the entry's file and so the page's URL, which Sveltia fixes at the
-     * moment the entry is created.
+     * A book must name itself: blank is rejected rather than defaulted,
+     * because an untitled book would render an empty card and an empty
+     * heading. An entry saved with no title has one written into it from its
+     * ISBN before it is merged, so this fails only when the catalogue had no
+     * record either — which is exactly when a person should look at it.
      */
-    title: z.string(),
+    title: z.string().min(1),
     subtitle: optionalCmsField(z.string()),
     /**
      * Filled from the ISBN when the entry does not state them, so a book with
