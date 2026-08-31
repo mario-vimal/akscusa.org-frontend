@@ -240,18 +240,35 @@ group and registrant depends on the ISBN range tables rather than fixed offsets,
 so the site does not invent hyphenation; the table search accepts an ISBN typed
 either way.
 
-Cover art is fetched by ISBN and committed, so Astro optimizes it at build time
-instead of the page depending on a third party at runtime:
+A new book only needs a title, its authors, its ISBN, and the summary AKSC
+writes. The rest of the edition — cover art, subtitle, publisher, edition year,
+first publication year — is looked up from the ISBN on Open Library and
+committed, so Astro optimizes the cover at build time instead of the page
+depending on a third party at runtime:
 
 ```
-npm run fetch:covers          # fetch any cover not already stored
-node scripts/fetch-book-covers.mjs --force   # refetch everything
+npm run enrich:books                        # fill in every blank field and missing cover
+node scripts/enrich-books.mjs --force       # refetch every cover
+node scripts/enrich-books.mjs --covers-only # covers only, leaving frontmatter alone
 ```
+
+`.github/workflows/enrich-books.yml` runs this on the pull request Sveltia opens
+for a book and commits what it finds, so an editor who knows only the ISBN still
+gets a complete entry. The build itself never calls Open Library.
+
+A fetched value only ever fills a blank field; nothing an editor typed is
+replaced. `title`, `authors`, `isbn`, `topics`, `resources`, and `draft` are
+never touched, and neither is `summary`: a catalogue summary is the publisher's
+marketing copy, which is both the wrong voice for this site and not ours to
+copy. A free-text publication date yields a year only when it names exactly one,
+so a reprint cannot come to claim it was written the year it was reprinted.
 
 Covers land in `app/features/books/assets/covers/<isbn>.jpg`, are trimmed of the
 flat padding Open Library adds to some images, and are matched to a book by
 filename. A book with no cover file renders without one, so nothing breaks when
-Open Library has nothing for an ISBN.
+Open Library has nothing for an ISBN; the run lists those books rather than
+failing. A cover already on disk is never refetched, so one committed by hand
+stands.
 
 ### Comics and toolkit scenarios, published as panels
 
@@ -316,7 +333,8 @@ them would fail every pull request the CMS opens.
 | `npm test`               | Run Vitest once                               |
 | `npm run generate-types` | Generate Cloudflare runtime binding types     |
 | `npm run verify:pages`   | Smoke-test `dist` through Wrangler Pages      |
-| `npm run fetch:covers`   | Fetch missing book covers from Open Library   |
+| `npm run enrich:books`   | Fetch book covers and details by ISBN         |
+| `npm run fetch:covers`   | Fetch missing book covers only                |
 | `npm run deploy:pages`   | Deploy `dist` with the Pages command          |
 | `npm run validate`       | Run all checks, build, and Pages verification |
 
@@ -453,6 +471,11 @@ validate`, and skips draft pull requests: the CMS opens one per saved entry, and
 validation waits until the entry leaves Draft and the request is marked ready
 for review. Set the `CMS_REPO` repository variable so that build matches the
 deployed one.
+
+The one other workflow is `.github/workflows/enrich-books.yml`, which fills in a
+new book's cover and bibliographic details from its ISBN and commits them to the
+branch. It is the only workflow with write access, and it refuses to run on a
+pull request from a fork.
 
 ## Figma
 

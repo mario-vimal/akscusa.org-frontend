@@ -1,0 +1,73 @@
+name: Enrich books
+
+# A book entry is a title, an ISBN, and a summary an editor wrote. Everything
+# else about the edition — cover art, subtitle, publisher, the two years — can
+# be looked up from the ISBN, so it is looked up here rather than asked of the
+# editor, and committed to the branch Sveltia opened.
+#
+# This runs on the pull request rather than during the build on purpose: the
+# cover has to be committed for Astro to optimize it, and a build that called
+# Open Library would depend on a third party being up to render the site.
+#
+# It pushes onto the branch an editor may still have open in Sveltia, whose next
+# save then has to be made on top of this commit. If that turns out to get in an
+# editor's way, narrow the trigger to `ready_for_review`, which fires once the
+# editor is done with the entry.
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+    paths:
+      - "cms/content/books/**"
+  # A manual run fills in every book, which is how a cover that Open Library
+  # only added later gets picked up.
+  workflow_dispatch:
+
+concurrency:
+  group: enrich-books-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  enrich:
+    # A pull request from a fork must not be handed a token that can write, and
+    # it never needs one: Sveltia commits to a branch in this repository.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the branch under review
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Fill in what the entries do not say
+        run: npm run enrich:books
+
+      - name: Commit anything fetched
+        # Only what the run produced is committed, and only when it produced
+        # something. A push made with GITHUB_TOKEN does not start another
+        # workflow, so this cannot loop; validation runs when the entry is
+        # marked ready for review, which is after this has landed.
+        run: |
+          if git diff --quiet; then
+            echo "Nothing to add: every book already has its cover and details."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/features/books/assets/covers cms/content/books
+          git commit -m "Fetch book covers and details from Open Library"
+          git push
