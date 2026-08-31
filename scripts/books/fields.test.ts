@@ -8,12 +8,15 @@ describe("isBlank", () => {
     expect(isBlank(null)).toBe(true);
     expect(isBlank("")).toBe(true);
     expect(isBlank("   ")).toBe(true);
+    expect(isBlank([])).toBe(true);
+    expect(isBlank([""])).toBe(true);
   });
 
   it("treats a stated value as stated", () => {
     expect(isBlank("Navayana")).toBe(false);
     expect(isBlank(2014)).toBe(false);
     expect(isBlank(0)).toBe(false);
+    expect(isBlank(["B. R. Ambedkar"])).toBe(false);
   });
 });
 
@@ -50,30 +53,45 @@ describe("yearFromPublishDate", () => {
 
 describe("fieldsToFill", () => {
   const record = {
+    title: "Annihilation of Caste",
     subtitle: "The Annotated Critical Edition",
+    authors: ["B. R. Ambedkar"],
     publisher: "Navayana",
     publishedYear: 2014,
     firstPublishedYear: 1936,
   };
 
   it("fills every field the entry has left blank", () => {
-    expect(fieldsToFill({ title: "Annihilation of Caste" }, record)).toEqual(
-      record,
-    );
-    expect(fieldsToFill({ subtitle: "", publishedYear: null }, record)).toEqual(
-      record,
-    );
+    expect(fieldsToFill({}, record)).toEqual(record);
+    expect(
+      fieldsToFill({ subtitle: "", authors: [], publishedYear: null }, record),
+    ).toEqual(record);
+  });
+
+  it("fills the title and the authors an entry never stated", () => {
+    // The whole point of the ISBN: an entry that says only that can still
+    // name its book.
+    expect(fieldsToFill({ isbn: "9788189059637" }, record)).toMatchObject({
+      title: "Annihilation of Caste",
+      authors: ["B. R. Ambedkar"],
+    });
   });
 
   it("never replaces a value an editor typed", () => {
     const existing = {
+      title: "Annihilation of Caste (annotated)",
       subtitle: "The Annotated Critical Edition, 2nd printing",
+      authors: ["Bhimrao Ramji Ambedkar"],
       publisher: "Navayana Publishing",
       publishedYear: 2015,
       firstPublishedYear: 1936,
     };
 
     expect(fieldsToFill(existing, record)).toEqual({});
+  });
+
+  it("leaves a list alone when the record names nobody", () => {
+    expect(fieldsToFill({ authors: [] }, { authors: [] })).toEqual({});
   });
 
   it("fills only what the record supplies", () => {

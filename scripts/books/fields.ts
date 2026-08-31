@@ -7,11 +7,13 @@
  * fallback for a blank field, not an authority over the entry.
  */
 
-import type { Scalar } from "./frontmatter.ts";
+import type { FieldValue } from "./frontmatter.ts";
 
 /** The subset of a catalogue record this site has a use for. */
 export interface BookRecord {
+  title?: string;
   subtitle?: string;
+  authors?: string[];
   publisher?: string;
   /** Year of this edition, which for a reprint is not the year written. */
   publishedYear?: number;
@@ -20,31 +22,43 @@ export interface BookRecord {
 }
 
 /**
- * The fields a catalogue may fill. `title`, `authors`, and `isbn` identify the
- * book and are the editor's to state; `topics`, `resources`, and `draft` are
- * editorial judgement. `summary` is deliberately absent: a catalogue summary is
- * the publisher's marketing copy, which is both the wrong voice for this site
- * and not ours to copy, so it stays a required field in the CMS.
+ * The fields a catalogue may fill, which is everything about the edition that
+ * the ISBN already decides. `isbn` itself is the question being asked, and
+ * `topics`, `resources`, and `draft` are editorial judgement. `summary` is
+ * deliberately absent: a catalogue summary is the publisher's marketing copy,
+ * which is both the wrong voice for this site and not ours to copy, so the
+ * one or two sentences a card prints stay AKSC's to write.
  */
 export const FILLABLE_FIELDS = [
+  "title",
   "subtitle",
+  "authors",
   "publisher",
   "publishedYear",
   "firstPublishedYear",
 ] as const satisfies readonly (keyof BookRecord)[];
 
 /**
- * Sveltia writes an empty string for a blank text widget and null for a blank
- * number widget, and a field an editor never opened is absent altogether. All
- * three mean the same thing here: nothing has been said, so we may say it.
+ * Sveltia writes an empty string for a blank text widget, null for a blank
+ * number widget and an empty list for a list widget nothing was added to, and
+ * a field an editor never opened is absent altogether. They all mean the same
+ * thing here: nothing has been said, so we may say it.
  */
 export function isBlank(value: unknown): boolean {
+  if (Array.isArray(value)) {
+    return value.every(isBlank);
+  }
+
   return (
     value === undefined ||
     value === null ||
     (typeof value === "string" && value.trim() === "")
   );
 }
+
+/** The inverse, as a guard: a record leaves out whatever it does not know. */
+const isStated = <Value>(value: Value | undefined): value is Value =>
+  !isBlank(value);
 
 /**
  * A publication date in a catalogue is free text: "2014", "Nov 2014",
@@ -86,13 +100,15 @@ export function yearFromPublishDate(
 export function fieldsToFill(
   existing: Record<string, unknown>,
   record: BookRecord,
-): Record<string, Scalar> {
-  const fields: Record<string, Scalar> = {};
+): Record<string, FieldValue> {
+  const fields: Record<string, FieldValue> = {};
 
   for (const field of FILLABLE_FIELDS) {
     const value = record[field];
 
-    if (value !== undefined && isBlank(existing[field])) {
+    // A record that holds nothing under a field fills nothing: writing an
+    // empty list over an absent one only makes the entry longer.
+    if (isStated(value) && isBlank(existing[field])) {
       fields[field] = value;
     }
   }

@@ -1,6 +1,7 @@
 import type { ImageMetadata } from "astro";
 
 import { coverForIsbn } from "~/features/books/covers";
+import { bookAuthors } from "~/features/books/presenters";
 import { bookHref, loadReadingBooks } from "~/features/books/queries/books";
 import {
   loadComicsIndex,
@@ -144,7 +145,8 @@ export async function loadSpotlight(): Promise<Spotlight | undefined> {
 
 export interface BookFeature {
   title: string;
-  authors: string;
+  /** Absent for a book whose entry names no author. */
+  authors?: string;
   href: string;
   cover?: ImageMetadata;
   /** The day the circle last sat with this book. */
@@ -194,7 +196,7 @@ export async function loadLatestBook(): Promise<BookFeature | undefined> {
 
   return {
     title: book.data.title,
-    authors: book.data.authors.join(", "),
+    authors: bookAuthors(book),
     href: bookHref(book),
     cover: coverForIsbn(book.data.isbn),
     readOn: latest.data.date,

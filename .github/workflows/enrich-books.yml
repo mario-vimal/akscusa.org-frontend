@@ -1,9 +1,11 @@
 name: Enrich books
 
-# A book entry is a title, an ISBN, and a summary an editor wrote. Everything
-# else about the edition — cover art, subtitle, publisher, the two years — can
-# be looked up from the ISBN, so it is looked up here rather than asked of the
-# editor, and committed to the branch Sveltia opened.
+# A book entry is an ISBN. Everything else about the edition — the title,
+# cover art, subtitle, authors, publisher, the two years — can be looked up
+# from the ISBN, so it is looked up here rather than asked of the editor, and
+# committed to the branch Sveltia opened. An entry that named no title is
+# renamed to the one that arrives, so it gets a readable URL. Only the summary
+# stays an editor's to write, and it can be written after the entry is saved.
 #
 # This runs on the pull request rather than during the build on purpose: the
 # cover has to be committed for Astro to optimize it, and a build that called

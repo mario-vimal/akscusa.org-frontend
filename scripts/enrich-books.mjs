@@ -3,11 +3,16 @@
  * Fills in what a book entry does not say, from its ISBN.
  *
  * Cover art is fetched from Open Library and stored under
- * `app/features/books/assets/covers/<isbn>.jpg`, and any of the optional
- * bibliographic fields left blank — subtitle, publisher, edition year, first
- * publication year — is written into the entry's frontmatter. A value an editor
- * typed is never replaced, and `summary` is never fetched: that sentence is
- * AKSC's own.
+ * `app/features/books/assets/covers/<isbn>.jpg`, and every bibliographic field
+ * left blank — title, subtitle, authors, publisher, edition year, first
+ * publication year — is written into the entry's frontmatter, so an ISBN is
+ * all an entry has to state. A value an editor typed is never replaced, and
+ * `summary` is never fetched: that sentence is AKSC's own.
+ *
+ * An entry saved without a title is also renamed to the title that arrives, so
+ * a book added from an ISBN alone still reaches a readable URL rather than
+ * keeping the random id the CMS gave a file that had no title to be named
+ * after.
  *
  * Both are committed, so Astro optimizes the cover at build time and the build
  * itself never calls a third party. `.github/workflows/enrich-books.yml` runs
@@ -24,15 +29,17 @@
  *   node scripts/enrich-books.mjs --covers-only # skip the frontmatter pass
  */
 import { existsSync } from "node:fs";
-import { appendFile, mkdir, writeFile } from "node:fs/promises";
+import { appendFile, mkdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 
 import { prepareCover } from "./books/cover.ts";
 import { readBookEntries, COVERS_DIR } from "./books/entries.ts";
 import { fieldsToFill } from "./books/fields.ts";
+import { renameTarget } from "./books/filename.ts";
 import { writeFrontmatterFields } from "./books/frontmatter.ts";
 import { fetchCover, fetchRecord } from "./books/open-library.ts";
+import { readReferencedBookIds } from "./books/references.ts";
 
 const force = process.argv.includes("--force");
 const coversOnly = process.argv.includes("--covers-only");
@@ -70,8 +77,9 @@ async function coverFor(book) {
 
 /**
  * Fills the blank bibliographic fields of one book. Returns the field names
- * it filled and whether Open Library had any record at all for the ISBN, so
- * the caller can tell "already complete" apart from "nothing to find".
+ * it filled, the title it supplied if the entry named none, and whether Open
+ * Library had any record at all for the ISBN, so the caller can tell "already
+ * complete" apart from "nothing to find".
  */
 async function detailsFor(book) {
   const record = await fetchRecord(book.isbn);
@@ -84,17 +92,52 @@ async function detailsFor(book) {
     console.log(`Fields ${book.label}: ${names.join(", ")}`);
   }
 
-  return { names, hasRecord };
+  return {
+    names,
+    hasRecord,
+    filledTitle: typeof fields.title === "string" ? fields.title : undefined,
+  };
+}
+
+/**
+ * Names an entry's file after the title this run supplied for it.
+ *
+ * Only an entry that had no title of its own is moved, because the filename is
+ * the entry's id: an editor who named the file by typing a title chose that
+ * id, and a catalogue does not get to overrule it later.
+ */
+async function renameToTitle(book, title, referenced) {
+  const target = renameTarget(book.file, title);
+
+  if (!target) {
+    return "unchanged";
+  }
+
+  if (referenced.has(path.basename(book.file, ".md"))) {
+    return "referenced";
+  }
+
+  if (existsSync(target)) {
+    return "taken";
+  }
+
+  await rename(book.file, target);
+  console.log(`Rename ${book.label} -> ${path.basename(target)}`);
+
+  return "renamed";
 }
 
 async function main() {
   const books = await readBookEntries();
+  const referenced = await readReferencedBookIds();
   await mkdir(COVERS_DIR, { recursive: true });
 
   let covers = 0;
   let filled = 0;
+  let renamed = 0;
   const noCover = [];
   const noOpenLibraryEntry = [];
+  const keptItsName = [];
 
   for (const book of books) {
     const coverOutcome = await coverFor(book);
@@ -104,6 +147,25 @@ async function main() {
       ? { names: [], hasRecord: true }
       : await detailsFor(book);
     if (details.names.length > 0) filled += 1;
+
+    if (details.filledTitle) {
+      const outcome = await renameToTitle(
+        book,
+        details.filledTitle,
+        referenced,
+      );
+
+      if (outcome === "renamed") renamed += 1;
+      if (outcome === "referenced" || outcome === "taken") {
+        keptItsName.push(
+          `${book.label} — ${
+            outcome === "taken"
+              ? "another book already has that filename"
+              : "a reading already names this entry"
+          }`,
+        );
+      }
+    }
 
     if (coverOutcome === "unavailable") {
       const label = `${book.title} (${book.isbn})`;
@@ -115,13 +177,23 @@ async function main() {
   }
 
   const summary = [
-    `${books.length} book(s) checked: ${covers} cover(s) written, ${filled} ${filled === 1 ? "entry" : "entries"} filled in.`,
+    `${books.length} book(s) checked: ${covers} cover(s) written, ${filled} ${filled === 1 ? "entry" : "entries"} filled in, ${renamed} renamed.`,
   ];
 
   if (covers === 0 && filled === 0) {
     summary.push(
       "",
       "**Nothing to commit.** Every book already has its cover and bibliographic details, or Open Library had nothing new to add.",
+    );
+  }
+
+  if (keptItsName.length > 0) {
+    summary.push(
+      "",
+      "**Kept its web address, which the ISBN would have renamed:**",
+      ...keptItsName.map((entry) => `- ${entry}`),
+      "",
+      "Renaming would have broken a link or overwritten another book, so the entry keeps the address it was created with. Rename the file by hand if that address matters.",
     );
   }
 

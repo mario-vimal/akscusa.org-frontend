@@ -33,13 +33,17 @@ export function lookupKeys(isbn: string): string[] {
 
 /** Just enough of Open Library's shape to read the fields we fill. */
 interface Edition {
+  title?: unknown;
   subtitle?: unknown;
+  authors?: unknown;
   publishers?: unknown;
   publish_date?: unknown;
   works?: unknown;
 }
 
 interface Work {
+  title?: unknown;
+  authors?: unknown;
   first_publish_date?: unknown;
 }
 
@@ -53,6 +57,29 @@ const firstString = (value: unknown): string | undefined =>
 
 const text = (value: unknown): string | undefined =>
   typeof value === "string" && value.trim() !== "" ? value.trim() : undefined;
+
+/**
+ * The author records an edition or a work points at. An edition names them
+ * directly, a work wraps each one in an `author` field, and an edition that
+ * names none is common enough that the work is always worth asking.
+ */
+export function authorKeys(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map((entry) => {
+      if (!isRecord(entry)) return undefined;
+      const author = isRecord(entry.author) ? entry.author : entry;
+
+      return typeof author.key === "string" &&
+        author.key.startsWith("/authors/")
+        ? author.key
+        : undefined;
+    })
+    .filter((key) => key !== undefined);
+}
 
 /** The work an edition belongs to, which is where a first publication is held. */
 function workKey(edition: Edition): string | undefined {
@@ -104,6 +131,24 @@ export async function fetchCover(isbn: string): Promise<Buffer | undefined> {
   return undefined;
 }
 
+/**
+ * The names behind an edition's author keys, in the order the record lists
+ * them, skipping any author record that could not be read. Each is a separate
+ * document, which is a handful of small requests for a book that usually has
+ * one author.
+ */
+async function fetchAuthors(keys: readonly string[]): Promise<string[]> {
+  const names = await Promise.all(
+    keys.map(async (key) => {
+      const json = await fetchJson(`https://openlibrary.org${key}.json`);
+
+      return isRecord(json) ? text(json.name) : undefined;
+    }),
+  );
+
+  return names.filter((name) => name !== undefined);
+}
+
 /** What Open Library knows about this edition, as fields this site can fill. */
 export async function fetchRecord(isbn: string): Promise<BookRecord> {
   let edition: Edition | undefined;
@@ -128,8 +173,16 @@ export async function fetchRecord(isbn: string): Promise<BookRecord> {
       )
     : undefined;
 
+  const keys = authorKeys(edition.authors);
+
   return {
+    // An edition of a translated or reissued text sometimes carries only the
+    // work's title, so the work answers for anything the edition leaves out.
+    title: text(edition.title) ?? text(work?.title),
     subtitle: text(edition.subtitle),
+    authors: await fetchAuthors(
+      keys.length > 0 ? keys : authorKeys(work?.authors),
+    ),
     publisher: firstString(edition.publishers),
     publishedYear: yearFromPublishDate(edition.publish_date),
     firstPublishedYear: yearFromPublishDate(work?.first_publish_date),

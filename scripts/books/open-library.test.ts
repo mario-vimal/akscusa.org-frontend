@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { coverUrl, lookupKeys } from "./open-library.ts";
+import { authorKeys, coverUrl, lookupKeys } from "./open-library.ts";
 
 describe("lookupKeys", () => {
   it("tries the ISBN-13 first and its ISBN-10 second", () => {
@@ -20,5 +20,24 @@ describe("coverUrl", () => {
     expect(coverUrl("9788189059637")).toBe(
       "https://covers.openlibrary.org/b/isbn/9788189059637-L.jpg?default=false",
     );
+  });
+});
+
+describe("authorKeys", () => {
+  it("reads the keys an edition names directly", () => {
+    expect(authorKeys([{ key: "/authors/OL1234A" }])).toEqual([
+      "/authors/OL1234A",
+    ]);
+  });
+
+  it("reads the keys a work wraps in an author field", () => {
+    expect(
+      authorKeys([{ author: { key: "/authors/OL1234A" }, type: {} }]),
+    ).toEqual(["/authors/OL1234A"]);
+  });
+
+  it("ignores anything that is not an author record", () => {
+    expect(authorKeys([{ key: "/works/OL99W" }, "OL1234A", null])).toEqual([]);
+    expect(authorKeys(undefined)).toEqual([]);
   });
 });

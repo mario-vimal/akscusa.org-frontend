@@ -31,9 +31,21 @@ export const books = defineCollection({
     pattern: "**/*.md",
   }),
   schema: z.object({
-    title: z.string(),
+    /**
+     * A book must name itself: blank is rejected rather than defaulted,
+     * because an untitled book would render an empty card and an empty
+     * heading. An entry saved with no title has one written into it from its
+     * ISBN before it is merged, so this fails only when the catalogue had no
+     * record either — which is exactly when a person should look at it.
+     */
+    title: z.string().min(1),
     subtitle: optionalCmsField(z.string()),
-    authors: z.array(z.string()).min(1),
+    /**
+     * Filled from the ISBN when the entry does not state them, so a book with
+     * no authors is one Open Library had nothing for. Pages print the line
+     * only when there is one rather than an empty byline.
+     */
+    authors: optionalCmsList(z.array(z.string()).default([])),
     /**
      * Identifies the edition the circle read, for bibliographic lookup and
      * cover naming. Correcting it does not affect a reading's link to this
@@ -45,7 +57,13 @@ export const books = defineCollection({
     publishedYear: optionalCmsField(z.number().int()),
     /** Year the text first appeared, kept for posthumous works. */
     firstPublishedYear: optionalCmsField(z.number().int()),
-    summary: z.string(),
+    /**
+     * AKSC's own sentence or two, the one thing about a book that cannot come
+     * from its ISBN: a catalogue summary is the publisher's marketing copy.
+     * Optional so an entry can be saved from the ISBN alone and written up
+     * afterwards, rather than an editor filling the field with a blurb.
+     */
+    summary: optionalCmsField(z.string()),
     topics: topicsSchema,
     resources: optionalCmsList(z.array(linkSchema).default([])),
     draft: z.boolean().default(false),

@@ -7,6 +7,7 @@ import { formatPacificDate } from "~/lib/dates";
 import { topicLabel } from "~/features/editorial/taxonomy";
 import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
 import { openLibraryUrl } from "~/features/books/isbn";
+import { bookAuthors } from "~/features/books/presenters";
 import type { BookWithReadings } from "~/features/books/queries/books";
 
 interface Props {
@@ -17,11 +18,16 @@ const { entry } = Astro.props;
 const { book, readings } = entry;
 const { data } = book;
 
-const authors = data.authors.join(", ");
+const authors = bookAuthors(book);
 const cover = coverForIsbn(data.isbn);
 
 const facts = [
-  { term: "Author", description: authors },
+  authors
+    ? {
+        term: data.authors.length === 1 ? "Author" : "Authors",
+        description: authors,
+      }
+    : null,
   data.publisher ? { term: "Publisher", description: data.publisher } : null,
   data.publishedYear
     ? { term: "Edition", description: String(data.publishedYear) }
@@ -48,7 +54,11 @@ const facts = [
         </p>
       )
     }
-    <p class="mt-5 text-lg font-semibold text-accent-300">By {authors}</p>
+    {
+      authors && (
+        <p class="mt-5 text-lg font-semibold text-accent-300">By {authors}</p>
+      )
+    }
   </PageMasthead>
 
   <Container class="pt-12 pb-20 sm:pt-14 sm:pb-28">

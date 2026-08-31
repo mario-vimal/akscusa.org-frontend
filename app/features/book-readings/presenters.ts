@@ -8,11 +8,19 @@ import { entryHref, type EditorialEntry } from "~/features/editorial/sections";
 import { formatPacificDate, formatPacificTime } from "~/lib/dates";
 import type { Badge, Detail } from "~/features/editorial/presenters";
 import { topicLabel } from "~/features/editorial/taxonomy";
+import { bookAuthors } from "~/features/books/presenters";
 import { bookHref, type Book } from "~/features/books/queries/books";
 
 type Reading = EditorialEntry<"bookReadings">;
 
 const list = (values: readonly string[]) => values.join(", ");
+
+/** The book a session worked through, named as a detail line prints it. */
+const bookTitleAndAuthors = (book: Book) => {
+  const authors = bookAuthors(book);
+
+  return authors ? `${book.data.title} by ${authors}` : book.data.title;
+};
 
 const isUpcoming = (reading: Reading) =>
   reading.data.date.getTime() >= Date.now();
@@ -31,7 +39,7 @@ export function bookReadingDetails(reading: Reading, book?: Book): Detail[] {
   if (book) {
     details.push({
       term: "Book",
-      description: `${book.data.title} by ${list(book.data.authors)}`,
+      description: bookTitleAndAuthors(book),
       href: bookHref(book),
     });
     details.push({ term: "ISBN", description: book.data.isbn });
@@ -68,7 +76,8 @@ export interface BookReadingRow {
   dateKey: string;
   book?: {
     title: string;
-    authors: string;
+    /** Absent for a book whose entry names no author. */
+    authors?: string;
     href: string;
   };
   /**
@@ -101,7 +110,7 @@ export function bookReadingRows(
     } = reading.data;
     const dateLabel = formatPacificDate(date);
     const book = books.get(reading.id);
-    const authors = book ? list(book.data.authors) : undefined;
+    const authors = book ? bookAuthors(book) : undefined;
 
     // Searching covers what the row shows plus what it only implies, so a
     // reader can narrow by year, topic, author, or ISBN without every one of
@@ -127,10 +136,9 @@ export function bookReadingRows(
       dateTime: date.toISOString(),
       dateLabel,
       dateKey: date.toISOString(),
-      book:
-        book && authors
-          ? { title: book.data.title, authors, href: bookHref(book) }
-          : undefined,
+      book: book
+        ? { title: book.data.title, authors, href: bookHref(book) }
+        : undefined,
       readsArticles: !bookId,
       bookKey: book?.data.title.toLowerCase() ?? "",
       titleKey: title.toLowerCase(),

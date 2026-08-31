@@ -110,6 +110,40 @@ Body copy, which is not frontmatter.
     });
   });
 
+  it("writes a list as the block sequence Sveltia writes", () => {
+    const blank = entry.replace('authors:\n  - "Kancha Ilaiah"', "authors: []");
+
+    expect(
+      writeFrontmatterFields(blank, {
+        authors: ["Kancha Ilaiah Shepherd", "Gaddar"],
+      }),
+    ).toContain('authors:\n  - "Kancha Ilaiah Shepherd"\n  - "Gaddar"\nisbn:');
+  });
+
+  it("takes the old items with it when it replaces a list", () => {
+    const filled = writeFrontmatterFields(entry, { authors: ["Periyar"] });
+
+    expect(readFrontmatter(filled, "x.md").data.authors).toEqual(["Periyar"]);
+    expect(filled).not.toContain("Kancha Ilaiah");
+  });
+
+  it("puts a title the entry never stated at the top", () => {
+    const untitled = entry.replace('title: "Buffalo Nationalism"\n', "");
+
+    expect(
+      writeFrontmatterFields(untitled, { title: "Buffalo Nationalism" }),
+    ).toContain('---\ntitle: "Buffalo Nationalism"\nauthors:');
+  });
+
+  it("falls back to the nearest earlier field the entry does have", () => {
+    // `publisher` follows `isbn`, and `publishedYear` follows `publisher`,
+    // which is absent here; the year lands after the ISBN rather than at the
+    // end of the block.
+    expect(writeFrontmatterFields(entry, { publishedYear: 2004 })).toContain(
+      'isbn: "9788185604695"\npublishedYear: 2004\nsummary:',
+    );
+  });
+
   it("refuses a file with no frontmatter to write into", () => {
     expect(() =>
       writeFrontmatterFields("Just a body.", { publisher: "Sage" }),

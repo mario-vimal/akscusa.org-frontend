@@ -10,8 +10,11 @@
 
 import { parse } from "yaml";
 
-/** Values this module can write. Books hold no nested field worth filling. */
-export type Scalar = string | number;
+/**
+ * Values this module can write: a scalar, or a list of strings for `authors`.
+ * Books hold no field nested deeper than that worth filling.
+ */
+export type FieldValue = string | number | readonly string[];
 
 const DELIMITED = /^---\r?\n([\s\S]*?)\r?\n---/;
 
@@ -42,45 +45,82 @@ export function readFrontmatter(source: string, file: string): Frontmatter {
  * way. JSON's escaping is a subset of YAML's double-quoted style, which makes
  * a colon, a quote, or an accented character in a subtitle safe to write.
  */
-const formatValue = (value: Scalar) =>
+const formatScalar = (value: string | number) =>
   typeof value === "number" ? String(value) : JSON.stringify(value);
 
+/**
+ * A list is written as a block sequence indented two spaces, which is what
+ * Sveltia writes and what every entry on disk already looks like. An empty
+ * list is written inline, because a block sequence with no items is not YAML.
+ */
+function formatField(key: string, value: FieldValue): string[] {
+  if (typeof value === "string" || typeof value === "number") {
+    return [`${key}: ${formatScalar(value)}`];
+  }
+
+  return value.length === 0
+    ? [`${key}: []`]
+    : [`${key}:`, ...value.map((item) => `  - ${formatScalar(item)}`)];
+}
+
 /** Matches a top-level key, which is the only depth a book field lives at. */
-const keyLine = (key: string) => new RegExp(`^${key}:[^\\S\\n]*.*$`, "m");
+const keyLine = (key: string) => new RegExp(`^${key}:[^\\S\\n]*.*$`);
 
 /**
- * Where a newly written field belongs, named by the key it follows. The order
- * mirrors `app/schemas/books.ts`, so a filled entry reads as an editor would
- * have written it. A field whose anchor is absent goes to the end of the block,
- * which is correct rather than pretty.
+ * The order `app/schemas/books.ts` states these fields in. A field the entry
+ * does not have is written after the last field before it that the entry does
+ * have, so a filled entry reads as an editor would have written it, and a
+ * field with nothing before it — the title of an entry that never named one —
+ * goes to the top of the block.
  */
-const PRECEDING_KEY: Record<string, string> = {
-  subtitle: "title",
-  publisher: "isbn",
-  publishedYear: "publisher",
-  firstPublishedYear: "publishedYear",
-};
+const FIELD_ORDER: readonly string[] = [
+  "title",
+  "subtitle",
+  "authors",
+  "isbn",
+  "publisher",
+  "publishedYear",
+  "firstPublishedYear",
+  "summary",
+  "topics",
+  "resources",
+  "draft",
+];
 
-function insert(block: string, key: string, line: string): string {
-  const anchor = PRECEDING_KEY[key];
-  const match = anchor ? block.match(keyLine(anchor)) : null;
+/** Which line `key` is written on, or -1 when the entry does not have it. */
+const lineOf = (lines: readonly string[], key: string) =>
+  lines.findIndex((line) => keyLine(key).test(line));
 
-  if (!match || match.index === undefined) {
-    return `${block}\n${line}`;
+/**
+ * How many lines the field beginning at `at` occupies: its own, plus the
+ * indented lines a list or a folded string continues onto.
+ */
+function span(lines: readonly string[], at: number): number {
+  let end = at + 1;
+
+  while (end < lines.length && /^\s+\S/.test(lines[end])) {
+    end += 1;
   }
 
-  // A list or a folded value under the anchor continues onto indented lines,
-  // and the new field has to clear them or it lands inside the anchor's value.
-  const lines = block.split("\n");
-  const anchorLine = block.slice(0, match.index).split("\n").length - 1;
+  return end - at;
+}
 
-  let at = anchorLine + 1;
-  while (at < lines.length && /^(\s+\S|\s*$)/.test(lines[at])) {
-    at += 1;
+/** Where a field the entry does not have belongs. */
+function insertionPoint(lines: readonly string[], key: string): number {
+  const position = FIELD_ORDER.indexOf(key);
+  const before = position === -1 ? [] : FIELD_ORDER.slice(0, position);
+
+  for (const anchor of [...before].reverse()) {
+    const at = lineOf(lines, anchor);
+
+    if (at !== -1) {
+      return at + span(lines, at);
+    }
   }
 
-  lines.splice(at, 0, line);
-  return lines.join("\n");
+  // A field the schema does not name goes to the end, which is correct rather
+  // than pretty; one the schema puts first goes first.
+  return position === -1 ? lines.length : 0;
 }
 
 /**
@@ -93,7 +133,7 @@ function insert(block: string, key: string, line: string): string {
  */
 export function writeFrontmatterFields(
   source: string,
-  fields: Record<string, Scalar>,
+  fields: Record<string, FieldValue>,
 ): string {
   const match = source.match(DELIMITED);
 
@@ -101,16 +141,22 @@ export function writeFrontmatterFields(
     throw new Error("Cannot write fields into a file with no frontmatter.");
   }
 
-  let block = match[1];
+  const lines = match[1].split("\n");
 
   for (const [key, value] of Object.entries(fields)) {
-    const line = `${key}: ${formatValue(value)}`;
+    const written = formatField(key, value);
+    const at = lineOf(lines, key);
 
-    block = keyLine(key).test(block)
-      ? block.replace(keyLine(key), line)
-      : insert(block, key, line);
+    // Replacing takes the whole of the old value with it, so a list an editor
+    // left empty does not keep its items under the new ones.
+    if (at === -1) {
+      lines.splice(insertionPoint(lines, key), 0, ...written);
+    } else {
+      lines.splice(at, span(lines, at), ...written);
+    }
   }
 
+  const block = lines.join("\n");
   const rest = source.slice(match.index + match[0].length);
 
   return `${source.slice(0, match.index)}---\n${block}\n---${rest}`;
