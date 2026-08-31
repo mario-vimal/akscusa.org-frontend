@@ -2,9 +2,10 @@
  * Books and the sessions that read them.
  *
  * The two are defined together because they are joined here: a reading names
- * the edition it worked through by ISBN, and that is the only link between
- * them. Keeping them apart would put the two halves of one relationship in two
- * files.
+ * the book it worked through by the book's stable content-entry id (its
+ * slug), and that is the only link between them. The id survives an editor
+ * correcting the book's ISBN, which the ISBN itself cannot. Keeping them
+ * apart would put the two halves of one relationship in two files.
  */
 
 import { defineCollection } from "astro:content";
@@ -33,7 +34,11 @@ export const books = defineCollection({
     title: z.string(),
     subtitle: optionalCmsField(z.string()),
     authors: z.array(z.string()).min(1),
-    /** Identifies the edition the circle read, and links readings to it. */
+    /**
+     * Identifies the edition the circle read, for bibliographic lookup and
+     * cover naming. Correcting it does not affect a reading's link to this
+     * book, which is by this entry's stable id instead.
+     */
     isbn: isbn13,
     publisher: optionalCmsField(z.string()),
     /** Year of this edition, which for a reprint is not the year written. */
@@ -60,10 +65,12 @@ export const bookReadings = defineCollection({
     /** Where the session met, or how to join it when it is held online. */
     location: z.string(),
     /**
-     * The book the session worked through, referenced by ISBN. Left unset for
-     * a session built on a set of articles or papers rather than one book.
+     * The stable content-entry id (slug) of the book the session worked
+     * through. Left unset for a session built on a set of articles or papers
+     * rather than one book. Referencing the id rather than the ISBN means
+     * correcting a book's ISBN cannot break this link.
      */
-    isbn: optionalCmsField(isbn13),
+    book: optionalCmsField(z.string().min(1)),
     participants: optionalCmsList(z.array(z.string()).default([])),
     registrationUrl: optionalUrl,
     /** Anything else read for the session, such as a linked PDF. */

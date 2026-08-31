@@ -63,6 +63,7 @@ jobs:
         run: |
           if git diff --quiet; then
             echo "Nothing to add: every book already has its cover and details."
+            echo "**No commit made:** nothing changed on disk for this run." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
@@ -71,3 +72,4 @@ jobs:
           git add app/features/books/assets/covers cms/content/books
           git commit -m "Fetch book covers and details from Open Library"
           git push
+          echo "**Committed and pushed** the covers and details this run fetched." >> "$GITHUB_STEP_SUMMARY"

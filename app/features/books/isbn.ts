@@ -1,7 +1,8 @@
 /**
- * ISBN-13 is the key that links a reading to the book it worked through, so it
- * is normalized and check-digit validated at build time. A typo in an ISBN is
- * otherwise invisible: it would simply fail to resolve to a book.
+ * ISBN-13 identifies the edition a book entry names, so it is normalized and
+ * check-digit validated at build time. A typo in an ISBN is otherwise
+ * invisible, and it would be caught by nothing else, since a reading names its
+ * book by the book entry's stable id rather than by this field.
  */
 
 /** Strips the spaces and hyphens people naturally type into an ISBN. */

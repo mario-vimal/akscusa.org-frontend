@@ -182,8 +182,9 @@ export async function loadReading(): Promise<ReadingFeature | undefined> {
 export async function loadLatestBook(): Promise<BookFeature | undefined> {
   const [readings, booksByReading] = await Promise.all([
     loadEditorialEntries("bookReadings"),
-    // A reading resolves to a book only when its ISBN matches a published book,
-    // so the map is the honest source rather than the ISBN on the reading.
+    // A reading resolves to a book only when its stable id matches a
+    // published book, so the map is the honest source rather than any field
+    // stored on the reading itself.
     loadReadingBooks(),
   ]);
 
@@ -197,8 +198,9 @@ export async function loadLatestBook(): Promise<BookFeature | undefined> {
     href: bookHref(book),
     cover: coverForIsbn(book.data.isbn),
     readOn: latest.data.date,
-    sessions: readings.filter((entry) => entry.data.isbn === book.data.isbn)
-      .length,
+    sessions: readings.filter(
+      (entry) => booksByReading.get(entry.id)?.id === book.id,
+    ).length,
   };
 }
 

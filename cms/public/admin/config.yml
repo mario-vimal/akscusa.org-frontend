@@ -563,12 +563,12 @@ collections:
         label: Location
         widget: string
         hint: "Where the session met, or how to join it when it is held online."
-      - name: isbn
+      - name: book
         label: Book
         widget: relation
         required: false
         collection: books
-        value_field: isbn
+        value_field: "{{slug}}"
         search_fields: [title, isbn, authors.*]
         display_fields: [title, authors.*]
         hint: "Pick the book by title. Leave empty for a session built on articles or papers rather than one book."

@@ -3,6 +3,7 @@ import { getCollection, type CollectionEntry } from "astro:content";
 import { type EditorialEntry } from "~/features/editorial/sections";
 import { loadEditorialEntries } from "~/features/editorial/queries/entries";
 import { isPublished } from "~/lib/collections";
+import { checkUniqueIsbns, resolveReadings } from "./resolve";
 
 export type Book = CollectionEntry<"books">;
 export type Reading = EditorialEntry<"bookReadings">;
@@ -16,36 +17,19 @@ export interface BookWithReadings {
 const byTitle = (a: Book, b: Book) =>
   a.data.title.localeCompare(b.data.title, "en", { sensitivity: "base" });
 
-/**
- * Two books sharing an ISBN would make the link ambiguous, so that is caught
- * here rather than silently resolving to whichever loaded first. The clash is
- * checked across every book, drafts included, so drafting one cannot hide it.
- */
 async function loadBooks() {
   const all = (await getCollection("books")).sort(byTitle);
 
-  const seen = new Map<string, string>();
-  for (const book of all) {
-    const previous = seen.get(book.data.isbn);
-    if (previous) {
-      throw new Error(
-        `ISBN ${book.data.isbn} is used by both "${previous}" and "${book.id}". An ISBN must identify one book.`,
-      );
-    }
-    seen.set(book.data.isbn, book.id);
-  }
+  checkUniqueIsbns(all, (book) => book.data.isbn);
 
   return { all, published: all.filter(isPublished) };
 }
 
 /**
- * Resolves the ISBN on every reading in one pass.
- *
- * A reading pointing at an ISBN that no book claims is a broken link and fails
- * the build. A reading pointing at a book that is merely drafted is not: the
- * reading renders without its book, exactly as a reading with no ISBN does. A
- * draft is unfinished, not missing, and toggling one in the CMS must not take
- * down a build that succeeds locally, where drafts are visible.
+ * Resolves the book each reading names, by the book's stable content-entry
+ * id (its slug) rather than its ISBN. The id never changes when an editor
+ * corrects a book's ISBN, so fixing a typo in one cannot sever a reading's
+ * link to it.
  */
 async function resolve() {
   const [{ all, published }, readings] = await Promise.all([
@@ -53,38 +37,23 @@ async function resolve() {
     loadEditorialEntries("bookReadings"),
   ]);
 
-  const known = new Set(all.map((book) => book.data.isbn));
-  const byIsbn = new Map(published.map((book) => [book.data.isbn, book]));
-  const bookOfReading = new Map<string, Book>();
-  const readingsOfIsbn = new Map<string, Reading[]>();
+  const { bookOfReading, readingsOfBook } = resolveReadings(
+    all,
+    published,
+    readings,
+    (reading) => reading.data.book,
+  );
 
-  for (const reading of readings) {
-    const { isbn } = reading.data;
-    if (!isbn) continue;
-
-    if (!known.has(isbn)) {
-      throw new Error(
-        `Reading "${reading.id}" references ISBN ${isbn}, which has no entry in cms/content/books.`,
-      );
-    }
-
-    const book = byIsbn.get(isbn);
-    if (!book) continue;
-
-    bookOfReading.set(reading.id, book);
-    readingsOfIsbn.set(isbn, [...(readingsOfIsbn.get(isbn) ?? []), reading]);
-  }
-
-  return { books: published, readings, bookOfReading, readingsOfIsbn };
+  return { books: published, readings, bookOfReading, readingsOfBook };
 }
 
 /** Every book, each with the sessions that read it. Drives the books pages. */
 export async function loadBooksWithReadings(): Promise<BookWithReadings[]> {
-  const { books, readingsOfIsbn } = await resolve();
+  const { books, readingsOfBook } = await resolve();
 
   return books.map((book) => ({
     book,
-    readings: readingsOfIsbn.get(book.data.isbn) ?? [],
+    readings: readingsOfBook.get(book.id) ?? [],
   }));
 }
 

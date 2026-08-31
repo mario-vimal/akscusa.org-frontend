@@ -2,7 +2,7 @@
 title: "Riddles in Hinduism: Riddles 1 – 8"
 date: "2020-02-23T15:00:00-08:00"
 location: "Fremont, CA"
-isbn: "9788189059774"
+book: "riddles-in-hinduism"
 summary: "The reading circle opened Dr. Ambedkar's Riddles in Hinduism, working through Riddles 1 to 8."
 topics:
   - "ambedkar"

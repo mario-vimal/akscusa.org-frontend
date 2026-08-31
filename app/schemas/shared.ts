@@ -80,8 +80,10 @@ export const linkSchema = z.object({
   url: z.string(),
 });
 
-// ISBN-13 is the join key between a reading and a book, so it is normalized
-// and checked here rather than trusted. An invalid ISBN fails the build.
+// ISBN-13 identifies the edition a book entry names, so it is normalized and
+// checked here rather than trusted. An invalid ISBN fails the build. It is
+// bibliographic metadata rather than a relationship key: a reading names its
+// book by the book entry's stable id, not by this field.
 export const isbn13 = z
   .string()
   .transform(normalizeIsbn)

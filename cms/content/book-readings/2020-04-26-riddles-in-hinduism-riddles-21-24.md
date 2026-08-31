@@ -2,7 +2,7 @@
 title: "Riddles in Hinduism: Riddles 21 – 24"
 date: "2020-04-26T15:00:00-07:00"
 location: "Online on Zoom"
-isbn: "9788189059774"
+book: "riddles-in-hinduism"
 summary: "The reading circle closed its run through Riddles in Hinduism with Riddles 21 to 24, meeting online during the COVID-19 pandemic."
 topics:
   - "ambedkar"
