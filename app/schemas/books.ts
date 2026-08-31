@@ -11,12 +11,14 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
-import { editorialTopicIds } from "~/features/editorial/taxonomy";
 import {
   editorialBase,
   isbn13,
   linkSchema,
+  optionalCmsField,
+  optionalCmsList,
   optionalUrl,
+  topicsSchema,
 } from "~/schemas/shared";
 
 // Books are their own records because one book carries several readings. They
@@ -29,28 +31,18 @@ export const books = defineCollection({
   }),
   schema: z.object({
     title: z.string(),
-    subtitle: z.string().optional(),
+    subtitle: optionalCmsField(z.string()),
     authors: z.array(z.string()).min(1),
     /** Identifies the edition the circle read, and links readings to it. */
     isbn: isbn13,
-    publisher: z.string().optional(),
+    publisher: optionalCmsField(z.string()),
     /** Year of this edition, which for a reprint is not the year written. */
-    publishedYear: z
-      .number()
-      .int()
-      .nullable()
-      .optional()
-      .transform((value) => value ?? undefined),
+    publishedYear: optionalCmsField(z.number().int()),
     /** Year the text first appeared, kept for posthumous works. */
-    firstPublishedYear: z
-      .number()
-      .int()
-      .nullable()
-      .optional()
-      .transform((value) => value ?? undefined),
+    firstPublishedYear: optionalCmsField(z.number().int()),
     summary: z.string(),
-    topics: z.array(z.enum(editorialTopicIds)).default([]),
-    resources: z.array(linkSchema).default([]),
+    topics: topicsSchema,
+    resources: optionalCmsList(z.array(linkSchema).default([])),
     draft: z.boolean().default(false),
   }),
 });
@@ -71,13 +63,10 @@ export const bookReadings = defineCollection({
      * The book the session worked through, referenced by ISBN. Left unset for
      * a session built on a set of articles or papers rather than one book.
      */
-    isbn: z
-      .union([isbn13, z.literal("")])
-      .optional()
-      .transform((value) => value || undefined),
-    participants: z.array(z.string()).default([]),
+    isbn: optionalCmsField(isbn13),
+    participants: optionalCmsList(z.array(z.string()).default([])),
     registrationUrl: optionalUrl,
     /** Anything else read for the session, such as a linked PDF. */
-    resources: z.array(linkSchema).default([]),
+    resources: optionalCmsList(z.array(linkSchema).default([])),
   }),
 });
