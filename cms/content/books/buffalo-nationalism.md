@@ -3,7 +3,7 @@ title: Buffalo Nationalism
 subtitle: ''
 authors:
   - Kancha Ilaiah
-isbn: '9788185604695'
+isbn: '9789353282561'
 publisher: ''
 publishedYear: null
 firstPublishedYear: null
