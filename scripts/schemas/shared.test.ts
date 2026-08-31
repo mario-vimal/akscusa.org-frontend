@@ -1,0 +1,188 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
+import { parse } from "yaml";
+import { describe, expect, it } from "vitest";
+import { z } from "astro/zod";
+
+import {
+  editorialBase,
+  isbn13,
+  optionalCmsField,
+  optionalCmsList,
+  optionalRemoteImage,
+  optionalUrl,
+  remoteImageSchema,
+  topicsSchema,
+} from "~/schemas/shared";
+
+/**
+ * Sveltia writes an explicit YAML `null` for a `required: false` widget an
+ * editor leaves blank — not just an absent key — and a plain text widget
+ * sometimes writes `""` instead. `optionalCmsField` and `optionalCmsList` are
+ * the two places that normalize every such empty shape to `undefined`/`[]`,
+ * so this file exercises them directly against representative values rather
+ * than duplicating one test per collection field.
+ */
+
+describe("optionalCmsField", () => {
+  // One row per category of widget the CMS can leave blank: an object group
+  // (heroImage/portrait), a URL/email string, a plain string, a number, and a
+  // date. Each must accept Sveltia's empty shapes and keep rejecting a value
+  // that is genuinely invalid.
+  const cases = [
+    {
+      label: "object widget (image)",
+      schema: remoteImageSchema,
+      valid: { src: "https://example.com/a.jpg", alt: "A description" },
+      invalid: { src: "not-a-url", alt: "A description" },
+    },
+    {
+      label: "url widget",
+      schema: z.url(),
+      valid: "https://example.com",
+      invalid: "not a url",
+    },
+    {
+      label: "email widget",
+      schema: z.email(),
+      valid: "press@example.com",
+      invalid: "not an email",
+    },
+    {
+      label: "string widget",
+      schema: z.string().min(1),
+      valid: "San Jose, California",
+      invalid: 42,
+    },
+    {
+      label: "number widget",
+      schema: z.number().int().positive(),
+      valid: 2018,
+      invalid: -1,
+    },
+    {
+      label: "date widget",
+      schema: z.coerce.date(),
+      valid: "2026-01-01",
+      invalid: "not a date",
+    },
+    {
+      label: "isbn relation widget",
+      schema: isbn13,
+      valid: "9788185604695",
+      invalid: "not-an-isbn",
+    },
+  ] as const;
+
+  it.each(cases)(
+    "normalizes every empty shape of a $label to undefined",
+    ({ schema, valid }) => {
+      const optional = optionalCmsField(schema);
+
+      expect(optional.parse(null)).toBeUndefined();
+      expect(optional.parse(undefined)).toBeUndefined();
+      expect(optional.parse(valid)).toEqual(schema.parse(valid));
+    },
+  );
+
+  // Only a plain string widget can be blanked to `""` by Sveltia; a URL,
+  // email, number, and date widget never serialize their empty state that
+  // way, so `""` is left for the base schema to reject there.
+  it("also normalizes an empty string for a string widget", () => {
+    expect(optionalCmsField(z.string().min(1)).parse("")).toBeUndefined();
+  });
+
+  it.each(cases)(
+    "still rejects a genuinely invalid $label",
+    ({ schema, invalid }) => {
+      expect(() => optionalCmsField(schema).parse(invalid)).toThrow();
+    },
+  );
+});
+
+describe("optionalCmsList", () => {
+  const listSchema = z.array(z.string()).default([]);
+
+  it("normalizes an explicit null to an empty list", () => {
+    expect(optionalCmsList(listSchema).parse(null)).toEqual([]);
+  });
+
+  it("keeps the default for a missing key", () => {
+    expect(optionalCmsList(listSchema).parse(undefined)).toEqual([]);
+  });
+
+  it("keeps a filled list untouched", () => {
+    expect(optionalCmsList(listSchema).parse(["a", "b"])).toEqual(["a", "b"]);
+  });
+
+  it("still enforces item validation", () => {
+    const withRefine = z
+      .array(z.string())
+      .default([])
+      .refine((ids) => new Set(ids).size === ids.length, "no duplicates");
+
+    expect(() => optionalCmsList(withRefine).parse(["a", "a"])).toThrow();
+  });
+});
+
+describe("topicsSchema", () => {
+  it("normalizes null to an empty list, as Sveltia writes for an empty multi-select", () => {
+    expect(topicsSchema.parse(null)).toEqual([]);
+  });
+
+  it("still rejects a topic outside the taxonomy", () => {
+    expect(() => topicsSchema.parse(["not-a-real-topic"])).toThrow();
+  });
+});
+
+describe("editorialBase.heroImage", () => {
+  // The regression this file exists to prevent: Sveltia writes `heroImage:
+  // null` for a hero image an editor never fills in, and
+  // `remoteImageSchema.optional()` alone rejects it because `.optional()`
+  // accepts only `undefined`.
+  it("accepts an explicit null, as Sveltia writes for a blank hero image", () => {
+    expect(editorialBase.heroImage.parse(null)).toBeUndefined();
+  });
+
+  it("still requires both src and alt when a hero image is present", () => {
+    expect(() =>
+      editorialBase.heroImage.parse({ src: "https://x.test" }),
+    ).toThrow();
+  });
+});
+
+describe("the fixed book-readings regression entry", () => {
+  // Reads the actual frontmatter that broke the build (df7f56e, run
+  // 33434271406) and checks each optional field against the schema piece
+  // that now handles it, so this file fails again if the fix regresses.
+  const path = fileURLToPath(
+    new URL(
+      "../../cms/content/book-readings/2026-08-31-buffalo-nationalism-chapters-34-42.md",
+      import.meta.url,
+    ),
+  );
+  const source = readFileSync(path, "utf8");
+  const frontmatter = parse(/^---\n([\s\S]*?)\n---/.exec(source)![1]) as {
+    heroImage: unknown;
+    sourceUrl: unknown;
+    registrationUrl: unknown;
+    topics: unknown;
+  };
+
+  it("parses heroImage: null", () => {
+    expect(optionalRemoteImage.parse(frontmatter.heroImage)).toBeUndefined();
+  });
+
+  it("parses the blank sourceUrl and registrationUrl strings", () => {
+    expect(optionalUrl.parse(frontmatter.sourceUrl)).toBeUndefined();
+    expect(optionalUrl.parse(frontmatter.registrationUrl)).toBeUndefined();
+  });
+
+  it("parses the filled-in topics list", () => {
+    expect(topicsSchema.parse(frontmatter.topics)).toEqual([
+      "religion-and-culture",
+      "hindutva",
+    ]);
+  });
+});

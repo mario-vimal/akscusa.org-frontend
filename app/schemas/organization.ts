@@ -5,7 +5,7 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
 import { generalBodyPaperKindIds } from "~/features/editorial/taxonomy";
-import { optionalUrl } from "~/schemas/shared";
+import { optionalCmsField, optionalUrl } from "~/schemas/shared";
 
 // A General Body meeting, not a loose file. The meeting is the entity: it has
 // an edition, a date, and a place, and it publishes one or more papers. The 1st
@@ -48,7 +48,7 @@ export const generalBodyMeetings = defineCollection({
               "Must be a lowercase kebab-case PDF under /media/general-body/.",
             ),
           /** Printed beside the link, so the size of the download is known. */
-          pageCount: z.number().int().positive().optional(),
+          pageCount: optionalCmsField(z.number().int().positive()),
         }),
       )
       .min(1),
