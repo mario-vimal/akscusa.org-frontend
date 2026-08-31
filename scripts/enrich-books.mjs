@@ -3,11 +3,11 @@
  * Fills in what a book entry does not say, from its ISBN.
  *
  * Cover art is fetched from Open Library and stored under
- * `app/features/books/assets/covers/<isbn>.jpg`, and any of the optional
- * bibliographic fields left blank — subtitle, publisher, edition year, first
- * publication year — is written into the entry's frontmatter. A value an editor
- * typed is never replaced, and `summary` is never fetched: that sentence is
- * AKSC's own.
+ * `app/features/books/assets/covers/<isbn>.jpg`, and every bibliographic field
+ * left blank — title, subtitle, authors, publisher, edition year, first
+ * publication year — is written into the entry's frontmatter, so an ISBN is
+ * very nearly all an entry has to state. A value an editor typed is never
+ * replaced, and `summary` is never fetched: that sentence is AKSC's own.
  *
  * Both are committed, so Astro optimizes the cover at build time and the build
  * itself never calls a third party. `.github/workflows/enrich-books.yml` runs

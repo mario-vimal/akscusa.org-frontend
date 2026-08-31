@@ -482,9 +482,9 @@ collections:
     label_singular: Book
     icon: book_2
     description: >-
-      One record per book the circle reads, identified by ISBN. Give the title,
-      the authors, the ISBN and a summary; the cover art, subtitle, publisher
-      and years are fetched from the ISBN after you save, so you can leave them
+      One record per book the circle reads, identified by ISBN. Give the title
+      and the ISBN; the cover art, subtitle, authors, publisher and years are
+      fetched from the ISBN after you save, so you can leave every other field
       blank and nothing needs uploading here.
     folder: cms/content/books
     create: true
@@ -492,7 +492,10 @@ collections:
     sortable_fields: [title]
     summary: "{{title}} — {{isbn}}"
     fields:
-      - { name: title, label: Title, widget: string }
+      - name: title
+        label: Title
+        widget: string
+        hint: "Names the page's web address, which is fixed when you save, so it is the one thing worth typing yourself."
       - name: subtitle
         label: Subtitle
         widget: string
@@ -501,7 +504,9 @@ collections:
       - name: authors
         label: Authors
         widget: list
+        required: false
         field: { name: name, label: Name, widget: string }
+        hint: "Leave blank to take the authors listed for this ISBN."
       - name: isbn
         label: ISBN-13
         widget: string
@@ -531,7 +536,8 @@ collections:
       - name: summary
         label: Summary
         widget: text
-        hint: One or two sentences shown on the books index and in search results.
+        required: false
+        hint: "One or two sentences in AKSC's own words, shown on the books index. The only thing the ISBN cannot supply, so leave it blank rather than pasting the publisher's blurb, and write it when you have time."
       - name: topics
         label: Topics
         widget: select

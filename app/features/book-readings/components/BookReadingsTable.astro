@@ -126,9 +126,11 @@ const columns = [
                     >
                       <cite class="not-italic">{row.book.title}</cite>
                     </a>
-                    <span class="mt-1 block text-sm text-ambedkar-900/70">
-                      {row.book.authors}
-                    </span>
+                    {row.book.authors && (
+                      <span class="mt-1 block text-sm text-ambedkar-900/70">
+                        {row.book.authors}
+                      </span>
+                    )}
                   </>
                 ) : row.readsArticles ? (
                   <span class="text-sm text-ambedkar-900/70">

@@ -242,11 +242,12 @@ group and registrant depends on the ISBN range tables rather than fixed offsets,
 so the site does not invent hyphenation; the table search accepts an ISBN typed
 either way.
 
-A new book only needs a title, its authors, its ISBN, and the summary AKSC
-writes. The rest of the edition — cover art, subtitle, publisher, edition year,
-first publication year — is looked up from the ISBN on Open Library and
-committed, so Astro optimizes the cover at build time instead of the page
-depending on a third party at runtime:
+A new book only needs a title and its ISBN. The rest of the edition — cover
+art, subtitle, authors, publisher, edition year, first publication year — is
+looked up from the ISBN on Open Library and committed, so Astro optimizes the
+cover at build time instead of the page depending on a third party at runtime.
+The title is still asked for because it names the entry's file and so the
+page's URL, which is fixed the moment the entry is created:
 
 ```
 npm run enrich:books                        # fill in every blank field and missing cover
@@ -259,11 +260,18 @@ for a book and commits what it finds, so an editor who knows only the ISBN still
 gets a complete entry. The build itself never calls Open Library.
 
 A fetched value only ever fills a blank field; nothing an editor typed is
-replaced. `title`, `authors`, `isbn`, `topics`, `resources`, and `draft` are
-never touched, and neither is `summary`: a catalogue summary is the publisher's
-marketing copy, which is both the wrong voice for this site and not ours to
-copy. A free-text publication date yields a year only when it names exactly one,
-so a reprint cannot come to claim it was written the year it was reprinted.
+replaced. `isbn` is the question being asked, `topics`, `resources`, and `draft`
+are editorial judgement, and `summary` is deliberately never fetched: a
+catalogue summary is the publisher's marketing copy, which is both the wrong
+voice for this site and not ours to copy. The summary is optional for the same
+reason — an entry saved from its ISBN alone is written up in AKSC's own words
+afterwards, rather than an editor filling a required field with a blurb. A
+free-text publication date yields a year only when it names exactly one, so a
+reprint cannot come to claim it was written the year it was reprinted.
+
+A book that names no authors and a book with no summary yet both render: the
+byline and the summary paragraph are printed only when there is one, and the
+page's meta description falls back to the book and its authors.
 
 Covers land in `app/features/books/assets/covers/<isbn>.jpg`, are trimmed of the
 flat padding Open Library adds to some images, and are matched to a book by
