@@ -35,9 +35,19 @@ export const books = defineCollection({
     isbn: isbn13,
     publisher: z.string().optional(),
     /** Year of this edition, which for a reprint is not the year written. */
-    publishedYear: z.number().int().optional(),
+    publishedYear: z
+      .number()
+      .int()
+      .nullable()
+      .optional()
+      .transform((value) => value ?? undefined),
     /** Year the text first appeared, kept for posthumous works. */
-    firstPublishedYear: z.number().int().optional(),
+    firstPublishedYear: z
+      .number()
+      .int()
+      .nullable()
+      .optional()
+      .transform((value) => value ?? undefined),
     summary: z.string(),
     topics: z.array(z.enum(editorialTopicIds)).default([]),
     resources: z.array(linkSchema).default([]),
