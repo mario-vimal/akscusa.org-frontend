@@ -5,8 +5,6 @@ authors:
   - Periyar
 isbn: '9798190357936'
 publisher: ''
-publishedYear: null
-firstPublishedYear: null
 summary: |-
   Will rats be liberated because of cats? Will goats and cocks be liberated because of foxes? Will the wealth of Indians increase because of the British? Will the non-Brahmins attain equality because of the Brahmins? If one thinks over these questions, one can realize the truth.
 
