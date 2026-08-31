@@ -482,8 +482,10 @@ collections:
     label_singular: Book
     icon: book_2
     description: >-
-      One record per book the circle reads, identified by ISBN. Cover art is
-      fetched from Open Library by ISBN, so there is nothing to upload here.
+      One record per book the circle reads, identified by ISBN. Give the title,
+      the authors, the ISBN and a summary; the cover art, subtitle, publisher
+      and years are fetched from the ISBN after you save, so you can leave them
+      blank and nothing needs uploading here.
     folder: cms/content/books
     create: true
     slug: "{{slug}}"
@@ -491,7 +493,11 @@ collections:
     summary: "{{title}} — {{isbn}}"
     fields:
       - { name: title, label: Title, widget: string }
-      - { name: subtitle, label: Subtitle, widget: string, required: false }
+      - name: subtitle
+        label: Subtitle
+        widget: string
+        required: false
+        hint: "Leave blank to take the subtitle listed for this ISBN."
       - name: authors
         label: Authors
         widget: list
@@ -505,21 +511,23 @@ collections:
             "Enter the 13 digit ISBN of the edition read.",
           ]
         hint: "ISBN-13 of the edition the circle read. It links every reading to this book, so it must be correct."
-      - { name: publisher, label: Publisher, widget: string, required: false }
-      - {
-          name: publishedYear,
-          label: Edition year,
-          widget: number,
-          required: false,
-          value_type: int,
-        }
-      - {
-          name: firstPublishedYear,
-          label: First published,
-          widget: number,
-          required: false,
-          value_type: int,
-        }
+      - name: publisher
+        label: Publisher
+        widget: string
+        required: false
+        hint: "Leave blank to take the publisher listed for this ISBN."
+      - name: publishedYear
+        label: Edition year
+        widget: number
+        required: false
+        value_type: int
+        hint: "Year of this edition. Leave blank to take the year listed for this ISBN."
+      - name: firstPublishedYear
+        label: First published
+        widget: number
+        required: false
+        value_type: int
+        hint: "Year the text first appeared, which for a reprint is not the edition year. Leave blank to take the year listed for this ISBN."
       - name: summary
         label: Summary
         widget: text
