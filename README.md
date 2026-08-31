@@ -181,7 +181,7 @@ the fields its own kind of entry needs.
 | `interventions` | `cms/content/interventions`  | `/interventions`  | `kind`, `status`, `concludedDate`, `outcome`, `resources` |
 | `conferences`   | `cms/content/conferences`    | `/conferences`    | `edition`, `location`, `format`, speaker references       |
 | `programs`      | `cms/content/programs`       | `/programs`       | `kind`, `status`, `schedule`, `location`, `posters`       |
-| `bookReadings`  | `cms/content/book-readings`  | `/book-readings`  | `location`, `isbn`, `participants`, `registrationUrl`     |
+| `bookReadings`  | `cms/content/book-readings`  | `/book-readings`  | `location`, `book`, `participants`, `registrationUrl`     |
 
 `app/features/editorial/taxonomy.ts` is the single source of truth for every
 controlled vocabulary: shared `topics`, article categories, intervention kinds
@@ -213,22 +213,24 @@ draft, or misspelled references fail the build rather than silently dropping a
 speaker. Portraits are optional R2 URLs, so the same biography and image can be
 reused by future conferences without copying either.
 
-### Books, linked by ISBN
+### Books, linked by stable id
 
 `books` is another collection outside that base shape, because a book has no
 publication date of its own here and never appears in a dated index. It lives in
 `cms/content/books` and is served at `/books/` and `/books/<slug>/`.
 
 One book usually carries several readings, so the metadata is stored once and
-referenced. A reading names the edition it worked through in its `isbn` field,
-the CMS offers that as a relation to the books collection, and
-`app/features/books/queries/books.ts` resolves it at build time. Two checks keep
-the link honest and fail the build rather than degrading quietly:
+referenced. A reading names the book it worked through in its `book` field, by
+the book entry's stable content id (its slug) rather than its ISBN, the CMS
+offers that as a relation to the books collection, and
+`app/features/books/queries/books.ts` resolves it at build time. Referencing
+the slug rather than the ISBN means correcting a book's ISBN afterwards cannot
+sever every reading that names it. Two checks keep the link honest and fail
+the build rather than degrading quietly:
 
 - an ISBN-13 must pass its check digit, so a typo cannot slip through
-  (`app/features/books/isbn.ts`);
-- a reading may not reference an ISBN that no book entry claims, and no two
-  books may claim the same ISBN.
+  (`app/features/books/isbn.ts`), and no two books may claim the same ISBN;
+- a reading may not reference a book slug that no book entry claims.
 
 A book page lists every session that read it, and `/book-readings/` renders a
 sortable, searchable table whose Book column links back to the book. A reading
@@ -240,18 +242,53 @@ group and registrant depends on the ISBN range tables rather than fixed offsets,
 so the site does not invent hyphenation; the table search accepts an ISBN typed
 either way.
 
-Cover art is fetched by ISBN and committed, so Astro optimizes it at build time
-instead of the page depending on a third party at runtime:
+A new book only needs its ISBN. The title and the rest of the edition — cover
+art, subtitle, authors, publisher, edition year, first publication year — are
+looked up from the ISBN on Open Library and committed, so Astro optimizes the
+cover at build time instead of the page depending on a third party at runtime.
+An entry saved with no title is also renamed to the file that title names, so
+it reaches a readable URL rather than keeping the random id the CMS gives a
+file it has no title to name. Typing the title yourself is how you choose that
+URL, and it is the only reason to:
 
 ```
-npm run fetch:covers          # fetch any cover not already stored
-node scripts/fetch-book-covers.mjs --force   # refetch everything
+npm run enrich:books                        # fill in every blank field and missing cover
+node scripts/enrich-books.mjs --force       # refetch every cover
+node scripts/enrich-books.mjs --covers-only # covers only, leaving frontmatter alone
 ```
+
+`.github/workflows/enrich-books.yml` runs this on the pull request Sveltia opens
+for a book and commits what it finds, so an editor who knows only the ISBN still
+gets a complete entry. The build itself never calls Open Library.
+
+Only an entry that had no title of its own is renamed: the filename is the
+entry's id, so a title an editor typed chose that id and a catalogue does not
+overrule it later. The rename is refused, and reported, when another book
+already has that filename or a reading already names this entry, because a
+tidier URL is not worth breaking the link between a reading and its book. A
+book that reaches the build with no title fails it rather than publishing an
+empty heading, which is the case where Open Library had no record at all.
+
+A fetched value only ever fills a blank field; nothing an editor typed is
+replaced. `isbn` is the question being asked, `topics`, `resources`, and `draft`
+are editorial judgement, and `summary` is deliberately never fetched: a
+catalogue summary is the publisher's marketing copy, which is both the wrong
+voice for this site and not ours to copy. The summary is optional for the same
+reason — an entry saved from its ISBN alone is written up in AKSC's own words
+afterwards, rather than an editor filling a required field with a blurb. A
+free-text publication date yields a year only when it names exactly one, so a
+reprint cannot come to claim it was written the year it was reprinted.
+
+A book that names no authors and a book with no summary yet both render: the
+byline and the summary paragraph are printed only when there is one, and the
+page's meta description falls back to the book and its authors.
 
 Covers land in `app/features/books/assets/covers/<isbn>.jpg`, are trimmed of the
 flat padding Open Library adds to some images, and are matched to a book by
 filename. A book with no cover file renders without one, so nothing breaks when
-Open Library has nothing for an ISBN.
+Open Library has nothing for an ISBN; the run lists those books rather than
+failing. A cover already on disk is never refetched, so one committed by hand
+stands.
 
 ### Comics and toolkit scenarios, published as panels
 
@@ -316,7 +353,8 @@ them would fail every pull request the CMS opens.
 | `npm test`               | Run Vitest once                               |
 | `npm run generate-types` | Generate Cloudflare runtime binding types     |
 | `npm run verify:pages`   | Smoke-test `dist` through Wrangler Pages      |
-| `npm run fetch:covers`   | Fetch missing book covers from Open Library   |
+| `npm run enrich:books`   | Fetch book covers and details by ISBN         |
+| `npm run fetch:covers`   | Fetch missing book covers only                |
 | `npm run deploy:pages`   | Deploy `dist` with the Pages command          |
 | `npm run validate`       | Run all checks, build, and Pages verification |
 
@@ -453,6 +491,11 @@ validate`, and skips draft pull requests: the CMS opens one per saved entry, and
 validation waits until the entry leaves Draft and the request is marked ready
 for review. Set the `CMS_REPO` repository variable so that build matches the
 deployed one.
+
+The one other workflow is `.github/workflows/enrich-books.yml`, which fills in a
+new book's title, cover and bibliographic details from its ISBN and commits them
+to the branch. It is the only workflow with write access, and it refuses to run
+on a pull request from a fork.
 
 ## Figma
 

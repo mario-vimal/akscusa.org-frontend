@@ -21,8 +21,10 @@ import {
 import {
   editorialBase,
   linkSchema,
+  optionalCmsField,
+  optionalCmsList,
+  optionalRemoteImage,
   optionalUrl,
-  remoteImageSchema,
 } from "~/schemas/shared";
 
 export const articles = defineCollection({
@@ -33,14 +35,16 @@ export const articles = defineCollection({
   schema: z.object({
     ...editorialBase,
     category: z.enum(articleCategoryIds),
-    authors: z
-      .array(
-        z.object({
-          name: z.string(),
-          role: z.string().optional(),
-        }),
-      )
-      .default([]),
+    authors: optionalCmsList(
+      z
+        .array(
+          z.object({
+            name: z.string(),
+            role: optionalCmsField(z.string()),
+          }),
+        )
+        .default([]),
+    ),
   }),
 });
 
@@ -52,14 +56,11 @@ export const pressReleases = defineCollection({
   schema: z.object({
     ...editorialBase,
     /** Place of issue, printed ahead of the date in the classic release style. */
-    dateline: z.string().optional(),
+    dateline: optionalCmsField(z.string()),
     /** Every organisation the release is issued in the name of. */
     issuedBy: z.array(z.string()).min(1),
-    contactEmail: z
-      .union([z.email(), z.literal("")])
-      .optional()
-      .transform((value) => value || undefined),
-    attachments: z.array(linkSchema).default([]),
+    contactEmail: optionalCmsField(z.email()),
+    attachments: optionalCmsList(z.array(linkSchema).default([])),
   }),
 });
 
@@ -73,10 +74,10 @@ export const interventions = defineCollection({
     kind: z.enum(interventionKindIds),
     status: z.enum(interventionStatusIds),
     /** Set once the work is over, so a concluded entry can show a date range. */
-    concludedDate: z.coerce.date().optional(),
+    concludedDate: optionalCmsField(z.coerce.date()),
     /** What the intervention achieved, shown on concluded entries. */
-    outcome: z.string().optional(),
-    resources: z.array(linkSchema).default([]),
+    outcome: optionalCmsField(z.string()),
+    resources: optionalCmsList(z.array(linkSchema).default([])),
   }),
 });
 
@@ -88,28 +89,30 @@ export const conferences = defineCollection({
   schema: z.object({
     ...editorialBase,
     /** Which annual conference this is, counting from the first in 2018. */
-    edition: z.number().int().positive().optional(),
+    edition: optionalCmsField(z.number().int().positive()),
     /** Set only for a conference that runs over more than one day. */
-    endDate: z.coerce.date().optional(),
-    location: z.string().optional(),
+    endDate: optionalCmsField(z.coerce.date()),
+    location: optionalCmsField(z.string()),
     format: z.enum(conferenceFormatIds),
-    theme: z.string().optional(),
+    theme: optionalCmsField(z.string()),
     registrationUrl: optionalUrl,
-    speakers: z
-      .array(
-        z
-          .string()
-          .regex(
-            /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-            "Must be a lowercase kebab-case speaker slug.",
-          ),
-      )
-      .default([])
-      .refine(
-        (ids) => new Set(ids).size === ids.length,
-        "A conference cannot list the same speaker twice.",
-      ),
-    resources: z.array(linkSchema).default([]),
+    speakers: optionalCmsList(
+      z
+        .array(
+          z
+            .string()
+            .regex(
+              /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+              "Must be a lowercase kebab-case speaker slug.",
+            ),
+        )
+        .default([])
+        .refine(
+          (ids) => new Set(ids).size === ids.length,
+          "A conference cannot list the same speaker twice.",
+        ),
+    ),
+    resources: optionalCmsList(z.array(linkSchema).default([])),
   }),
 });
 
@@ -126,7 +129,7 @@ export const speakers = defineCollection({
     role: z.string(),
     /** Paragraphs are separated by blank lines in the CMS text field. */
     bio: z.string(),
-    portrait: remoteImageSchema.optional(),
+    portrait: optionalRemoteImage,
     sourceUrl: optionalUrl,
     draft: z.boolean().default(false),
   }),
@@ -145,23 +148,25 @@ export const programs = defineCollection({
     kind: z.enum(programKindIds),
     status: z.enum(programStatusIds),
     /** Time or range as published, retained separately from the calendar day. */
-    schedule: z.string().optional(),
-    location: z.string().optional(),
+    schedule: optionalCmsField(z.string()),
+    location: optionalCmsField(z.string()),
     registrationUrl: optionalUrl,
-    posters: z
-      .array(
-        z.object({
-          src: z
-            .string()
-            .regex(
-              /^\/media\/programs\/[a-z0-9-]+\.jpg$/,
-              "Must be a lowercase kebab-case JPG under /media/programs/.",
-            ),
-          alt: z.string().min(1),
-          caption: z.string().optional(),
-        }),
-      )
-      .default([]),
-    resources: z.array(linkSchema).default([]),
+    posters: optionalCmsList(
+      z
+        .array(
+          z.object({
+            src: z
+              .string()
+              .regex(
+                /^\/media\/programs\/[a-z0-9-]+\.jpg$/,
+                "Must be a lowercase kebab-case JPG under /media/programs/.",
+              ),
+            alt: z.string().min(1),
+            caption: optionalCmsField(z.string()),
+          }),
+        )
+        .default([]),
+    ),
+    resources: optionalCmsList(z.array(linkSchema).default([])),
   }),
 });

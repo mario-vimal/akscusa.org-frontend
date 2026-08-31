@@ -7,8 +7,8 @@ interface Props {
   href: string;
   title: string;
   subtitle?: string;
-  authors: string;
-  summary: string;
+  authors?: string;
+  summary?: string;
   isbn: string;
   publisher?: string;
   sessions: number;
@@ -57,9 +57,7 @@ const sessionLabel =
     }
 
     <div class="min-w-0">
-      <p class="label text-ambedkar-700">
-        {authors}
-      </p>
+      {authors && <p class="label text-ambedkar-700">{authors}</p>}
       <h2
         class="mt-2 font-display text-xl leading-[1.16] font-semibold tracking-title text-balance text-ambedkar-950"
       >
@@ -84,7 +82,7 @@ const sessionLabel =
     </div>
   </div>
 
-  <p class="mt-5 leading-7 text-ambedkar-900/75">{summary}</p>
+  {summary && <p class="mt-5 leading-7 text-ambedkar-900/75">{summary}</p>}
 
   <ul class="mt-4 space-y-1 text-sm text-ambedkar-900/70">
     <li class="wrap-break-word">ISBN {isbn}</li>

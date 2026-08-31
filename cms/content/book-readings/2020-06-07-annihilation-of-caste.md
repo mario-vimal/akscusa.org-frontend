@@ -2,7 +2,7 @@
 title: "Annihilation of Caste, continued"
 date: "2020-06-07T15:00:00-07:00"
 location: "Online on Zoom"
-isbn: "9788189059637"
+book: "annihilation-of-caste"
 summary: "A second session on Annihilation of Caste, carrying on the circle's reading of Dr. Ambedkar's 1936 address."
 topics:
   - "ambedkar"

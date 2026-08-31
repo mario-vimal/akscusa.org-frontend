@@ -1,6 +1,7 @@
 import type { ImageMetadata } from "astro";
 
 import { coverForIsbn } from "~/features/books/covers";
+import { bookAuthors } from "~/features/books/presenters";
 import { bookHref, loadReadingBooks } from "~/features/books/queries/books";
 import {
   loadComicsIndex,
@@ -13,7 +14,7 @@ import {
   type EditorialEntry,
 } from "~/features/editorial/sections";
 import { loadEditorialEntries } from "~/features/editorial/queries/entries";
-import { bySoonestFirst, isUpcoming } from "~/lib/collections";
+import { bySoonestFirst, isUpcoming, type Dated } from "~/lib/collections";
 
 /**
  * What the homepage puts in front of a first-time reader.
@@ -142,14 +143,31 @@ export async function loadSpotlight(): Promise<Spotlight | undefined> {
 /* The reading circle                                                         */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * The entry a dated section is currently on: the soonest one still to come,
+ * or the most recent one when nothing is scheduled.
+ *
+ * Not simply the newest, which is the trap here. A reading is published weeks
+ * before it is held, so the newest entry is normally one that has not happened
+ * yet, and anything that treats it as the latest thing done says the circle
+ * has read a book it has only announced. Entries arrive newest first, so the
+ * fallback is the first of them.
+ */
+const currentOf = <T extends Dated>(entries: readonly T[]): T | undefined =>
+  entries.filter(isUpcoming).sort(bySoonestFirst)[0] ?? entries[0];
+
 export interface BookFeature {
   title: string;
-  authors: string;
+  /** Absent for a book whose entry names no author. */
+  authors?: string;
   href: string;
   cover?: ImageMetadata;
-  /** The day the circle last sat with this book. */
-  readOn: Date;
-  /** How many sessions the circle has held on it. */
+  /**
+   * The day of the session this book is the book of: the next one when one is
+   * scheduled, otherwise the last one held.
+   */
+  sessionOn: Date;
+  /** How many sessions the circle has given it. */
   sessions: number;
 }
 
@@ -160,7 +178,7 @@ export interface ReadingFeature extends FeaturedRef {
 /**
  * The session the circle is holding next, or the last one it held.
  *
- * This and `loadLatestBook` are separate because they are not always the same
+ * This and `loadCurrentBook` are separate because they are not always the same
  * entry. A session can be a set of articles rather than a book, in which case
  * the newest session has no cover to show and the newest *book* is a different
  * record. Keeping them apart means the band can show a cover without pretending
@@ -168,8 +186,7 @@ export interface ReadingFeature extends FeaturedRef {
  */
 export async function loadReading(): Promise<ReadingFeature | undefined> {
   const readings = await loadEditorialEntries("bookReadings");
-  const reading =
-    readings.filter(isUpcoming).sort(bySoonestFirst)[0] ?? readings[0];
+  const reading = currentOf(readings);
   if (!reading) return undefined;
 
   return {
@@ -178,27 +195,40 @@ export async function loadReading(): Promise<ReadingFeature | undefined> {
   };
 }
 
-/** The most recent book the circle has read, with its cover. */
-export async function loadLatestBook(): Promise<BookFeature | undefined> {
+/**
+ * The book the circle is on: the one its next session works through, or the
+ * one its last session did when nothing is scheduled.
+ *
+ * This deliberately does not mean "the last book read". The newest session is
+ * usually one that has not happened yet — a reading is announced before it is
+ * held — so picking it and calling it read states as done a thing the circle
+ * has only planned. `currentOf` is the same rule `loadReading` uses, applied
+ * to the sessions that name a book.
+ */
+export async function loadCurrentBook(): Promise<BookFeature | undefined> {
   const [readings, booksByReading] = await Promise.all([
     loadEditorialEntries("bookReadings"),
-    // A reading resolves to a book only when its ISBN matches a published book,
-    // so the map is the honest source rather than the ISBN on the reading.
+    // A reading resolves to a book only when its stable id matches a
+    // published book, so the map is the honest source rather than any field
+    // stored on the reading itself.
     loadReadingBooks(),
   ]);
 
-  const latest = readings.find((entry) => booksByReading.has(entry.id));
-  const book = latest && booksByReading.get(latest.id);
-  if (!latest || !book) return undefined;
+  const session = currentOf(
+    readings.filter((entry) => booksByReading.has(entry.id)),
+  );
+  const book = session && booksByReading.get(session.id);
+  if (!session || !book) return undefined;
 
   return {
     title: book.data.title,
-    authors: book.data.authors.join(", "),
+    authors: bookAuthors(book),
     href: bookHref(book),
     cover: coverForIsbn(book.data.isbn),
-    readOn: latest.data.date,
-    sessions: readings.filter((entry) => entry.data.isbn === book.data.isbn)
-      .length,
+    sessionOn: session.data.date,
+    sessions: readings.filter(
+      (entry) => booksByReading.get(entry.id)?.id === book.id,
+    ).length,
   };
 }
 
@@ -283,7 +313,7 @@ export async function loadHomeFeatures(): Promise<HomeFeatures> {
     loadSpotlight(),
     loadWriting(),
     loadReading(),
-    loadLatestBook(),
+    loadCurrentBook(),
     loadComicsIndex(),
   ]);
 

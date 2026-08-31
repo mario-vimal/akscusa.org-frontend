@@ -4,8 +4,12 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
-import { editorialTopicIds } from "~/features/editorial/taxonomy";
-import { optionalUrl } from "~/schemas/shared";
+import {
+  optionalCmsField,
+  optionalCmsList,
+  optionalUrl,
+  topicsSchema,
+} from "~/schemas/shared";
 
 // Drawn work: a comic and a toolkit scenario are both a titled sequence of
 // panels, so they share one panel shape.
@@ -29,7 +33,7 @@ const panelSchema = (mediaFolder: string) =>
     /** Describes the drawing. The words in the panel go in `transcript`. */
     alt: z.string().min(1),
     /** Every word drawn inside the panel, in reading order. */
-    transcript: z.string().optional(),
+    transcript: optionalCmsField(z.string()),
   });
 
 // Artwork is credited, never anonymous. A comic drawn by somebody else is the
@@ -37,7 +41,7 @@ const panelSchema = (mediaFolder: string) =>
 const creditSchema = z.object({
   name: z.string(),
   /** For example "Art", "Script", or "Art and script". */
-  role: z.string().optional(),
+  role: optionalCmsField(z.string()),
   url: optionalUrl,
 });
 
@@ -55,10 +59,10 @@ export const comics = defineCollection({
     /** When the comic was published, used to order the index. */
     date: z.coerce.date(),
     summary: z.string(),
-    topics: z.array(z.enum(editorialTopicIds)).default([]),
+    topics: topicsSchema,
     credits: z.array(creditSchema).min(1),
     /** Warns a reader ahead of a comic that depicts violence or a slur. */
-    contentNote: z.string().optional(),
+    contentNote: optionalCmsField(z.string()),
     /**
      * In reading order. The first panel is the title panel, so it is also the
      * cover shown on the index; a comic never needs a separate hero image.
@@ -92,7 +96,7 @@ export const toolkitScenarios = defineCollection({
     /** The question put to the reader once they have read the scenario. */
     prompt: z.string(),
     panels: z.array(panelSchema("anti-caste-toolkit")).min(1),
-    credits: z.array(creditSchema).default([]),
+    credits: optionalCmsList(z.array(creditSchema).default([])),
     sourceUrl: optionalUrl,
     draft: z.boolean().default(false),
   }),

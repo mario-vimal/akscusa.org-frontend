@@ -2,6 +2,7 @@
 import type { GetStaticPaths } from "astro";
 
 import BookDetail from "~/features/books/components/BookDetail.astro";
+import { bookDescription } from "~/features/books/presenters";
 import { loadBooksWithReadings } from "~/features/books/queries/books";
 import SiteLayout from "~/layouts/SiteLayout.astro";
 
@@ -16,6 +17,9 @@ export const getStaticPaths = (async () => {
 const { entry } = Astro.props;
 ---
 
-<SiteLayout title={entry.book.data.title} description={entry.book.data.summary}>
+<SiteLayout
+  title={entry.book.data.title}
+  description={bookDescription(entry.book)}
+>
   <BookDetail entry={entry} />
 </SiteLayout>

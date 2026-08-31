@@ -2,8 +2,10 @@ import type { ImageMetadata } from "astro";
 
 /**
  * Cover art, keyed by the ISBN of the edition read. The files are fetched by
- * `scripts/fetch-book-covers.mjs` and committed, so Astro optimizes them at
- * build time rather than the page depending on a third party at runtime.
+ * `scripts/enrich-books.mjs` and committed, so Astro optimizes them at build
+ * time rather than the page depending on a third party at runtime. An edition
+ * Open Library does not hold is committed by hand under the same name; the
+ * script never refetches a cover already on disk.
  *
  * A book with no cover file simply renders without one.
  */

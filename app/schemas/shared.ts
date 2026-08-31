@@ -12,17 +12,47 @@ import { isValidIsbn13, normalizeIsbn } from "~/features/books/isbn";
 import { editorialTopicIds } from "~/features/editorial/taxonomy";
 
 // Structured records edited through the CMS, unlike the static copy above.
-// The CMS writes an empty string for an optional field left blank, so optional
-// URLs accept one and normalize it away rather than failing validation.
-export const optionalUrl = z
-  .union([z.url(), z.literal("")])
-  .optional()
-  .transform((value) => value || undefined);
+//
+// Sveltia writes an explicit YAML `null` for a scalar, object, or relation
+// widget an editor leaves blank on a `required: false` field — not just a
+// missing key — and for a plain text widget it sometimes writes `""` instead.
+// Zod's `.optional()` only accepts `undefined`, so every optional field a
+// Sveltia widget can produce needs to normalize its own empty shape here,
+// once, rather than fail validation the next time an editor leaves it blank.
+// This is what turned a valid `heroImage: null` into a build failure.
+export function optionalCmsField<Schema extends z.ZodTypeAny>(schema: Schema) {
+  return z.preprocess(
+    (value) => (value === null || value === "" ? undefined : value),
+    schema.optional(),
+  );
+}
+
+// A list/select widget an editor leaves empty is likewise sometimes written as
+// `null` rather than an absent key or `[]`. `schema` here is expected to
+// already carry its own `.default([])`, so a missing key keeps working exactly
+// as before; this only extends that default to cover the explicit `null`.
+export function optionalCmsList<Schema extends z.ZodTypeAny>(schema: Schema) {
+  return z.preprocess((value) => (value === null ? [] : value), schema);
+}
+
+export const optionalUrl = optionalCmsField(z.url());
 
 export const remoteImageSchema = z.object({
   src: z.url(),
   alt: z.string(),
 });
+
+// A hero image, portrait, or other optional image object is collapsed by
+// Sveltia to `null` as a whole when an editor never opens the group, rather
+// than sending an object with blank fields.
+export const optionalRemoteImage = optionalCmsField(remoteImageSchema);
+
+// Shared by every editorial-shaped collection that offers the multi-select
+// topics widget, and by books and comics, which offer the same widget outside
+// `editorialBase`.
+export const topicsSchema = optionalCmsList(
+  z.array(z.enum(editorialTopicIds)).default([]),
+);
 
 // Editorial records share one shape so the blog, press releases, interventions,
 // and conferences can be listed, sorted, and cross-referenced by the same code.
@@ -33,12 +63,12 @@ export const editorialBase = {
   date: z.coerce.date(),
   /** One or two sentences used on index cards and as the meta description. */
   summary: z.string(),
-  topics: z.array(z.enum(editorialTopicIds)).default([]),
+  topics: topicsSchema,
   /**
    * Absolute URL of a hero image. Editorial media lives outside Git, so this
    * points at the media host rather than a repository path.
    */
-  heroImage: remoteImageSchema.optional(),
+  heroImage: optionalRemoteImage,
   /** Where this entry was first published, kept so migrated copy is traceable. */
   sourceUrl: optionalUrl,
   featured: z.boolean().default(false),
@@ -50,8 +80,10 @@ export const linkSchema = z.object({
   url: z.string(),
 });
 
-// ISBN-13 is the join key between a reading and a book, so it is normalized
-// and checked here rather than trusted. An invalid ISBN fails the build.
+// ISBN-13 identifies the edition a book entry names, so it is normalized and
+// checked here rather than trusted. An invalid ISBN fails the build. It is
+// bibliographic metadata rather than a relationship key: a reading names its
+// book by the book entry's stable id, not by this field.
 export const isbn13 = z
   .string()
   .transform(normalizeIsbn)

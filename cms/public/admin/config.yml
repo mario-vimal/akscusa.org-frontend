@@ -482,20 +482,32 @@ collections:
     label_singular: Book
     icon: book_2
     description: >-
-      One record per book the circle reads, identified by ISBN. Cover art is
-      fetched from Open Library by ISBN, so there is nothing to upload here.
+      One record per book the circle reads, identified by ISBN. The ISBN is the
+      only field you have to fill: the title, cover art, subtitle, authors,
+      publisher and years are all fetched from it after you save, and nothing
+      needs uploading here.
     folder: cms/content/books
     create: true
     slug: "{{slug}}"
     sortable_fields: [title]
     summary: "{{title}} — {{isbn}}"
     fields:
-      - { name: title, label: Title, widget: string }
-      - { name: subtitle, label: Subtitle, widget: string, required: false }
+      - name: title
+        label: Title
+        widget: string
+        required: false
+        hint: "Leave blank to take the title listed for this ISBN. The page's web address is named from the title either way, so type it here if you want to choose that address yourself."
+      - name: subtitle
+        label: Subtitle
+        widget: string
+        required: false
+        hint: "Leave blank to take the subtitle listed for this ISBN."
       - name: authors
         label: Authors
         widget: list
+        required: false
         field: { name: name, label: Name, widget: string }
+        hint: "Leave blank to take the authors listed for this ISBN."
       - name: isbn
         label: ISBN-13
         widget: string
@@ -505,25 +517,28 @@ collections:
             "Enter the 13 digit ISBN of the edition read.",
           ]
         hint: "ISBN-13 of the edition the circle read. It links every reading to this book, so it must be correct."
-      - { name: publisher, label: Publisher, widget: string, required: false }
-      - {
-          name: publishedYear,
-          label: Edition year,
-          widget: number,
-          required: false,
-          value_type: int,
-        }
-      - {
-          name: firstPublishedYear,
-          label: First published,
-          widget: number,
-          required: false,
-          value_type: int,
-        }
+      - name: publisher
+        label: Publisher
+        widget: string
+        required: false
+        hint: "Leave blank to take the publisher listed for this ISBN."
+      - name: publishedYear
+        label: Edition year
+        widget: number
+        required: false
+        value_type: int
+        hint: "Year of this edition. Leave blank to take the year listed for this ISBN."
+      - name: firstPublishedYear
+        label: First published
+        widget: number
+        required: false
+        value_type: int
+        hint: "Year the text first appeared, which for a reprint is not the edition year. Leave blank to take the year listed for this ISBN."
       - name: summary
         label: Summary
         widget: text
-        hint: One or two sentences shown on the books index and in search results.
+        required: false
+        hint: "One or two sentences in AKSC's own words, shown on the books index. The only thing the ISBN cannot supply, so leave it blank rather than pasting the publisher's blurb, and write it when you have time."
       - name: topics
         label: Topics
         widget: select
@@ -555,12 +570,12 @@ collections:
         label: Location
         widget: string
         hint: "Where the session met, or how to join it when it is held online."
-      - name: isbn
+      - name: book
         label: Book
         widget: relation
         required: false
         collection: books
-        value_field: isbn
+        value_field: "{{slug}}"
         search_fields: [title, isbn, authors.*]
         display_fields: [title, authors.*]
         hint: "Pick the book by title. Leave empty for a session built on articles or papers rather than one book."

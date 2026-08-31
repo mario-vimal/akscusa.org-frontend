@@ -118,23 +118,34 @@ const { lead, more, reading, book, recent } = Astro.props;
                   )}
                   <div class="min-w-0">
                     <p class="label label-sm text-ambedkar-900/70">
-                      Latest book read
+                      Current book
                     </p>
                     <h3 class="mt-2 font-display text-xl leading-[1.16] font-bold tracking-title text-balance text-ambedkar-950">
                       <a class="link-underline" href={book.href}>
                         {book.title}
                       </a>
                     </h3>
-                    <p class="mt-2 font-serif text-base leading-6 text-ambedkar-900/80 italic">
-                      {book.authors}
-                    </p>
+                    {book.authors && (
+                      <p class="mt-2 font-serif text-base leading-6 text-ambedkar-900/80 italic">
+                        {book.authors}
+                      </p>
+                    )}
+                    {/*
+                      Stated without tense, and dated, because this page is
+                      built once and then stands. "Latest book read" and "read
+                      over three sessions" were both false the moment the
+                      circle announced a session it had not yet held, and a
+                      label that toggles on the build date would go on to
+                      falsify itself the day that session passed. A count and a
+                      date can only be overtaken by a new reading, which is a
+                      rebuild.
+                    */}
                     <p class="mt-3 text-sm leading-6 text-ambedkar-900/70">
-                      {book.sessions > 1
-                        ? `Read over ${book.sessions} sessions`
-                        : "Read in one session"}
+                      {book.sessions}{" "}
+                      {book.sessions === 1 ? "session" : "sessions"}
                       <span> · </span>
-                      <time datetime={isoDate(book.readOn)}>
-                        {formatDate(book.readOn)}
+                      <time datetime={isoDate(book.sessionOn)}>
+                        {formatDate(book.sessionOn)}
                       </time>
                     </p>
                   </div>
