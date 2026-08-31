@@ -1,11 +1,11 @@
 ---
 title: Buffalo Nationalism
-subtitle: ''
+subtitle: "A Critique of Spiritual Fascism"
 authors:
   - Kancha Ilaiah
-isbn: '9788185604695'
-publisher: ''
-publishedYear: null
+isbn: '9789353282561'
+publisher: "SAGE Publications, Incorporated"
+publishedYear: 2019
 firstPublishedYear: null
 summary: |-
   ‘O Mother Lachumamma, your blouse is torn,
