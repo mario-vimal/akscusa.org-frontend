@@ -20,7 +20,15 @@ const canonicalUrl = Astro.site
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <!--
+      `initial-scale=1` is what stops iOS Safari rescaling the whole document.
+      Without it Safari is free to pick the initial scale, and it picks one that
+      fits the widest thing on the page: a single overflowing element then
+      shrinks every other page to a quarter size rather than just scrolling
+      sideways. Pinning the scale keeps overflow a local bug. `maximum-scale`
+      and `user-scalable` are deliberately absent so pinch zoom still works.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />

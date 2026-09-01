@@ -45,47 +45,77 @@ const hasAbove = Astro.slots.has("above");
 
 /*
  * Whether the photograph is taller than it is wide, worked out from the file
- * rather than asked of the caller. It decides only how much of the band an
- * upright picture may take from `lg`.
+ * rather than asked of the caller. It decides which edge of the band the
+ * picture is hung from, and how much of the band it may take from `lg`.
  */
 const isUpright = backgroundImage
   ? backgroundImage.height / backgroundImage.width > 1.1
   : false;
 
 /*
- * The picture keeps its own proportions at every width: full height, automatic
- * width, flush to the right edge of the band.
+ * The picture keeps its own proportions at every width, so it is never enlarged
+ * to fill a shape it does not have. Which edge it hangs from depends on which
+ * way round it is, because a phone band is taller than it is wide and a desktop
+ * band is much wider than it is tall.
  *
- * Stretching it across the band with `object-cover` meant the band enlarged the
- * picture until it filled a shape the picture does not have, which on a phone
- * showed a mouth or a single eye blown up across the screen. No amount of
- * `object-position` fixes that, because the mismatch is the aspect ratio and
- * not the framing.
+ * An upright picture hangs from the right at full height. It is narrower than
+ * the band, so the ink carries the rest.
  *
- * Full height with an automatic width never enlarges past the band, so nothing
- * is zoomed. An upright picture ends up occupying the right third or so and the
- * ink carries the rest; a landscape one is wider than the band and loses its
- * left edge, which is where the reading column sits anyway. From `lg` it is
- * held to roughly half the band so the text column stays clear of it. It fades
- * out at its left edge so the picture joins the panel rather than sitting on it
- * as a pasted rectangle.
+ * A landscape picture hangs from the bottom at full width below `md`. Giving it
+ * full height there instead — the shape of the band, not the shape of the
+ * picture — meant a 3:2 photograph was scaled until only the middle half of it
+ * was left on screen, which is a sculpture reduced to an unreadable slab. Full
+ * width shows the whole picture at the foot of the band and lets the type sit
+ * on the ink above it. From `md` the band is wide enough that the same picture
+ * hangs from the right at full height, and from `lg` it is held to roughly half
+ * the width so the reading column stays clear of it.
+ *
+ * `max-w-none` matters below the width cap: clamping an element to the band is
+ * what reintroduces a crop, because the element then stops matching the picture
+ * and the object fit makes up the difference. Where a cap is deliberate it can
+ * only bite by a few per cent, so a right-hung picture covers and loses a sliver
+ * of the edge the mask is already fading. The bottom-hung one contains instead,
+ * because there is no cap on it and nothing to hide a horizontal seam.
+ *
+ * Each fades out along the edge it enters from, so the picture joins the panel
+ * rather than sitting on it as a pasted rectangle.
  */
-const backgroundClasses = [
-  "absolute inset-y-0 right-0 -z-30 h-full w-auto max-w-full object-cover object-center duotone",
-  "[mask-image:linear-gradient(to_right,transparent_0%,black_34%)]",
-  isUpright ? "lg:max-w-[46%]" : "lg:max-w-[58%]",
-].join(" ");
+const backgroundClasses = (
+  isUpright
+    ? [
+        "absolute inset-y-0 right-0 -z-30 h-full w-auto max-w-none object-cover object-right duotone",
+        "[mask-image:linear-gradient(to_right,transparent_0%,black_34%)]",
+        "lg:max-w-[46%]",
+      ]
+    : [
+        "absolute inset-x-0 bottom-0 -z-30 h-auto w-full object-contain object-bottom duotone",
+        "[mask-image:linear-gradient(to_top,black_58%,transparent_100%)]",
+        "md:inset-y-0 md:right-0 md:left-auto md:h-full md:w-auto md:max-w-none md:object-cover md:object-right",
+        "md:[mask-image:linear-gradient(to_right,transparent_0%,black_34%)]",
+        "lg:max-w-[58%]",
+      ]
+).join(" ");
 
 /*
- * One scrim for both. It is heavy everywhere below `lg`, where the band is
- * narrow enough that the text runs across the picture, and thins out to the
- * right from `lg`, where the picture has moved off the reading column and has
- * to stay legible.
+ * The scrim follows the picture, so it turns at the same width the picture
+ * does. While an upright picture is on the right and a landscape one is at the
+ * foot of the band, the ramp runs across for the first and down for the second;
+ * the down ramp lets go near the bottom, where only the credit sits and it
+ * carries its own text shadow. Keeping the horizontal ramp there buried the
+ * picture in ink.
+ *
+ * Once a picture has moved to the right of a wide band, off the reading column,
+ * one ramp thinning to the right serves it.
  */
 const scrimClasses = [
-  "absolute inset-0 -z-10 bg-linear-to-r",
-  "from-ambedkar-1000/96 via-ambedkar-950/88 to-ambedkar-950/78",
-  "lg:from-ambedkar-1000/95 lg:from-30% lg:via-ambedkar-950/70 lg:to-ambedkar-950/25",
+  "absolute inset-0 -z-10",
+  isUpright
+    ? "bg-linear-to-r from-ambedkar-1000/96 via-ambedkar-950/88 to-ambedkar-950/78"
+    : [
+        "bg-linear-to-b from-ambedkar-1000/94 via-ambedkar-950/82 via-60% to-ambedkar-950/50",
+        "md:bg-linear-to-r md:from-ambedkar-1000/96 md:via-ambedkar-950/88 md:via-50% md:to-ambedkar-950/60",
+      ].join(" "),
+  "lg:bg-linear-to-r lg:from-ambedkar-1000/95 lg:from-30% lg:via-ambedkar-950/70 lg:via-50% lg:to-ambedkar-950/38",
 ].join(" ");
 ---
 
@@ -116,7 +146,7 @@ const scrimClasses = [
           sizes={
             isUpright
               ? "(min-width: 1024px) 46vw, 100vw"
-              : "(min-width: 1024px) 58vw, 100vw"
+              : "(min-width: 1024px) 58vw, (min-width: 768px) 80vw, 100vw"
           }
           widths={[640, 960, 1280, 1600]}
         />
@@ -192,37 +222,49 @@ const scrimClasses = [
     </div>
 
     <slot />
-  </Container>
 
-  {
-    backgroundImage && (backgroundLabel || backgroundCredit) && (
-      <div class="absolute right-4 bottom-4 max-w-[calc(100%-2rem)] text-right sm:right-6 sm:bottom-5">
-        {backgroundLabel && (
-          <p class="font-display text-[0.625rem] font-semibold tracking-[0.12em] text-white/65 uppercase [text-shadow:0_1px_4px_var(--color-ambedkar-1000)]">
-            Pictured: {backgroundLabel}
-          </p>
-        )}
-        {backgroundCredit && (
-          <p class="mt-1 text-[0.6875rem] leading-4 text-white/55 [text-shadow:0_1px_4px_var(--color-ambedkar-1000)]">
-            Image:{" "}
-            <a
-              class="underline decoration-white/25 underline-offset-2 hover:text-white"
-              href={backgroundCredit.sourceHref}
-            >
-              {backgroundCredit.creator}
-            </a>{" "}
-            ·{" "}
-            <a
-              class="underline decoration-white/25 underline-offset-2 hover:text-white"
-              href={backgroundCredit.licenseHref}
-              rel="license"
-            >
-              {backgroundCredit.license}
-            </a>{" "}
-            · cropped and recolored
-          </p>
-        )}
-      </div>
-    )
-  }
+    {
+      /*
+      The attribution a Creative Commons photograph requires. It is pinned to
+      the corner of the panel from `sm`, where there is room for it beside the
+      reading column.
+
+      Below that it stays in the flow, under the content it belongs to. Pinning
+      it on a phone put a three-line credit on top of the masthead's own meta
+      line, because an absolute box cannot know how tall the text above it has
+      wrapped to; the two simply printed over each other.
+    */
+    }
+    {
+      backgroundImage && (backgroundLabel || backgroundCredit) && (
+        <div class="mt-10 sm:absolute sm:right-6 sm:bottom-5 sm:mt-0 sm:max-w-[calc(100%-3rem)] sm:text-right">
+          {backgroundLabel && (
+            <p class="font-display text-[0.625rem] font-semibold tracking-[0.12em] text-white/90 uppercase [text-shadow:0_1px_4px_var(--color-ambedkar-1000)]">
+              Pictured: {backgroundLabel}
+            </p>
+          )}
+          {backgroundCredit && (
+            <p class="mt-1 text-[0.6875rem] leading-4 text-white/85 [text-shadow:0_1px_4px_var(--color-ambedkar-1000)]">
+              Image:{" "}
+              <a
+                class="underline decoration-white/25 underline-offset-2 hover:text-white"
+                href={backgroundCredit.sourceHref}
+              >
+                {backgroundCredit.creator}
+              </a>{" "}
+              ·{" "}
+              <a
+                class="underline decoration-white/25 underline-offset-2 hover:text-white"
+                href={backgroundCredit.licenseHref}
+                rel="license"
+              >
+                {backgroundCredit.license}
+              </a>{" "}
+              · cropped and recolored
+            </p>
+          )}
+        </div>
+      )
+    }
+  </Container>
 </div>
