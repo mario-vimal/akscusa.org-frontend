@@ -24,6 +24,24 @@
     margin-top: 0;
   }
 
+  /*
+   * The lede. An entry used to open at exactly the size it closed at, so the
+   * masthead's summary was followed by a wall of even grey text with nothing to
+   * step down from. Setting the opening paragraph one size up and at full ink
+   * strength gives a piece a way in, which is what a lede is for, and it costs
+   * the editor nothing: the first paragraph of the Markdown is already the
+   * opening of the argument.
+   *
+   * Scoped to a paragraph that genuinely opens the entry. Some entries begin on
+   * a heading or a figure, and enlarging the paragraph after those would put
+   * the emphasis in the middle of the piece rather than at its start.
+   */
+  .prose-editorial :global(> p:first-child) {
+    font-size: 1.3125rem;
+    line-height: 1.6;
+    color: var(--color-ambedkar-950);
+  }
+
   .prose-editorial :global(p),
   .prose-editorial :global(ul),
   .prose-editorial :global(ol) {

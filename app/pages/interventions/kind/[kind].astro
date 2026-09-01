@@ -3,8 +3,12 @@ import type { GetStaticPaths } from "astro";
 
 import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
 import EntryCard from "~/features/editorial/components/EntryCard.astro";
+import EntryLead from "~/features/editorial/components/EntryLead.astro";
 import { editorialSections, entryHref } from "~/features/editorial/sections";
-import { groupByTerm } from "~/features/editorial/queries/entries";
+import {
+  groupByTerm,
+  splitLeadEntry,
+} from "~/features/editorial/queries/entries";
 import {
   interventionBadge,
   interventionEyebrow,
@@ -34,6 +38,7 @@ const {
 } = Astro.props;
 const section = editorialSections.interventions;
 const title = `${kind.label} — ${section.title}`;
+const { lead, rest } = splitLeadEntry(interventions);
 ---
 
 <SiteLayout title={title} description={kind.description}>
@@ -42,11 +47,28 @@ const title = `${kind.label} — ${section.title}`;
     title={kind.label}
     description={kind.description}
     count={`${interventions.length} ${interventions.length === 1 ? "intervention" : "interventions"}`}
+    itemCount={rest.length}
     filters={interventionFilters(allInterventions, kind.id)}
     filtersLabel="Filter interventions by kind"
+    listLabel="Earlier interventions"
   >
     {
-      interventions.map((intervention) => (
+      lead && (
+        <EntryLead
+          slot="lead"
+          label="Latest intervention"
+          href={entryHref("interventions", lead.id)}
+          title={lead.data.title}
+          summary={lead.data.summary}
+          eyebrow={interventionEyebrow(lead)}
+          badge={interventionBadge(lead)}
+          meta={interventionMeta(lead)}
+          topics={lead.data.topics}
+        />
+      )
+    }
+    {
+      rest.map((intervention) => (
         <li>
           <EntryCard
             href={entryHref("interventions", intervention.id)}

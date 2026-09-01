@@ -1,9 +1,13 @@
 ---
 import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
 import EntryCard from "~/features/editorial/components/EntryCard.astro";
+import EntryLead from "~/features/editorial/components/EntryLead.astro";
 import conferenceAudience from "~/features/conferences/assets/conference-audience-6vajp0pscx0.jpg";
 import { editorialSections, entryHref } from "~/features/editorial/sections";
-import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import {
+  loadEditorialEntries,
+  splitLeadEntry,
+} from "~/features/editorial/queries/entries";
 import { formatDateRange } from "~/lib/dates";
 import {
   conferenceBadge,
@@ -12,6 +16,7 @@ import {
 
 const section = editorialSections.conferences;
 const conferences = await loadEditorialEntries("conferences");
+const { lead, rest } = splitLeadEntry(conferences);
 ---
 
 <EditorialIndex
@@ -21,10 +26,27 @@ const conferences = await loadEditorialEntries("conferences");
   count={`${conferences.length} ${conferences.length === 1 ? "conference" : "conferences"}`}
   empty={section.empty}
   isEmpty={conferences.length === 0}
+  itemCount={rest.length}
+  listLabel="Earlier conferences"
   backgroundImage={conferenceAudience}
 >
   {
-    conferences.map((conference) => (
+    lead && (
+      <EntryLead
+        slot="lead"
+        label="Most recent conference"
+        href={entryHref("conferences", lead.id)}
+        title={lead.data.title}
+        summary={lead.data.summary}
+        eyebrow={formatDateRange(lead.data.date, lead.data.endDate)}
+        badge={conferenceBadge(lead)}
+        meta={conferenceMeta(lead)}
+        topics={lead.data.topics}
+      />
+    )
+  }
+  {
+    rest.map((conference) => (
       <li>
         <EntryCard
           href={entryHref("conferences", conference.id)}

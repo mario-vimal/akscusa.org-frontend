@@ -22,7 +22,7 @@ const { quotes } = Astro.props;
   <div class="absolute inset-0 -z-10 grain opacity-[0.035]" aria-hidden="true">
   </div>
 
-  <Container class="py-20 sm:py-28">
+  <Container class="py-16 sm:py-24">
     <div class="reveal section-head border-white/20">
       <p class="eyebrow eyebrow-light">Revolutionary voices</p>
 
@@ -133,12 +133,20 @@ const { quotes } = Astro.props;
               aria-label={`${index + 1} of ${quotes.length}`}
               data-carousel-slide
             >
-              <figure class="flex min-h-72 flex-col justify-between sm:min-h-80">
+              {/*
+                  Every slide is as tall as the longest quotation, because they
+                  share one flex row. Aligned to the bottom of that row rather
+                  than the top, a short quotation reads as air above the words
+                  instead of a hole beneath them, and the citation lands in the
+                  same place on every slide, so paging through them does not
+                  make the band jump.
+                */}
+              <figure class="flex h-full flex-col justify-end">
                 <blockquote class="max-w-5xl font-serif text-[1.75rem] leading-[1.18] font-normal tracking-[-0.02em] text-balance text-white sm:text-[2.5rem] lg:text-[3.25rem]">
                   {quote.text}
                 </blockquote>
 
-                <figcaption class="mt-10 border-t border-white/20 pt-4">
+                <figcaption class="mt-8 border-t border-white/20 pt-4 sm:mt-10">
                   <p class="font-display text-xs font-semibold tracking-[0.16em] text-accent-300 uppercase">
                     {quote.author}
                   </p>

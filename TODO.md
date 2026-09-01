@@ -4,17 +4,11 @@ Work that is agreed but not yet done. Delete a row once it ships.
 
 ## System pages
 
-The site currently falls through to Astro's and Cloudflare's own error pages,
-which carry neither the masthead, the helpline strip, nor the footer. A reader
-who mistypes a URL or arrives from a dead inbound link is shown a page that
-does not look like AKSC and offers them nowhere to go.
+The site falls through to Astro's and Cloudflare's own error pages for
+everything below, which carry neither the masthead, the helpline strip, nor the
+footer. A reader who mistypes a URL or arrives from a dead inbound link is shown
+a page that does not look like AKSC and offers them nowhere to go.
 
-- [ ] **404 — Not found.** `app/pages/404.astro`, rendered in `SiteLayout` so
-      the header, helpline strip, and footer are all present. Say plainly that
-      the page is gone or was never there, and route the reader on: the
-      sections under Actions, the blog, and the search their browser did not
-      give them. Cloudflare Pages serves `dist/404.html` automatically for a
-      static build, so no route configuration is needed.
 - [ ] **500 — Something went wrong.** Only reachable once a page renders on
       the server, which the site does not do yet. Add it with the first D1
       backed route, not before.

@@ -1,0 +1,90 @@
+---
+/**
+ * Not found.
+ *
+ * The site fell through to Astro's and Cloudflare's own error pages, which
+ * carry neither the masthead, the helpline strip, nor the footer: a reader who
+ * mistyped an address, or followed one of the many links still pointing at the
+ * WordPress and Squarespace sites AKSC is migrating off, was shown a page that
+ * did not look like AKSC and offered them nowhere to go.
+ *
+ * It is `SectionLanding` rather than a layout of its own. A 404 is a page that
+ * names a problem and then hands over a list of places to go, which is the
+ * shape that component already has, and reusing it means the routes out of a
+ * dead link are ruled and set like every other index on the site.
+ *
+ * Static rendering, and no CMS collection: one page, changing only when the
+ * design does. Cloudflare Pages serves `dist/404.html` for any unmatched path
+ * in a static build, so this needs no route configuration.
+ */
+import marchSpeech from "~/assets/shared/leaders/martin-luther-king-jr-march-speech-public-domain.jpg";
+import SectionLanding from "~/components/ui/SectionLanding.astro";
+import { actionsPage } from "~/features/actions/sections";
+import { editorialSections } from "~/features/editorial/sections";
+import {
+  helplineNavigation,
+  joinNavigation,
+  organizationNavigation,
+} from "~/config/navigation";
+import SiteLayout from "~/layouts/SiteLayout.astro";
+
+/*
+ * The helpline leads, as it does in the strip above the header: a reader who
+ * arrived here needing it should not have to work out that a broken link is not
+ * the same as a closed door.
+ *
+ * Every other destination takes its label and its address from the definition
+ * the rest of the site is built from, so a section that is renamed or moved
+ * cannot leave a second dead link on the page whose job is dead links.
+ */
+const destinations = [
+  {
+    title: helplineNavigation.label,
+    description:
+      "Report caste discrimination, or talk it through with someone who has heard it before. Free and confidential.",
+    href: `${helplineNavigation.href}/`,
+  },
+  {
+    title: actionsPage.title,
+    description: actionsPage.description,
+    href: "/actions/",
+  },
+  {
+    title: editorialSections.articles.label,
+    description: editorialSections.articles.description,
+    href: `${editorialSections.articles.path}/`,
+  },
+  {
+    title: organizationNavigation.overviewLabel,
+    description:
+      "Who AKSC is, the constitution that governs it, the general body that decides, and how to reach us.",
+    href: `${organizationNavigation.href}/`,
+  },
+  {
+    title: joinNavigation.label,
+    description:
+      "AKSC is a membership organization. Members set its direction and carry its work.",
+    href: `${joinNavigation.href}/`,
+  },
+  {
+    title: "Home",
+    description:
+      "Start again from the beginning: what the circle is writing, reading, and taking on.",
+    href: "/",
+  },
+];
+---
+
+<SiteLayout
+  title="Page not found"
+  description="This page could not be found. Routes to the anti-caste helpline, AKSC's campaigns and writing, and the rest of the site."
+>
+  <SectionLanding
+    eyebrow="Error 404"
+    title="This page is not here."
+    description="The address is either wrong or it has moved. Nothing you did caused it. Here is the rest of the site."
+    items={destinations}
+    backgroundImage={marchSpeech}
+    backgroundLabel="Martin Luther King Jr. speaking at the March on Washington for Jobs and Freedom, 1963"
+  />
+</SiteLayout>

@@ -39,7 +39,7 @@ const badgeClasses =
   {
     (eyebrow || badge) && (
       <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-        {eyebrow && <p class="label text-ambedkar-700">{eyebrow}</p>}
+        {eyebrow && <p class="label text-accent-700">{eyebrow}</p>}
         {badge && (
           <span
             class:list={[
@@ -65,7 +65,7 @@ const badgeClasses =
     </a>
   </h2>
 
-  <p class="mt-3 leading-7 text-ambedkar-900/72">{summary}</p>
+  <p class="card-summary mt-3 leading-7 text-ambedkar-900/72">{summary}</p>
 
   {
     meta.length > 0 && (
@@ -77,25 +77,24 @@ const badgeClasses =
     )
   }
 
-  <div class="mt-auto pt-6">
-    {
-      topics.length > 0 && (
-        <ul class="flex flex-wrap gap-1.5">
-          {topics.map((topic) => (
-            <li class="tag">{topicLabel(topic)}</li>
-          ))}
-        </ul>
-      )
-    }
-    <p
-      class="mt-5 flex items-center gap-2 font-display text-xs font-semibold tracking-[0.12em] text-ambedkar-700 uppercase transition-colors group-hover:text-ambedkar-950"
-      aria-hidden="true"
-    >
-      Read more
-      <span
-        class="inline-block transition-transform duration-300 ease-out-firm group-hover:translate-x-1"
-        >&rarr;</span
-      >
-    </p>
-  </div>
+  {
+    /*
+     * No "Read more →" line. It said nothing the card did not already say, and
+     * an index of seventeen statements printed it seventeen times: the same
+     * three words and the same arrow down the whole page, which is the tell of
+     * a template rather than of an editor. The card already answers that it can
+     * be followed — the accent rule draws across its top edge, its border
+     * firms, and the title underlines itself — so the corner is given back to
+     * the topics, which actually differ from one entry to the next.
+     */
+  }
+  {
+    topics.length > 0 && (
+      <ul class="mt-auto flex flex-wrap gap-1.5 pt-6">
+        {topics.map((topic) => (
+          <li class="tag">{topicLabel(topic)}</li>
+        ))}
+      </ul>
+    )
+  }
 </article>

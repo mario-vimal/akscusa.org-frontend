@@ -1,10 +1,15 @@
 ---
 import phuleTeachingSculpture from "~/assets/shared/leaders/phule-teaching-sculpture-cc-by-sa-4.jpg";
 import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
+import EntryLead from "~/features/editorial/components/EntryLead.astro";
 import { editorialSections, entryHref } from "~/features/editorial/sections";
-import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import {
+  loadEditorialEntries,
+  splitLeadEntry,
+} from "~/features/editorial/queries/entries";
 import {
   programBadge,
+  programCover,
   programEyebrow,
   programMeta,
 } from "~/features/editorial/presenters";
@@ -12,6 +17,16 @@ import ProgramCard from "./ProgramCard.astro";
 
 const section = editorialSections.programs;
 const programs = await loadEditorialEntries("programs");
+
+// The newest program leads the index and the rest follow as cards, the way the
+// interventions, blog, and press release indexes already read. Seventeen equal
+// tiles said nothing about which of them a reader had not already seen.
+const { lead, rest } = splitLeadEntry(programs);
+
+// Measured up front, so the index makes one pass over the poster files rather
+// than one per card.
+const leadCover = lead ? await programCover(lead) : undefined;
+const covers = await Promise.all(rest.map(programCover));
 ---
 
 <EditorialIndex
@@ -21,6 +36,8 @@ const programs = await loadEditorialEntries("programs");
   count={`${programs.length} ${programs.length === 1 ? "program" : "programs"}`}
   empty={section.empty}
   isEmpty={programs.length === 0}
+  itemCount={rest.length}
+  listLabel="Earlier programs"
   backgroundImage={phuleTeachingSculpture}
   backgroundLabel="Jyotirao and Savitribai Phule, sculpted at Phulewada in Pune"
   backgroundCredit={{
@@ -32,7 +49,26 @@ const programs = await loadEditorialEntries("programs");
   }}
 >
   {
-    programs.map((program) => (
+    lead && (
+      <EntryLead
+        slot="lead"
+        href={entryHref("programs", lead.id)}
+        title={lead.data.title}
+        summary={lead.data.summary}
+        eyebrow={programEyebrow(lead)}
+        badge={programBadge(lead)}
+        label={
+          lead.data.status === "scheduled" ? "Next program" : "Latest program"
+        }
+        meta={programMeta(lead)}
+        topics={lead.data.topics}
+        poster={leadCover}
+      />
+    )
+  }
+
+  {
+    rest.map((program, index) => (
       <li>
         <ProgramCard
           href={entryHref("programs", program.id)}
@@ -42,7 +78,7 @@ const programs = await loadEditorialEntries("programs");
           badge={programBadge(program)}
           meta={programMeta(program)}
           topics={program.data.topics}
-          poster={program.data.posters[0]}
+          poster={covers[index]}
         />
       </li>
     ))

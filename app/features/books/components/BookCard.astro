@@ -82,32 +82,25 @@ const sessionLabel =
     </div>
   </div>
 
-  {summary && <p class="mt-5 leading-7 text-ambedkar-900/75">{summary}</p>}
+  {
+    summary && (
+      <p class="card-summary mt-5 leading-7 text-ambedkar-900/75">{summary}</p>
+    )
+  }
 
   <ul class="mt-4 space-y-1 text-sm text-ambedkar-900/70">
     <li class="wrap-break-word">ISBN {isbn}</li>
     {publisher && <li>{publisher}</li>}
   </ul>
 
-  <div class="mt-auto pt-6">
-    {
-      topics.length > 0 && (
-        <ul class="flex flex-wrap gap-2">
-          {topics.map((topic) => (
-            <li class="tag">{topicLabel(topic)}</li>
-          ))}
-        </ul>
-      )
-    }
-    <p
-      class="mt-5 flex items-center gap-2 font-display text-xs font-semibold tracking-[0.12em] text-ambedkar-700 uppercase transition-colors group-hover:text-ambedkar-950"
-      aria-hidden="true"
-    >
-      Read more
-      <span
-        class="inline-block transition-transform duration-300 group-hover:translate-x-1"
-        >&rarr;</span
-      >
-    </p>
-  </div>
+  {/* See EntryCard: the repeated "Read more →" is gone from every index. */}
+  {
+    topics.length > 0 && (
+      <ul class="mt-auto flex flex-wrap gap-2 pt-6">
+        {topics.map((topic) => (
+          <li class="tag">{topicLabel(topic)}</li>
+        ))}
+      </ul>
+    )
+  }
 </article>

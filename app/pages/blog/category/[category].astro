@@ -3,8 +3,12 @@ import type { GetStaticPaths } from "astro";
 
 import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
 import EntryCard from "~/features/editorial/components/EntryCard.astro";
+import EntryLead from "~/features/editorial/components/EntryLead.astro";
 import { editorialSections, entryHref } from "~/features/editorial/sections";
-import { groupByTerm } from "~/features/editorial/queries/entries";
+import {
+  groupByTerm,
+  splitLeadEntry,
+} from "~/features/editorial/queries/entries";
 import { formatDate } from "~/lib/dates";
 import { articleFilters, articleMeta } from "~/features/editorial/presenters";
 import { articleCategories } from "~/features/editorial/taxonomy";
@@ -26,6 +30,7 @@ export const getStaticPaths = (async () => {
 const { term: category, entries: articles, all: allArticles } = Astro.props;
 const section = editorialSections.articles;
 const title = `${category.label} — ${section.title}`;
+const { lead, rest } = splitLeadEntry(articles);
 ---
 
 <SiteLayout title={title} description={category.description}>
@@ -34,11 +39,28 @@ const title = `${category.label} — ${section.title}`;
     title={category.label}
     description={category.description}
     count={`${articles.length} ${articles.length === 1 ? "article" : "articles"}`}
+    itemCount={rest.length}
     filters={articleFilters(allArticles, category.id)}
     filtersLabel="Filter articles by category"
+    listLabel="Earlier articles"
   >
     {
-      articles.map((article) => (
+      lead && (
+        <EntryLead
+          slot="lead"
+          label="Latest article"
+          href={entryHref("articles", lead.id)}
+          title={lead.data.title}
+          summary={lead.data.summary}
+          eyebrow={formatDate(lead.data.date)}
+          badge={{ label: category.label }}
+          meta={articleMeta(lead)}
+          topics={lead.data.topics}
+        />
+      )
+    }
+    {
+      rest.map((article) => (
         <li>
           <EntryCard
             href={entryHref("articles", article.id)}

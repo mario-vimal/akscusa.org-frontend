@@ -8,6 +8,7 @@ import {
   type EditorialEntry,
 } from "~/features/editorial/sections";
 import { formatDate, formatDateRange, ordinal } from "~/lib/dates";
+import { measurePublicImage, type ImageSize } from "~/lib/public-image";
 import {
   articleCategories,
   conferenceFormatLabel,
@@ -281,6 +282,24 @@ export function programMeta(program: Program): string[] {
 }
 
 export type ProgramPoster = Program["data"]["posters"][number];
+
+/** A poster with the intrinsic size read off the committed file. */
+export interface SizedProgramPoster extends ProgramPoster, ImageSize {}
+
+/**
+ * The flyer an index card leads on, measured so it can be printed at its own
+ * proportions. AKSC's posters arrive both upright and landscape, and fitting
+ * either one into a fixed well reduced the artwork to a stamp between two bars
+ * of white — on a page whose only real colour is those posters.
+ */
+export async function programCover(
+  program: Program,
+): Promise<SizedProgramPoster | undefined> {
+  const poster = program.data.posters[0];
+  if (!poster) return undefined;
+
+  return { ...poster, ...(await measurePublicImage(poster.src)) };
+}
 
 export function programDetails(program: Program): Detail[] {
   const details: Detail[] = [

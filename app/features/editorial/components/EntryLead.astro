@@ -1,0 +1,166 @@
+---
+import type {
+  Badge,
+  SizedProgramPoster,
+} from "~/features/editorial/presenters";
+import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
+
+interface Props {
+  href: string;
+  title: string;
+  summary: string;
+  /** Date or kind line printed above the title, for example "Litigation · 12 March 2024". */
+  eyebrow?: string;
+  badge?: Badge;
+  /** Names the entry's standing in the index, for example "Latest statement". */
+  label?: string;
+  /** Short supporting facts such as authors, venue, or who issued a statement. */
+  meta?: readonly string[];
+  topics?: readonly EditorialTopic[];
+  /** The entry's flyer, for a section that publishes one. */
+  poster?: SizedProgramPoster;
+}
+
+const {
+  href,
+  title,
+  summary,
+  eyebrow,
+  badge,
+  label = "Latest",
+  meta = [],
+  topics = [],
+  poster,
+} = Astro.props;
+
+const badgeClasses =
+  badge?.tone === "muted"
+    ? "border-rule-strong text-ambedkar-900/70"
+    : "border-accent-600 text-accent-700";
+---
+
+{
+  /*
+   * The newest entry of an index, set as a lead rather than as the first of
+   * twelve equal tiles.
+   *
+   * Every index on the site opened the same way: a dark masthead, then a grid
+   * of same-sized white cards with the same six-line summary in each. Nothing
+   * in that grid said which entry mattered or which one had just been
+   * published, so a reader had no way in except to start at the top left and
+   * read every card — and a page where everything is emphasised equally is a
+   * page where nothing is. This gives the index a first paragraph.
+   *
+   * It borrows the two-column measure of `section-head` rather than inventing
+   * one, so the label sits in the same channel a section label does everywhere
+   * else, and the accent rule above it is the same rule that opens a section.
+   *
+   * The lede is set in the serif. Past the masthead an index page carried no
+   * serif at all, so the third face — the one the site reserves for argument —
+   * never appeared until the reader was already inside an entry.
+   *
+   * The stretched anchor keeps its own focus ring here, unlike the one in a
+   * card: its box is a display-scale headline, which is a perfectly readable
+   * thing to draw a ring around, so there is nothing to hand the ring to.
+   */
+}
+<article class="group relative">
+  <div class="rule-draw" aria-hidden="true"></div>
+
+  <div
+    class:list={[
+      "mt-6 grid gap-x-12 gap-y-8",
+      poster
+        ? "lg:grid-cols-[minmax(0,11rem)_minmax(0,1fr)_minmax(0,15rem)]"
+        : "gap-y-5 lg:grid-cols-[minmax(0,13rem)_minmax(0,1fr)]",
+    ]}
+  >
+    <div class="flex flex-col gap-4">
+      <p class="label text-accent-700">{label}</p>
+      {
+        eyebrow && (
+          <p class="font-display text-sm font-semibold tracking-title text-ambedkar-900/75">
+            {eyebrow}
+          </p>
+        )
+      }
+      {
+        badge && (
+          <p>
+            <span
+              class:list={[
+                "inline-block rounded-sm border px-1.5 py-0.5 font-display text-[0.625rem] font-semibold tracking-[0.1em] uppercase",
+                badgeClasses,
+              ]}
+            >
+              {badge.label}
+            </span>
+          </p>
+        )
+      }
+    </div>
+
+    <div class="min-w-0">
+      <h2
+        class="font-display text-display-sm leading-[1.04] font-bold tracking-display text-balance text-ambedkar-950"
+      >
+        <a
+          class="bg-[linear-gradient(to_right,currentColor,currentColor)] bg-size-[0%_2px] bg-position-[0_100%] bg-no-repeat transition-[background-size] duration-300 ease-out-firm group-hover:bg-size-[100%_2px] after:absolute after:inset-0"
+          href={href}
+        >
+          {title}
+        </a>
+      </h2>
+
+      <p
+        class="mt-5 max-w-2xl font-serif text-xl leading-[1.62] text-ambedkar-900/85"
+      >
+        {summary}
+      </p>
+
+      {
+        meta.length > 0 && (
+          <ul class="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-sm text-ambedkar-900/70">
+            {meta.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        )
+      }
+
+      {
+        topics.length > 0 && (
+          <ul class="mt-6 flex flex-wrap gap-1.5">
+            {topics.map((topic) => (
+              <li class="tag">{topicLabel(topic)}</li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+
+    {
+      /*
+        The flyer, where the section publishes one. It is printed at its own
+        proportions on a hairlined sheet rather than fitted to a well, so an
+        upright poster stays upright. Ordered before the text on a phone,
+        because the artwork is what tells a reader at a glance what the program
+        was; on a wide screen it returns to the outer column so the reading
+        measure is not pushed around.
+      */
+    }
+    {
+      poster && (
+        <img
+          class="order-first w-full rounded-md border border-rule bg-white lg:order-none lg:self-start"
+          src={poster.src}
+          alt={poster.alt}
+          width={poster.width}
+          height={poster.height}
+          loading="eager"
+          decoding="async"
+        />
+      )
+    }
+  </div>
+</article>

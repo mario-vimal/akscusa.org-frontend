@@ -70,7 +70,6 @@ export function mountQuoteCarousels(): void {
           { index: current, distance: Number.POSITIVE_INFINITY },
         );
         current = nearest.index;
-        current = nearest.index;
       };
 
       const announce = () => {

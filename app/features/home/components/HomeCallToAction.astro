@@ -53,14 +53,17 @@ const { closing } = Astro.props;
 
         <figure class="lg:self-end">
           <!--
-            `duotone` only drains the colour out of a photograph. The brand blue
-            is put back by the layer over it, which is how PageMasthead does it
-            too; without that pair the picture reads as a grey rectangle on a
-            white page.
+            `duotone-light` only drains the colour out of a photograph. The
+            brand blue is put back by the layer over it, which is how
+            PageMasthead does it too; without that pair the picture reads as a
+            grey rectangle on a white page. The light variant is used because
+            this band is white: the darkened `duotone` the mastheads use is
+            there so type can be laid over the ink, and nothing is laid over
+            this one.
           -->
           <div class="relative isolate overflow-hidden rounded-md">
             <ResponsiveImage
-              class="w-full duotone"
+              class="w-full duotone-light"
               src={phulePortrait}
               alt=""
               sizes="(min-width: 1024px) 18rem, 100vw"

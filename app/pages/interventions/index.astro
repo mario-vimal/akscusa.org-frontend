@@ -2,8 +2,12 @@
 import periyarAndAnnadurai from "~/assets/shared/leaders/periyar-annadurai-public-domain.jpg";
 import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
 import EntryCard from "~/features/editorial/components/EntryCard.astro";
+import EntryLead from "~/features/editorial/components/EntryLead.astro";
 import { editorialSections, entryHref } from "~/features/editorial/sections";
-import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import {
+  loadEditorialEntries,
+  splitLeadEntry,
+} from "~/features/editorial/queries/entries";
 import {
   interventionBadge,
   interventionEyebrow,
@@ -14,6 +18,7 @@ import SiteLayout from "~/layouts/SiteLayout.astro";
 
 const section = editorialSections.interventions;
 const interventions = await loadEditorialEntries("interventions");
+const { lead, rest } = splitLeadEntry(interventions);
 ---
 
 <SiteLayout title={section.title} description={section.description}>
@@ -26,11 +31,28 @@ const interventions = await loadEditorialEntries("interventions");
     filtersLabel="Filter interventions by kind"
     empty={section.empty}
     isEmpty={interventions.length === 0}
+    itemCount={rest.length}
+    listLabel="Earlier interventions"
     backgroundImage={periyarAndAnnadurai}
     backgroundLabel="C. N. Annadurai and Periyar E. V. Ramasamy"
   >
     {
-      interventions.map((intervention) => (
+      lead && (
+        <EntryLead
+          slot="lead"
+          label="Latest intervention"
+          href={entryHref("interventions", lead.id)}
+          title={lead.data.title}
+          summary={lead.data.summary}
+          eyebrow={interventionEyebrow(lead)}
+          badge={interventionBadge(lead)}
+          meta={interventionMeta(lead)}
+          topics={lead.data.topics}
+        />
+      )
+    }
+    {
+      rest.map((intervention) => (
         <li>
           <EntryCard
             href={entryHref("interventions", intervention.id)}

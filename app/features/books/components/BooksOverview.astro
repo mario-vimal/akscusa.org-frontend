@@ -18,6 +18,7 @@ const entries = await loadBooksWithReadings();
   count={`${entries.length} ${entries.length === 1 ? "book" : "books"}`}
   empty="No books have been published yet."
   isEmpty={entries.length === 0}
+  itemCount={entries.length}
   backgroundImage={libraryShelves}
 >
   {

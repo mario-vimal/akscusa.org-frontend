@@ -1,6 +1,4 @@
-import { fileURLToPath } from "node:url";
-
-import sharp from "sharp";
+import { measurePublicImage } from "~/lib/public-image";
 
 /**
  * A panel as it is stored: a committed image, a description of the drawing,
@@ -24,43 +22,14 @@ export interface TranscriptLine {
   text: string;
 }
 
-const publicDirectory = fileURLToPath(
-  new URL("../../../cms/public", import.meta.url),
-);
-
-const sizes = new Map<string, Promise<{ width: number; height: number }>>();
-
-/**
- * Panels are served straight from the public directory, so Astro never sees
- * them as an import and cannot supply their dimensions. Reading the header at
- * build time gives every panel a width and a height, which is what keeps a page
- * of 37 images from reflowing as each one arrives.
- *
- * Hard-coding an aspect ratio instead would break the first time an artist
- * sends a panel that is not square.
- */
-function measure(src: string) {
-  const cached = sizes.get(src);
-  if (cached) return cached;
-
-  const measurement = sharp(`${publicDirectory}${src}`)
-    .metadata()
-    .then(({ width, height }) => {
-      if (!width || !height) {
-        throw new Error(`Could not read the dimensions of ${src}.`);
-      }
-      return { width, height };
-    });
-
-  sizes.set(src, measurement);
-  return measurement;
-}
-
 export async function sizePanels(
   panels: readonly Panel[],
 ): Promise<SizedPanel[]> {
   return Promise.all(
-    panels.map(async (panel) => ({ ...panel, ...(await measure(panel.src)) })),
+    panels.map(async (panel) => ({
+      ...panel,
+      ...(await measurePublicImage(panel.src)),
+    })),
   );
 }
 

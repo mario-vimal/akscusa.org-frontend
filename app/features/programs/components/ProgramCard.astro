@@ -1,6 +1,9 @@
 ---
 import type { EditorialTopic } from "~/features/editorial/taxonomy";
-import type { Badge, ProgramPoster } from "~/features/editorial/presenters";
+import type {
+  Badge,
+  SizedProgramPoster,
+} from "~/features/editorial/presenters";
 import { topicLabel } from "~/features/editorial/taxonomy";
 
 interface Props {
@@ -11,7 +14,7 @@ interface Props {
   badge: Badge;
   meta?: readonly string[];
   topics?: readonly EditorialTopic[];
-  poster?: ProgramPoster;
+  poster?: SizedProgramPoster;
 }
 
 const {
@@ -31,32 +34,32 @@ const badgeClasses =
     : "border-accent-600 text-accent-700";
 ---
 
-<article class="card group overflow-hidden">
+<article class="card group">
   {
     poster ? (
       /*
-        The poster is taken out of flow. An absolutely positioned box
-        contributes nothing to an ancestor's intrinsic size, so a 1800px
-        artwork can never report its intrinsic width up through the card into
-        the grid track, whichever way an engine resolves a percentage-sized
-        replaced element while measuring.
+        The flyer is printed at its own proportions rather than fitted into a
+        well. A fixed well can only suit one shape, and these arrive both
+        upright and landscape: the 4:3 well cut an upright poster down to about
+        half the card's width and set it between two bars of white, which is
+        how the section's only real colour came to read as a stamp.
 
-        The figure keeps the 4:3 well and `object-contain` centres the artwork
-        inside it, which is what the flex centring did before. The padding is
-        on the image because `object-contain` fits the artwork to the content
-        box, so it insets the artwork rather than the well.
+        Sized from the committed file, so a column of them does not reflow as
+        each one loads, and so a row of cards is allowed to come out uneven.
+        That unevenness is the point: it is what separates an index of real
+        posters from a grid of identical tiles.
       */
-      <div class="relative aspect-4/3 bg-white">
-        <img
-          class="absolute inset-0 size-full object-contain p-3 sm:p-4"
-          src={poster.src}
-          alt={poster.alt}
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
+      <img
+        class="w-full bg-white"
+        src={poster.src}
+        alt={poster.alt}
+        width={poster.width}
+        height={poster.height}
+        loading="lazy"
+        decoding="async"
+      />
     ) : (
-      <div class="on-dark relative isolate flex aspect-4/3 items-end overflow-hidden bg-ambedkar-950 p-6 text-white">
+      <div class="on-dark relative isolate flex aspect-16/9 items-end overflow-hidden bg-ambedkar-950 p-6 text-white">
         <div
           class="absolute inset-0 -z-10 bg-linear-to-br from-ambedkar-800 to-ambedkar-1000"
           aria-hidden="true"
@@ -71,7 +74,7 @@ const badgeClasses =
   <div class="flex flex-1 p-6 sm:p-8">
     <div class="flex min-w-0 flex-1 flex-col">
       <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <p class="label text-ambedkar-700">
+        <p class="label text-accent-700">
           {eyebrow}
         </p>
         <span
@@ -107,27 +110,18 @@ const badgeClasses =
         )
       }
 
-      <div class="mt-auto pt-6">
-        {
-          topics.length > 0 && (
-            <ul class="flex flex-wrap gap-2">
-              {topics.map((topic) => (
-                <li class="tag">{topicLabel(topic)}</li>
-              ))}
-            </ul>
-          )
-        }
-        <p
-          class="mt-5 flex items-center gap-2 font-display text-xs font-semibold tracking-[0.12em] text-ambedkar-700 uppercase transition-colors group-hover:text-ambedkar-950"
-          aria-hidden="true"
-        >
-          View program
-          <span
-            class="inline-block transition-transform duration-300 group-hover:translate-x-1"
-            >&rarr;</span
-          >
-        </p>
-      </div>
+      {
+        /* See EntryCard: the repeated "View program →" is gone from every index. */
+      }
+      {
+        topics.length > 0 && (
+          <ul class="mt-auto flex flex-wrap gap-2 pt-6">
+            {topics.map((topic) => (
+              <li class="tag">{topicLabel(topic)}</li>
+            ))}
+          </ul>
+        )
+      }
     </div>
   </div>
 </article>

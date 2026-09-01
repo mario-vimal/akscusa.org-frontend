@@ -58,6 +58,7 @@ const paperLabel = (paper: GeneralBodyMeeting["data"]["papers"][number]) =>
   count={`${meetings.length} ${meetings.length === 1 ? "meeting" : "meetings"}`}
   empty="No General Body meetings have been published yet."
   isEmpty={meetings.length === 0}
+  itemCount={meetings.length}
   list={false}
   backgroundImage={ambedkar1950}
   backgroundLabel="B. R. Ambedkar, 1950"

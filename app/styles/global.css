@@ -152,8 +152,17 @@
 }
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
+  /*
+   * Smooth scrolling is motion the reader did not ask for, and an in-page jump
+   * animates the whole viewport, which is the movement people with vestibular
+   * disorders report as the worst of them. Every other animation on the site is
+   * already gated; this one was not, so a reader who has turned motion down was
+   * still thrown down the page by a table of contents link.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
 
   body {
@@ -223,6 +232,19 @@
  */
 @utility duotone {
   filter: grayscale(1) contrast(1.32) brightness(0.5);
+}
+
+/*
+ * The same reduction, for a photograph that sits on a light band rather than
+ * inside a dark one. `duotone` is darkened to 0.5 so type can be laid over it
+ * on the ink; on white paper nothing is laid over the picture and that
+ * darkening only buries the subject, which is how an archival portrait of the
+ * Phules became a flat blue slab beside the closing ask. Held near its original
+ * brightness the picture stays a picture, and the colour layer over it still
+ * returns it to the brand blue.
+ */
+@utility duotone-light {
+  filter: grayscale(1) contrast(1.08) brightness(1.04);
 }
 
 @layer components {
@@ -453,6 +475,32 @@
   .card:hover .card-title a,
   .card:focus-within .card-title a {
     background-size: 100% 1px;
+  }
+
+  /*
+   * The summary inside an index card, held to a fixed number of lines.
+   *
+   * A grid row is as tall as its tallest card, so one long entry sets the
+   * height of every card beside it. On the books index one summary was a
+   * publisher's blurb of some two hundred words, which stretched its row to
+   * roughly three times the height of its neighbours and left them each with a
+   * field of empty white between the ISBN and the topics: the grid stopped
+   * reading as a contents page and started reading as a mistake.
+   *
+   * Clamping is the right answer rather than editing the entry, because an
+   * index card is a pointer and the entry's own page carries the text in full.
+   * Six lines is long enough that almost nothing is actually cut, and short
+   * enough that the one outlier cannot set the row.
+   *
+   * `-webkit-` prefixed properties are required: the unprefixed `line-clamp` is
+   * still not honoured on its own in Safari or Firefox.
+   */
+  .card-summary {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 6;
+    line-clamp: 6;
+    overflow: hidden;
   }
 
   /*

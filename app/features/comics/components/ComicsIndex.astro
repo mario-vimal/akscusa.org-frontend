@@ -57,7 +57,19 @@ const meta =
           The first comics are being drawn. Please check back soon.
         </p>
       ) : (
-        <ul class="reveal-children mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <ul
+          class:list={[
+            "reveal-children mt-12 grid gap-6",
+            /*
+              Never more columns than there are comics. Two covers in a
+              three-column grid left a third of the row empty, which reads as a
+              comic that failed to load rather than as the end of the shelf.
+            */
+            comics.length >= 3
+              ? "sm:grid-cols-2 lg:grid-cols-3"
+              : "sm:grid-cols-2",
+          ]}
+        >
           {comics.map((comic) => (
             <li>
               <ComicCard {...comic} />

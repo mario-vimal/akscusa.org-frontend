@@ -19,6 +19,12 @@ if (!home || home.data.pageType !== "home") {
 // The hero, the quotes, and the closing call are the homepage's own copy and
 // live in app/content. Everything between them is the newest entry of each
 // kind, chosen in features/home/featured.ts.
+//
+// The sections do not share a height. Every one of them used to be set to the
+// same py-20 sm:py-28, so the page came down in six equal steps whatever was
+// in them; the spotlight and the quotes are now held tighter and the three
+// columns of latest work given more room, so the rhythm follows the content
+// rather than the template.
 const { spotlight, writing, reading, book, comics, recent } =
   await loadHomeFeatures();
 ---

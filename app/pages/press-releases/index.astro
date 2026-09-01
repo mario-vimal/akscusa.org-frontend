@@ -2,14 +2,19 @@
 import mlkPressConference from "~/assets/shared/leaders/martin-luther-king-jr-press-conference-public-domain.jpg";
 import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
 import EntryCard from "~/features/editorial/components/EntryCard.astro";
+import EntryLead from "~/features/editorial/components/EntryLead.astro";
 import { editorialSections, entryHref } from "~/features/editorial/sections";
-import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import {
+  loadEditorialEntries,
+  splitLeadEntry,
+} from "~/features/editorial/queries/entries";
 import { formatDate } from "~/lib/dates";
 import { pressReleaseMeta } from "~/features/editorial/presenters";
 import SiteLayout from "~/layouts/SiteLayout.astro";
 
 const section = editorialSections.pressReleases;
 const releases = await loadEditorialEntries("pressReleases");
+const { lead, rest } = splitLeadEntry(releases);
 ---
 
 <SiteLayout title={section.title} description={section.description}>
@@ -20,11 +25,27 @@ const releases = await loadEditorialEntries("pressReleases");
     count={`${releases.length} ${releases.length === 1 ? "statement" : "statements"}`}
     empty={section.empty}
     isEmpty={releases.length === 0}
+    itemCount={rest.length}
+    listLabel="Earlier statements"
     backgroundImage={mlkPressConference}
     backgroundLabel="Martin Luther King Jr. at a press conference, 1964"
   >
     {
-      releases.map((release) => (
+      lead && (
+        <EntryLead
+          slot="lead"
+          label="Latest statement"
+          href={entryHref("pressReleases", lead.id)}
+          title={lead.data.title}
+          summary={lead.data.summary}
+          eyebrow={formatDate(lead.data.date)}
+          meta={pressReleaseMeta(lead)}
+          topics={lead.data.topics}
+        />
+      )
+    }
+    {
+      rest.map((release) => (
         <li>
           <EntryCard
             href={entryHref("pressReleases", release.id)}

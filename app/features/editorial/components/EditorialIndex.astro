@@ -37,8 +37,20 @@ interface Props {
    * section renders its own body, such as the book readings table.
    */
   list?: boolean;
+  /**
+   * Names the grid when a lead entry sits above it, for example "Earlier
+   * statements". A run of cards under a lead needs to say what it is, or the
+   * lead reads as a duplicate of the first card.
+   */
+  listLabel?: string;
+  /**
+   * How many entries the default slot holds. Given, a short index stops
+   * reserving columns it cannot fill: two comics in a three-column grid left a
+   * third of the row empty, which reads as a missing entry rather than as the
+   * end of the list.
+   */
+  itemCount?: number;
 }
-
 const {
   eyebrow,
   title,
@@ -52,7 +64,33 @@ const {
   backgroundLabel,
   backgroundCredit,
   list = true,
+  listLabel = "More",
+  itemCount,
 } = Astro.props;
+
+/*
+ * A grid never wider than the list that has to fill it. Left at three columns a
+ * two-entry index reserved a third of the row for nothing, and an empty track
+ * at the end of a row reads as an entry that failed to load.
+ */
+const gridColumns =
+  itemCount === 1
+    ? "grid-cols-1"
+    : itemCount === 2
+      ? "grid-cols-1 sm:grid-cols-2"
+      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
+
+/*
+ * Whether a lead was actually passed, rather than whether the slot exists.
+ * `Astro.slots.has` answers the second question: a page that writes
+ * `{lead && <EntryLead slot="lead" />}` still declares the slot when `lead` is
+ * undefined, so a short index — a blog category with two articles — rendered an
+ * empty band of white paper under its masthead. Rendering the slot and looking
+ * at what came out is the only reliable answer.
+ */
+const leadHtml = Astro.slots.has("lead")
+  ? (await Astro.slots.render("lead")).trim()
+  : "";
 ---
 
 <section>
@@ -91,6 +129,23 @@ const {
     }
   </PageMasthead>
 
+  {
+    /*
+      The lead sits on its own band of paper between the ink masthead and the
+      grid. Banding it rather than running it into the same surface as the
+      cards is what makes an index read as a page with parts: ink, then paper,
+      then the page's own ground. Every index used to be one flat field from
+      the masthead to the footer.
+    */
+    leadHtml && (
+      <div class="border-b border-rule bg-paper">
+        <Container class="py-14 sm:py-16">
+          <Fragment set:html={leadHtml} />
+        </Container>
+      </div>
+    )
+  }
+
   <Container class="pt-16 pb-20 sm:pt-20 sm:pb-28">
     <!-- Standing context a section may need above its entries, such as how
       the reading circle meets. Most indexes leave this empty. -->
@@ -102,18 +157,23 @@ const {
           {empty}
         </p>
       ) : list ? (
-        /*
-          `grid-cols-1` is not redundant. Without a column definition the base
-          grid has a single implicit `auto` track, which is content-sized: a
-          card holding a 1800px poster can size the track to the poster's
-          intrinsic width and push the row far past the container. The larger
-          breakpoints never had the bug because `grid-cols-*` expands to
-          `minmax(0, 1fr)`, which ignores max-content, so the fault only ever
-          showed on a phone. This states the same track for the base.
-        */
-        <ul class="reveal-children grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <slot />
-        </ul>
+        <>
+          {leadHtml && (
+            <h2 class="label mb-7 text-ambedkar-900/55">{listLabel}</h2>
+          )}
+          {/*
+            `grid-cols-1` is not redundant. Without a column definition the base
+            grid has a single implicit `auto` track, which is content-sized: a
+            card holding a 1800px poster can size the track to the poster's
+            intrinsic width and push the row far past the container. The larger
+            breakpoints never had the bug because `grid-cols-*` expands to
+            `minmax(0, 1fr)`, which ignores max-content, so the fault only ever
+            showed on a phone. This states the same track for the base.
+          */}
+          <ul class:list={["reveal-children grid gap-5", gridColumns]}>
+            <slot />
+          </ul>
+        </>
       ) : (
         <slot />
       )
