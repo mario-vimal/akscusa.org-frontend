@@ -37,8 +37,15 @@ public_folder: /media
 # The editorial collections below share a common set of fields — title, date,
 # summary, topics,
 # hero image, source URL, featured, draft — and each adds only what its own kind
-# of entry needs. Their option lists mirror `app/features/editorial/taxonomy.ts`,
-# and `scripts/cms/config.test.ts` fails if the two drift apart.
+# of entry needs.
+#
+# Topics and Categories are vocabularies rather than pages: an entry in one is
+# a term that other collections file themselves under, chosen through a
+# relation widget so a term can only ever be picked, never mistyped. They are
+# editable here because naming a new subject is editorial judgement. The
+# structural lists that are not — an intervention's status, a program's kind —
+# stay as `select` options mirroring `app/features/editorial/taxonomy.ts`, and
+# `scripts/cms/config.test.ts` fails if those two drift apart.
 collections:
   - name: articles
     label: Blog
@@ -57,13 +64,12 @@ collections:
       - { name: date, label: Publication date, widget: datetime }
       - name: category
         label: Category
-        widget: select
-        options:
-          - { label: Ambedkarite Thought, value: ambedkarite-thought }
-          - { label: Caste in the USA, value: caste-in-the-usa }
-          - { label: History and Movements, value: history-and-movements }
-          - { label: Culture and Society, value: culture-and-society }
-          - { label: Books and Media, value: books-and-media }
+        widget: relation
+        collection: categories
+        value_field: "{{slug}}"
+        search_fields: [label, description]
+        display_fields: [label]
+        hint: "The shelf this article is filed under on the blog. Add a new category in the Categories collection if none of these fit."
       - name: summary
         label: Summary
         widget: text
@@ -75,24 +81,17 @@ collections:
         fields:
           - { name: name, label: Name, widget: string }
           - { name: role, label: Role, widget: string, required: false }
-      - name: topics
+      - &topics_field
+        name: topics
         label: Topics
-        widget: select
+        widget: relation
         multiple: true
         required: false
-        options: &editorial_topics
-          - { label: Caste discrimination, value: caste-discrimination }
-          - { label: Dr. Ambedkar, value: ambedkar }
-          - { label: Periyar, value: periyar }
-          - { label: Legislation, value: legislation }
-          - { label: Litigation, value: litigation }
-          - { label: Workplace, value: workplace }
-          - { label: Higher education, value: higher-education }
-          - { label: Solidarity, value: solidarity }
-          - { label: History, value: history }
-          - { label: Religion and culture, value: religion-and-culture }
-          - { label: Hindutva, value: hindutva }
-          - { label: Civil rights, value: civil-rights }
+        collection: topics
+        value_field: "{{slug}}"
+        search_fields: [label, description]
+        display_fields: [label]
+        hint: "Pick the subjects this is about from the Topics collection. Add one there first if the subject you need is not listed."
       - name: heroImage
         label: Hero image
         widget: object
@@ -157,12 +156,7 @@ collections:
         label: Press contact email
         widget: string
         required: false
-      - name: topics
-        label: Topics
-        widget: select
-        multiple: true
-        required: false
-        options: *editorial_topics
+      - *topics_field
       - name: attachments
         label: Attachments
         widget: list
@@ -232,12 +226,7 @@ collections:
         widget: text
         required: false
         hint: What the intervention achieved. Shown on concluded entries.
-      - name: topics
-        label: Topics
-        widget: select
-        multiple: true
-        required: false
-        options: *editorial_topics
+      - *topics_field
       - name: resources
         label: Resources
         widget: list
@@ -304,12 +293,7 @@ collections:
         label: Registration URL
         widget: string
         required: false
-      - name: topics
-        label: Topics
-        widget: select
-        multiple: true
-        required: false
-        options: *editorial_topics
+      - *topics_field
       - name: speakers
         label: Speakers
         widget: relation
@@ -436,12 +420,7 @@ collections:
         widget: string
         required: false
         hint: Shown only while the program is scheduled.
-      - name: topics
-        label: Topics
-        widget: select
-        multiple: true
-        required: false
-        options: *editorial_topics
+      - *topics_field
       - name: resources
         label: Resources
         widget: list
@@ -571,12 +550,7 @@ collections:
         widget: text
         required: false
         hint: "One or two sentences in AKSC's own words. Do not paste the publisher's blurb."
-      - name: topics
-        label: Topics
-        widget: select
-        multiple: true
-        required: false
-        options: *editorial_topics
+      - *topics_field
       - name: resources
         label: Where to read it
         widget: list
@@ -731,12 +705,7 @@ collections:
         label: Summary
         widget: text
         hint: One or two sentences shown on the readings index and in search results.
-      - name: topics
-        label: Topics
-        widget: select
-        multiple: true
-        required: false
-        options: *editorial_topics
+      - *topics_field
       - name: resources
         label: What we read
         widget: list
@@ -896,12 +865,7 @@ collections:
               required: false,
               hint: "Where readers can find more of their work.",
             }
-      - name: topics
-        label: Topics
-        widget: select
-        multiple: true
-        required: false
-        options: *editorial_topics
+      - *topics_field
       - name: contentNote
         label: Content note
         widget: string
@@ -996,3 +960,57 @@ collections:
           required: false,
         }
       - { name: draft, label: Draft, widget: boolean, default: false }
+
+  - name: topics
+    label: Topics
+    label_singular: Topic
+    icon: sell
+    description: >-
+      The subjects entries across the site are filed under. Anything with a
+      Topics field picks from this list, so a topic added here is offered
+      everywhere at once, and the chips a reader sees print the name given
+      here. Renaming a topic renames it on every entry carrying it; deleting
+      one leaves those entries showing its filename instead, so retire a topic
+      only once nothing is filed under it.
+    folder: cms/content/topics
+    create: true
+    identifier_field: label
+    slug: "{{slug}}"
+    sortable_fields: [label]
+    summary: "{{label}}"
+    fields:
+      - name: label
+        label: Name
+        widget: string
+        hint: "The name as it is printed on a chip — “Higher education”."
+      - name: description
+        label: What belongs here
+        widget: text
+        required: false
+        hint: "One sentence, so two editors do not file the same work under two topics."
+
+  - name: categories
+    label: Categories
+    label_singular: Category
+    icon: shelves
+    description: >-
+      The shelves the blog is sorted into. Every article is filed under exactly
+      one, and readers narrow the blog index by them. Add a category when
+      several articles genuinely belong together; one category per article is
+      no use to a reader.
+    folder: cms/content/categories
+    create: true
+    identifier_field: label
+    slug: "{{slug}}"
+    sortable_fields: [label]
+    summary: "{{label}}"
+    fields:
+      - name: label
+        label: Name
+        widget: string
+        hint: "The name as it is printed on the blog — “Books and Media”."
+      - name: description
+        label: What belongs here
+        widget: text
+        required: false
+        hint: "One sentence saying what this shelf holds."

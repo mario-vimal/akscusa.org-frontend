@@ -13,6 +13,7 @@ import {
   type NextSession,
   type ReadingEntry,
 } from "~/features/book-readings/presenters";
+import { loadTermLabels } from "~/features/editorial/queries/taxonomy";
 import { isUpcoming } from "~/lib/collections";
 
 /** The reading circle as this page states it. */
@@ -24,9 +25,10 @@ export interface ReadingCircle {
 }
 
 export async function loadReadingCircle(): Promise<ReadingCircle> {
-  const [readings, books] = await Promise.all([
+  const [readings, books, topicLabel] = await Promise.all([
     loadEditorialEntries("bookReadings"),
     loadReadingBooks(),
+    loadTermLabels("topics"),
   ]);
 
   /*
@@ -47,7 +49,7 @@ export async function loadReadingCircle(): Promise<ReadingCircle> {
    * something nobody has checked.
    */
   return {
-    entries: readingEntries(readings, books),
+    entries: readingEntries(readings, books, topicLabel),
     opener: opening ? nextSession(opening, books.get(opening.id)) : undefined,
   };
 }

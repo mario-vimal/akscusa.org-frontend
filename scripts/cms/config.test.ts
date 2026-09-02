@@ -5,9 +5,7 @@ import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 
 import {
-  articleCategories,
   conferenceFormats,
-  editorialTopics,
   generalBodyPaperKinds,
   interventionKinds,
   interventionStatuses,
@@ -20,6 +18,8 @@ import { CMS_REPO_PLACEHOLDER } from "./repo";
 interface CmsField {
   name: string;
   widget?: string;
+  collection?: string;
+  value_field?: string;
   options?: Array<{ label: string; value: string }>;
   fields?: CmsField[];
 }
@@ -37,6 +37,7 @@ interface CmsConfig {
   collections: Array<{
     name: string;
     folder?: string;
+    create?: boolean;
     files?: Array<{ file: string }>;
     fields?: CmsField[];
   }>;
@@ -154,12 +155,53 @@ describe("Sveltia CMS taxonomy options", () => {
     "programs",
   ];
 
-  it.each(editorialCollections)("offers every topic in %s", (name) => {
-    expectMatches(name, "topics", editorialTopics);
+  // Topics and categories are content an editor maintains, so a fixed option
+  // list here would be exactly the thing that was removed: a new subject would
+  // again need a developer. A relation is also what makes the reference safe,
+  // because an editor can only pick a term that exists.
+  const relationField = (collectionName: string, fieldName: string) => {
+    const field = collection(collectionName).fields?.find(
+      (entry) => entry.name === fieldName,
+    );
+
+    expect(
+      field,
+      `field "${fieldName}" is missing from "${collectionName}"`,
+    ).toBeDefined();
+    return field!;
+  };
+
+  const taxonomyCollections = [...editorialCollections, "books", "comics"];
+
+  it.each(taxonomyCollections)(
+    "picks topics from the collection in %s",
+    (name) => {
+      const topics = relationField(name, "topics");
+
+      expect(topics.widget).toBe("relation");
+      expect(topics.collection).toBe("topics");
+      expect(topics.value_field).toBe("{{slug}}");
+    },
+  );
+
+  it("picks an article's category from the collection", () => {
+    const category = relationField("articles", "category");
+
+    expect(category.widget).toBe("relation");
+    expect(category.collection).toBe("categories");
+    expect(category.value_field).toBe("{{slug}}");
   });
 
-  it("offers every article category", () => {
-    expectMatches("articles", "category", articleCategories);
+  it("lets an editor add a term to either vocabulary", () => {
+    for (const name of ["topics", "categories"]) {
+      const vocabulary = collection(name);
+
+      expect(vocabulary.folder).toBe(`cms/content/${name}`);
+      expect(vocabulary.create).toBe(true);
+      expect(
+        vocabulary.fields?.find((field) => field.name === "label"),
+      ).toBeDefined();
+    }
   });
 
   it("offers every intervention kind and status", () => {

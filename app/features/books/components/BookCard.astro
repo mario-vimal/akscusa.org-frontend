@@ -1,6 +1,6 @@
 ---
 import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
-import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
+import { loadTermLabels } from "~/features/editorial/queries/taxonomy";
 import { COVER_ALT, COVER_WIDTHS } from "~/features/books/covers";
 
 interface Props {
@@ -13,7 +13,7 @@ interface Props {
   cover?: string;
   publisher?: string;
   sessions: number;
-  topics?: readonly EditorialTopic[];
+  topics?: readonly string[];
 }
 
 const {
@@ -33,6 +33,8 @@ const sessionLabel =
   sessions === 0
     ? "Not yet scheduled"
     : `${sessions} ${sessions === 1 ? "session" : "sessions"}`;
+
+const topicLabel = await loadTermLabels("topics");
 ---
 
 <article class="card group p-6 sm:p-8">

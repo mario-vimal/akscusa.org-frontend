@@ -11,7 +11,6 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
 import {
-  articleCategoryIds,
   conferenceFormatIds,
   interventionKindIds,
   interventionStatusIds,
@@ -36,7 +35,17 @@ export const articles = defineCollection({
   }),
   schema: z.object({
     ...editorialBase,
-    category: z.enum(articleCategoryIds),
+    /**
+     * The id of a term in the editor-maintained `categories` collection. The
+     * blog's shelves are editorial judgement rather than a rule the templates
+     * depend on, so a new one is added as content and not as an enum member.
+     */
+    category: z
+      .string()
+      .regex(
+        /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+        "Must be a lowercase kebab-case category slug.",
+      ),
     authors: optionalCmsList(
       z
         .array(

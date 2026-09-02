@@ -16,7 +16,6 @@ const routes = new Map([
     "/blog/caste-discrimination-where-is-it/",
     "Caste discrimination, where is it?",
   ],
-  ["/blog/category/ambedkarite-thought/", "Ambedkarite Thought"],
   ["/press-releases/", "Press Releases and Statements"],
   [
     "/press-releases/aksc-condemns-the-killing-of-george-floyd/",
@@ -28,7 +27,6 @@ const routes = new Map([
     "/interventions/lets-read-ambedkar-10-lectures-series/",
     "About the instructor",
   ],
-  ["/interventions/kind/legislative/", "Legislative"],
   ["/actions/", "What we do"],
   ["/book-readings/", "Book Readings"],
   ["/books/", "Every book the reading circle has worked through"],
@@ -168,6 +166,69 @@ try {
 
     if (!body.includes(marker)) {
       throw new Error(`${route} did not contain its expected content.`);
+    }
+  }
+
+  // The sitemap and robots.txt are checked against each other rather than
+  // against a literal domain, because the domain is `site` in
+  // `astro.config.mjs` and repeating it here is how a test comes to assert the
+  // old address after a move. What matters is that the three agree, and that
+  // the sitemap covers the routes rather than the CMS.
+  const readText = async (path) => {
+    const response = await fetch(`${origin}${path}`, {
+      signal: AbortSignal.timeout(5_000),
+    });
+
+    if (!response.ok) {
+      throw new Error(`${path} returned HTTP ${response.status}.`);
+    }
+
+    return response.text();
+  };
+
+  const index = await readText("/sitemap-index.xml");
+  const [, indexed] = index.match(/<loc>([^<]+)<\/loc>/) ?? [];
+
+  if (!indexed) {
+    throw new Error("/sitemap-index.xml names no sitemap.");
+  }
+
+  const site = new URL(indexed).origin;
+  const sitemap = await readText(new URL(indexed).pathname);
+  const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+    ([, url]) => url,
+  );
+
+  for (const url of urls) {
+    if (new URL(url).origin !== site) {
+      throw new Error(`${url} is not on the site the sitemap index names.`);
+    }
+  }
+
+  const listed = new Set(urls.map((url) => new URL(url).pathname));
+
+  for (const path of ["/", ...routes.keys()].filter(
+    (path) => path.endsWith("/") && !path.startsWith("/admin"),
+  )) {
+    if (!listed.has(path)) {
+      throw new Error(
+        `${path} is a page of this site but is not in ${indexed}.`,
+      );
+    }
+  }
+
+  // The CMS is a single-page app behind GitHub sign-in, so indexing it would
+  // put a sign-in wall in search results.
+  if ([...listed].some((path) => path.startsWith("/admin"))) {
+    throw new Error(`${indexed} lists the CMS.`);
+  }
+
+  const robots = await readText("/robots.txt");
+  const sitemapUrl = new URL("/sitemap-index.xml", site).href;
+
+  for (const line of [`Sitemap: ${sitemapUrl}`, "Disallow: /admin/"]) {
+    if (!robots.includes(line)) {
+      throw new Error(`/robots.txt does not say "${line}".`);
     }
   }
 

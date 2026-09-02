@@ -26,9 +26,11 @@ const { lead, rest } = splitLeadEntry(interventions);
     eyebrow={section.eyebrow}
     title={section.title}
     description={section.description}
-    count={`${interventions.length} ${interventions.length === 1 ? "intervention" : "interventions"}`}
+    countNoun={{ one: "intervention", other: "interventions" }}
     filters={interventionFilters(interventions)}
     filtersLabel="Filter interventions by kind"
+    filterKey="kind"
+    leadTerm={lead?.data.kind}
     empty={section.empty}
     isEmpty={interventions.length === 0}
     itemCount={rest.length}
@@ -53,7 +55,7 @@ const { lead, rest } = splitLeadEntry(interventions);
     }
     {
       rest.map((intervention) => (
-        <li>
+        <li data-filter-term={intervention.data.kind}>
           <EntryCard
             href={entryHref("interventions", intervention.id)}
             title={intervention.data.title}

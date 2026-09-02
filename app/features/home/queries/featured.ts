@@ -173,30 +173,6 @@ export interface BookFeature {
   sessions: number;
 }
 
-export interface ReadingFeature extends FeaturedRef {
-  location: string;
-}
-
-/**
- * The session the circle is holding next, or the last one it held.
- *
- * This and `loadCurrentBook` are separate because they are not always the same
- * entry. A session can be a set of articles rather than a book, in which case
- * the newest session has no cover to show and the newest *book* is a different
- * record. Keeping them apart means the band can show a cover without pretending
- * the circle read a book it did not.
- */
-export async function loadReading(): Promise<ReadingFeature | undefined> {
-  const readings = await loadEditorialEntries("bookReadings");
-  const reading = currentOf(readings);
-  if (!reading) return undefined;
-
-  return {
-    ...toRef("bookReadings", reading),
-    location: reading.data.location,
-  };
-}
-
 /**
  * The book the circle is on: the one its next session works through, or the
  * one its last session did when nothing is scheduled.
@@ -204,8 +180,8 @@ export async function loadReading(): Promise<ReadingFeature | undefined> {
  * This deliberately does not mean "the last book read". The newest session is
  * usually one that has not happened yet — a reading is announced before it is
  * held — so picking it and calling it read states as done a thing the circle
- * has only planned. `currentOf` is the same rule `loadReading` uses, applied
- * to the sessions that name a book.
+ * has only planned. `currentOf` selects the same honest "on now" state for the
+ * sessions that name a book.
  */
 export async function loadCurrentBook(): Promise<BookFeature | undefined> {
   const [readings, booksByReading] = await Promise.all([
@@ -301,7 +277,6 @@ export async function loadRecentWork(
 export interface HomeFeatures {
   spotlight?: Spotlight;
   writing: Writing;
-  reading?: ReadingFeature;
   book?: BookFeature;
   /** The book read before the current one, set beside it rather than in the row. */
   previous?: ShelfBook;
@@ -316,15 +291,13 @@ export interface HomeFeatures {
  * knows how they are chosen.
  */
 export async function loadHomeFeatures(): Promise<HomeFeatures> {
-  const [spotlight, writing, reading, book, wholeShelf, drawn] =
-    await Promise.all([
-      loadSpotlight(),
-      loadWriting(),
-      loadReading(),
-      loadCurrentBook(),
-      loadShelf(),
-      loadComicsIndex(),
-    ]);
+  const [spotlight, writing, book, wholeShelf, drawn] = await Promise.all([
+    loadSpotlight(),
+    loadWriting(),
+    loadCurrentBook(),
+    loadShelf(),
+    loadComicsIndex(),
+  ]);
 
   /*
    * The book on now is set at size, and the one before it fills the column
@@ -341,14 +314,12 @@ export async function loadHomeFeatures(): Promise<HomeFeatures> {
   const shown = [
     spotlight?.href,
     writing.lead?.href,
-    reading?.href,
     ...writing.more.map((entry) => entry.href),
   ].filter((href): href is string => Boolean(href));
 
   return {
     spotlight,
     writing,
-    reading,
     book,
     previous,
     shelf,

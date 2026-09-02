@@ -1,5 +1,5 @@
 ---
-import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
+import { loadTermLabels } from "~/features/editorial/queries/taxonomy";
 
 interface Badge {
   label: string;
@@ -16,7 +16,7 @@ interface Props {
   badge?: Badge;
   /** Short supporting facts such as authors, venue, or who issued a statement. */
   meta?: readonly string[];
-  topics?: readonly EditorialTopic[];
+  topics?: readonly string[];
 }
 
 const {
@@ -33,6 +33,8 @@ const badgeClasses =
   badge?.tone === "muted"
     ? "border-rule text-ambedkar-900/70"
     : "border-accent-600 text-accent-700";
+
+const topicLabel = await loadTermLabels("topics");
 ---
 
 <article class="card group p-6 sm:p-7">

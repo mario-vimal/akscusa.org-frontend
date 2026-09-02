@@ -128,8 +128,19 @@ describe("topicsSchema", () => {
     expect(topicsSchema.parse(null)).toEqual([]);
   });
 
-  it("still rejects a topic outside the taxonomy", () => {
-    expect(() => topicsSchema.parse(["not-a-real-topic"])).toThrow();
+  // Topics are entries in a collection an editor maintains, so there is no
+  // fixed list to check a value against here. What the schema still holds to
+  // is the shape of an id: an entry stores the topic's filename, and anything
+  // that is not one could not name a term. That a stored id names a term which
+  // exists is checked in `scripts/content/taxonomy.test.ts`.
+  it("rejects a value that is not a term id", () => {
+    expect(() => topicsSchema.parse(["Not A Slug"])).toThrow();
+  });
+
+  it("accepts an id of a topic an editor has added", () => {
+    expect(topicsSchema.parse(["a-brand-new-topic"])).toEqual([
+      "a-brand-new-topic",
+    ]);
   });
 });
 

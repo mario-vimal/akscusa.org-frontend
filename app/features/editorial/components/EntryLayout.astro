@@ -7,7 +7,7 @@ import {
   type EditorialCollection,
 } from "~/features/editorial/sections";
 import type { Badge, Detail, LinkItem } from "~/features/editorial/presenters";
-import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
+import { loadTermLabels } from "~/features/editorial/queries/taxonomy";
 import ProseContent from "./ProseContent.astro";
 
 interface EntryPoster {
@@ -25,7 +25,7 @@ interface Props {
   /** Set apart from the body, used for an intervention's outcome. */
   callout?: { heading: string; text: string };
   links?: { heading: string; items: readonly LinkItem[] };
-  topics?: readonly EditorialTopic[];
+  topics?: readonly string[];
   heroImage?: { src: string; alt: string };
   /** AKSC's own flyers for the entry, shown in an aside beside its details. */
   posters?: readonly EntryPoster[];
@@ -61,6 +61,8 @@ const badgeClasses =
 
 const hasPosters = posters.length > 0;
 const hasMultiplePosters = posters.length > 1;
+
+const topicLabel = await loadTermLabels("topics");
 ---
 
 <article>

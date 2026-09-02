@@ -82,7 +82,8 @@ says "this belongs with me" and survives the directory being moved. There are no
 | --------------------------------------------- | ---------------------------------- |
 | Reads a content collection                    | `features/<feature>/queries/`      |
 | Turns an entry into the strings a page prints | `features/<feature>/presenters.ts` |
-| A controlled vocabulary                       | `features/editorial/taxonomy.ts`   |
+| A structural vocabulary                       | `features/editorial/taxonomy.ts`   |
+| An editor-maintained vocabulary               | `cms/content/topics`, `categories` |
 | Pure helper, no content access                | `features/<feature>/<name>.ts`     |
 | Useful to more than one feature               | `app/lib/`                         |
 | A collection's schema                         | `app/schemas/<domain>.ts`          |
@@ -183,23 +184,41 @@ the fields its own kind of entry needs.
 | `programs`      | `cms/content/programs`       | `/programs`       | `kind`, `status`, `schedule`, `location`, `posters`       |
 | `bookReadings`  | `cms/content/book-readings`  | `/book-readings`  | `location`, `book`, `participants`, `registrationUrl`     |
 
-`app/features/editorial/taxonomy.ts` is the single source of truth for every
-controlled vocabulary: shared `topics`, article categories, intervention kinds
-and statuses, conference formats, and program kinds and statuses.
-`app/schemas/` turns those lists into Zod enums and the pages render their
-labels. The CMS cannot import
-TypeScript, so `cms/public/admin/config.yml` repeats the options in YAML and
-`scripts/cms/config.test.ts` fails if the two drift apart.
+Vocabularies come from one of two places, depending on whether the site's code
+depends on the terms.
 
-`topics` is shared across all six collections, so an article, a statement, and
-a campaign about the same subject stay relatable without duplicating an entry.
+The **structural** ones stay in `app/features/editorial/taxonomy.ts`:
+intervention kinds and statuses, conference formats, program kinds and
+statuses, and General Body paper kinds. A term there decides what a template
+does — whether a concluded intervention prints a date range, which shelf a
+program falls on — so adding one means writing the behaviour that goes with it.
+`app/schemas/` turns those lists into Zod enums. The CMS cannot import
+TypeScript, so `cms/public/admin/config.yml` repeats them as `select` options
+and `scripts/cms/config.test.ts` fails if the two drift apart.
+
+The **editorial** ones are content, in `cms/content/topics/` and
+`cms/content/categories/`. Naming a new subject or a new blog shelf is
+editorial judgement, not a code change, so an editor adds a term in the CMS and
+every form that files an entry under one offers it immediately. Entries store a
+term's filename and pick it through a relation widget, so a term can be renamed
+without rewriting the entries that carry it and cannot be mistyped.
+`app/features/editorial/queries/taxonomy.ts` is how a page reads them, and
+`scripts/content/taxonomy.test.ts` catches an entry left pointing at a term
+that no longer exists.
+
+`topics` is shared across every collection, including books and comics, so an
+article, a statement, a campaign, and a book about the same subject stay
+relatable without duplicating an entry.
 
 Each section has an index at its route and an entry page at
 `<route>/<slug>/`. Book readings are listed as a record rather than as cards:
 one entry per book, carrying the run of sittings it took and the flyers those
-sittings were announced with. Articles are also browsable by category at
-`/blog/category/<category>/` and interventions by kind at
-`/interventions/kind/<kind>/`; only terms that have entries get a page.
+sittings were announced with. The blog and the interventions index narrow
+themselves in place: the chips under the masthead filter the entries already on
+the page and remember the choice in the query string, such as
+`/blog/?category=books-and-media`, so a vocabulary an editor keeps adding to
+never turns into a page per term. Only terms that entries actually use are
+offered.
 `app/features/editorial/` holds the shared list, card, and entry components, so
 a change to one section's chrome lands on all six.
 

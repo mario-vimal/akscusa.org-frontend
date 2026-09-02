@@ -3,12 +3,7 @@ import type { ImageMetadata } from "astro";
 
 import Container from "~/components/ui/Container.astro";
 import PageMasthead from "~/components/ui/PageMasthead.astro";
-
-interface FilterLink {
-  label: string;
-  href: string;
-  current?: boolean;
-}
+import { ALL_TERMS, type Filter } from "~/features/editorial/presenters";
 
 interface ImageCredit {
   creator: string;
@@ -23,8 +18,20 @@ interface Props {
   description: string;
   /** Printed beside the title, for example "38 entries". */
   count?: string;
-  filters?: readonly FilterLink[];
+  filters?: readonly Filter[];
   filtersLabel?: string;
+  /**
+   * The query key a chosen filter is remembered in, such as `category`. It is
+   * what makes a narrowed index linkable without publishing a page per term.
+   */
+  filterKey?: string;
+  /**
+   * The term the lead entry is filed under, so the lead is put away with the
+   * rest of its category when a different one is chosen.
+   */
+  leadTerm?: string;
+  /** How the count words itself as the filter changes the number shown. */
+  countNoun?: { one: string; other: string };
   /** Shown in place of the list when nothing has been published yet. */
   empty?: string;
   isEmpty?: boolean;
@@ -58,6 +65,9 @@ const {
   count,
   filters = [],
   filtersLabel = "Filter",
+  filterKey,
+  leadTerm,
+  countNoun,
   empty,
   isEmpty = false,
   backgroundImage,
@@ -91,43 +101,39 @@ const gridColumns =
 const leadHtml = Astro.slots.has("lead")
   ? (await Astro.slots.render("lead")).trim()
   : "";
+
+/*
+ * The meta line, worded here when the caller gives a noun rather than a
+ * finished string. A filtered index rewrites it as the number shown changes,
+ * and it can only do that if it knows how to say "1 article" as well as "8".
+ */
+const total =
+  itemCount === undefined ? undefined : itemCount + (leadHtml ? 1 : 0);
+const meta =
+  count ??
+  (countNoun && total !== undefined
+    ? `${total} ${total === 1 ? countNoun.one : countNoun.other}`
+    : undefined);
+
+// A filter row narrows this index in place. It is only wired up when the
+// caller says which query key remembers the choice; see `index-filter.ts`.
+const filtering = filters.length > 0 && filterKey !== undefined;
 ---
 
-<section>
+<section
+  data-index-filter={filtering ? filterKey : undefined}
+  data-count-one={filtering ? countNoun?.one : undefined}
+  data-count-other={filtering ? countNoun?.other : undefined}
+>
   <PageMasthead
     eyebrow={eyebrow}
     title={title}
     description={description}
-    meta={count}
+    meta={meta}
     backgroundImage={backgroundImage}
     backgroundLabel={backgroundLabel}
     backgroundCredit={backgroundCredit}
-  >
-    {
-      filters.length > 0 && (
-        <nav class="mt-12" aria-label={filtersLabel}>
-          <ul class="flex flex-wrap gap-x-6 gap-y-2">
-            {filters.map((filter) => (
-              <li>
-                <a
-                  class:list={[
-                    "inline-block border-b-2 py-1 font-display text-[0.875rem] font-medium transition-colors",
-                    filter.current
-                      ? "border-accent-300 text-white"
-                      : "border-transparent text-white/60 hover:border-white/40 hover:text-white",
-                  ]}
-                  href={filter.href}
-                  aria-current={filter.current ? "page" : undefined}
-                >
-                  {filter.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      )
-    }
-  </PageMasthead>
+  />
 
   {
     /*
@@ -138,7 +144,11 @@ const leadHtml = Astro.slots.has("lead")
       the masthead to the footer.
     */
     leadHtml && (
-      <div class="border-b border-rule bg-paper">
+      <div
+        class="border-b border-rule bg-paper"
+        data-filter-lead={filtering ? "" : undefined}
+        data-filter-term={filtering ? leadTerm : undefined}
+      >
         <Container class="py-14 sm:py-16">
           <Fragment set:html={leadHtml} />
         </Container>
@@ -152,6 +162,39 @@ const leadHtml = Astro.slots.has("lead")
     <slot name="intro" />
 
     {
+      /*
+        The filter row sits with the cards it filters, not up in the masthead.
+        On a phone the masthead is a screen of its own, so a chip pressed up
+        there changed a list the reader could not see and the page appeared not
+        to have done anything. Here the result of a press is the next thing
+        under it at every width.
+      */
+      filters.length > 0 && (
+        <div
+          class="mb-9"
+          role="group"
+          aria-label={filtersLabel}
+          data-filter-controls
+        >
+          <ul class="flex flex-wrap gap-x-5 gap-y-2">
+            {filters.map((filter) => (
+              <li>
+                <button
+                  type="button"
+                  class="inline-block cursor-pointer border-b-2 border-transparent py-2 font-display text-[0.875rem] font-medium text-ambedkar-900/70 transition-colors hover:border-ambedkar-900/25 hover:text-ambedkar-900 aria-pressed:border-accent-600 aria-pressed:text-ambedkar-900"
+                  data-filter-value={filter.value}
+                  aria-pressed={filter.value === ALL_TERMS}
+                >
+                  {filter.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+
+    {
       isEmpty ? (
         <p class="card max-w-2xl px-6 py-8 leading-7 text-ambedkar-900/75">
           {empty}
@@ -159,7 +202,12 @@ const leadHtml = Astro.slots.has("lead")
       ) : list ? (
         <>
           {leadHtml && (
-            <h2 class="label mb-7 text-ambedkar-900/55">{listLabel}</h2>
+            <h2
+              class="label mb-7 text-ambedkar-900/55"
+              data-filter-list-label={filtering ? "" : undefined}
+            >
+              {listLabel}
+            </h2>
           )}
           {/*
             `grid-cols-1` is not redundant. Without a column definition the base
@@ -180,3 +228,9 @@ const leadHtml = Astro.slots.has("lead")
     }
   </Container>
 </section>
+
+<script>
+  import { mountIndexFilters } from "~/features/editorial/index-filter";
+
+  mountIndexFilters();
+</script>

@@ -32,7 +32,7 @@ if (!home || home.data.pageType !== "home") {
 // in them; the spotlight and the quotes are now held tighter and the three
 // columns of latest work given more room, so the rhythm follows the content
 // rather than the template.
-const { spotlight, writing, reading, book, previous, shelf, comics, recent } =
+const { spotlight, writing, book, previous, shelf, comics, recent } =
   await loadHomeFeatures();
 ---
 
@@ -40,12 +40,7 @@ const { spotlight, writing, reading, book, previous, shelf, comics, recent } =
   <HomeHero hero={home.data.hero} />
   {
     (book || shelf.books.length > 0) && (
-      <HomeReading
-        book={book}
-        reading={reading}
-        previous={previous}
-        shelf={shelf}
-      />
+      <HomeReading book={book} previous={previous} shelf={shelf} />
     )
   }
   {spotlight && <HomeSpotlight spotlight={spotlight} />}

@@ -3,14 +3,11 @@
  * this out of the `.astro` files keeps the sections consistent and
  * the templates stay declarative.
  */
-import {
-  editorialSections,
-  type EditorialEntry,
-} from "~/features/editorial/sections";
+import type { EditorialEntry } from "~/features/editorial/sections";
+import { termsInUse, type Term } from "~/features/editorial/queries/taxonomy";
 import { formatDate, formatDateRange, ordinal } from "~/lib/dates";
 import { measurePublicImage, type ImageSize } from "~/lib/public-image";
 import {
-  articleCategories,
   conferenceFormatLabel,
   interventionKindLabel,
   interventionKinds,
@@ -37,11 +34,22 @@ export interface LinkItem {
   url: string;
 }
 
-interface Filter {
+/**
+ * One chip in an index's filter row.
+ *
+ * A chip names a term the visible entries are narrowed to; `ALL_TERMS` is the
+ * unnarrowed state. Filtering happens in the page rather than by navigating to
+ * a page per term: a vocabulary grows, and a route per term turns every new
+ * category into another near-empty listing in the sitemap that repeats what
+ * the index already shows.
+ */
+export interface Filter {
+  value: string;
   label: string;
-  href: string;
-  current?: boolean;
 }
+
+/** The chip that clears the filter, and the value that means "unfiltered". */
+export const ALL_TERMS = "all";
 
 const list = (values: readonly string[]) => values.join(", ");
 
@@ -76,28 +84,21 @@ export function articleDetails(article: Article): Detail[] {
 }
 
 /**
- * Category chips for the blog. Only categories that have published articles are
- * offered, so no chip ever leads to an empty page.
+ * Category chips for the blog, built from the categories an editor maintains.
+ *
+ * The terms are passed in rather than imported, because they are content now:
+ * only the page that loaded the vocabulary knows what it holds. Only categories
+ * that have published articles are offered, so no chip ever empties the list.
  */
 export function articleFilters(
   articles: Article[],
-  current?: string,
+  categories: readonly Term[],
 ): Filter[] {
-  const used = new Set(articles.map((article) => article.data.category));
-
   return [
-    {
-      label: "All articles",
-      href: `${editorialSections.articles.path}/`,
-      current: current === undefined,
-    },
-    ...articleCategories
-      .filter((category) => used.has(category.id))
-      .map((category) => ({
-        label: category.label,
-        href: `${editorialSections.articles.path}/category/${category.id}/`,
-        current: current === category.id,
-      })),
+    { value: ALL_TERMS, label: "All articles" },
+    ...termsInUse(categories, articles, (article) => article.data.category).map(
+      (category) => ({ value: category.id, label: category.label }),
+    ),
   ];
 }
 
@@ -178,27 +179,15 @@ export function interventionDetails(intervention: Intervention): Detail[] {
   return details;
 }
 
-/** Chips that narrow the interventions index by status, then by kind. */
-export function interventionFilters(
-  interventions: Intervention[],
-  current?: string,
-): Filter[] {
-  const { path } = editorialSections.interventions;
+/** Chips that narrow the interventions index by kind. */
+export function interventionFilters(interventions: Intervention[]): Filter[] {
   const usedKinds = new Set(interventions.map((entry) => entry.data.kind));
 
   return [
-    {
-      label: "All interventions",
-      href: `${path}/`,
-      current: current === undefined,
-    },
+    { value: ALL_TERMS, label: "All interventions" },
     ...interventionKinds
       .filter((kind) => usedKinds.has(kind.id))
-      .map((kind) => ({
-        label: kind.label,
-        href: `${path}/kind/${kind.id}/`,
-        current: current === kind.id,
-      })),
+      .map((kind) => ({ value: kind.id, label: kind.label })),
   ];
 }
 

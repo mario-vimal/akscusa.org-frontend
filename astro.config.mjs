@@ -3,6 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { defineConfig } from "astro/config";
 import { loadEnv } from "vite";
 
+import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
 import { resolveCmsDirectory } from "./scripts/cms/dev-routing";
@@ -105,7 +106,7 @@ export default defineConfig({
   output: "static",
   srcDir: "./app",
   publicDir: "./cms/public",
-  integrations: [cmsBackendRepo()],
+  integrations: [sitemap(), cmsBackendRepo()],
   vite: {
     plugins: [tailwindcss(), cmsDevServer()],
   },

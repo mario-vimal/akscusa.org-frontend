@@ -9,7 +9,7 @@ import type {
   Detail,
   ProgramPoster,
 } from "~/features/editorial/presenters";
-import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
+import { loadTermLabels } from "~/features/editorial/queries/taxonomy";
 
 interface LinkItem {
   label: string;
@@ -23,7 +23,7 @@ interface Props {
   details: readonly Detail[];
   posters?: readonly ProgramPoster[];
   links?: readonly LinkItem[];
-  topics?: readonly EditorialTopic[];
+  topics?: readonly string[];
   sourceUrl?: string;
 }
 
@@ -44,6 +44,8 @@ const badgeClasses =
   badge.tone === "muted"
     ? "border-white/40 text-white/85"
     : "border-accent-400/70 text-accent-300";
+
+const topicLabel = await loadTermLabels("topics");
 ---
 
 <article>

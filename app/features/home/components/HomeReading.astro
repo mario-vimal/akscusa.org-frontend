@@ -2,21 +2,17 @@
 import Container from "~/components/ui/Container.astro";
 import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
 import { COVER_ALT, COVER_WIDTHS } from "~/features/books/covers";
-import type {
-  BookFeature,
-  ReadingFeature,
-} from "~/features/home/queries/featured";
+import type { BookFeature } from "~/features/home/queries/featured";
 import type { Shelf, ShelfBook } from "~/features/home/queries/shelf";
 import { formatDate, formatMonth, isoDate } from "~/lib/dates";
 
 interface Props {
   book?: BookFeature;
-  reading?: ReadingFeature;
   previous?: ShelfBook;
   shelf: Shelf;
 }
 
-const { book, reading, previous, shelf } = Astro.props;
+const { book, previous, shelf } = Astro.props;
 const { books } = shelf;
 ---
 
@@ -27,9 +23,13 @@ const { books } = shelf;
   organisation is named for.
 
   It reads in the order a reader asks: what are you on now, and what have you
-  read? The book on now is set once, at size, with its session beneath it. The
-  shelf behind it is a row of covers that rotates, because a shelf is a thing
-  you push along rather than a grid of three cards that stops.
+  read? The book on now is set once, at size, with its session count and date
+  beneath it. The next session is deliberately not restated here: it works
+  through the current book, so naming both put the same reading on the page
+  twice under two labels. The reading index is one link away and is the place
+  that carries the session itself. The shelf behind it is a row of covers that
+  rotates, because a shelf is a thing you push along rather than a grid of
+  three cards that stops.
 
   It opens on an eyebrow and a heading and the spotlight beneath it opens on
   the rule alone and then a date, so the two bands at the top of the page do
@@ -108,25 +108,6 @@ const { books } = shelf;
                   {formatDate(book.sessionOn)}
                 </time>
               </p>
-
-              {reading && (
-                <div class="mt-7 border-t border-rule pt-6">
-                  <p class="label label-sm text-ambedkar-900/70">
-                    {reading.upcoming ? "Next session" : "Last met"}
-                  </p>
-                  <h4 class="mt-2 font-display text-lg leading-[1.25] font-bold tracking-title text-balance text-ambedkar-950">
-                    <a class="link-underline" href={reading.href}>
-                      {reading.title}
-                    </a>
-                  </h4>
-                  <p class="mt-2 text-sm leading-6 text-ambedkar-900/70">
-                    <time datetime={isoDate(reading.date)}>
-                      {formatDate(reading.date)}
-                    </time>
-                    <span class="block">{reading.location}</span>
-                  </p>
-                </div>
-              )}
 
               <p class="mt-7">
                 <a class="btn btn-outline btn-sm" href="/book-readings/">

@@ -4,7 +4,7 @@ import EntryHeader from "~/components/ui/EntryHeader.astro";
 import Poster from "~/components/ui/Poster.astro";
 import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
 import { formatPacificDate } from "~/lib/dates";
-import { topicLabel } from "~/features/editorial/taxonomy";
+import { loadTermLabels } from "~/features/editorial/queries/taxonomy";
 import AuthorByline from "~/features/authors/components/AuthorByline.astro";
 import { COVER_ALT, COVER_WIDTHS } from "~/features/books/covers";
 import { openLibraryUrl } from "~/features/books/isbn";
@@ -33,6 +33,8 @@ const facts = [
 ].filter((fact) => fact !== null);
 
 const hasFacts = facts.length > 0 || data.isbn !== undefined;
+
+const topicLabel = await loadTermLabels("topics");
 ---
 
 <article>

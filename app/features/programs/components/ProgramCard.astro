@@ -1,10 +1,9 @@
 ---
-import type { EditorialTopic } from "~/features/editorial/taxonomy";
 import type {
   Badge,
   SizedProgramPoster,
 } from "~/features/editorial/presenters";
-import { topicLabel } from "~/features/editorial/taxonomy";
+import { loadTermLabels } from "~/features/editorial/queries/taxonomy";
 
 interface Props {
   href: string;
@@ -13,7 +12,7 @@ interface Props {
   eyebrow: string;
   badge: Badge;
   meta?: readonly string[];
-  topics?: readonly EditorialTopic[];
+  topics?: readonly string[];
   poster?: SizedProgramPoster;
 }
 
@@ -32,6 +31,8 @@ const badgeClasses =
   badge.tone === "muted"
     ? "border-rule-strong text-ambedkar-900/70"
     : "border-accent-600 text-accent-700";
+
+const topicLabel = await loadTermLabels("topics");
 ---
 
 <article class="card group">

@@ -9,7 +9,6 @@
 import { z } from "astro/zod";
 
 import { isValidIsbn13, normalizeIsbn } from "~/features/books/isbn";
-import { editorialTopicIds } from "~/features/editorial/taxonomy";
 
 // Structured records edited through the CMS, unlike the static copy above.
 //
@@ -68,11 +67,25 @@ export const localImageSchema = (collection: string) =>
 // than sending an object with blank fields.
 export const optionalRemoteImage = optionalCmsField(remoteImageSchema);
 
-// Shared by every editorial-shaped collection that offers the multi-select
-// topics widget, and by books and comics, which offer the same widget outside
-// `editorialBase`.
+// Shared by every editorial-shaped collection that offers the topics widget,
+// and by books and comics, which offer the same widget outside `editorialBase`.
+//
+// The values are ids of entries in the editor-maintained `topics` collection,
+// not members of an enum: an editor adds a topic without a developer, so there
+// is no fixed list here to check against. A typo cannot arrive through the
+// CMS, because the relation widget only offers terms that exist, and
+// `scripts/content/taxonomy.test.ts` catches one typed into a file by hand.
 export const topicsSchema = optionalCmsList(
-  z.array(z.enum(editorialTopicIds)).default([]),
+  z
+    .array(
+      z
+        .string()
+        .regex(
+          /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+          "Must be a lowercase kebab-case topic slug.",
+        ),
+    )
+    .default([]),
 );
 
 // Editorial records share one shape so the blog, press releases, interventions,

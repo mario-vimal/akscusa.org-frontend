@@ -5,7 +5,7 @@ import PageMasthead from "~/components/ui/PageMasthead.astro";
 import ContributeCallout from "~/features/artwork/components/ContributeCallout.astro";
 import PanelSequence from "~/features/artwork/components/PanelSequence.astro";
 import type { SizedPanel } from "~/features/artwork/panels";
-import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
+import { loadTermLabels } from "~/features/editorial/queries/taxonomy";
 
 interface Action {
   label: string;
@@ -28,7 +28,7 @@ interface Props {
   summary: string;
   published: string;
   credits: readonly Credit[];
-  topics: readonly EditorialTopic[];
+  topics: readonly string[];
   contentNote?: string;
   panels: readonly SizedPanel[];
   previous?: Neighbour;
@@ -60,6 +60,8 @@ const {
 } = Astro.props;
 
 const total = panels.length;
+
+const topicLabel = await loadTermLabels("topics");
 ---
 
 <!--

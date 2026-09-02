@@ -10,11 +10,18 @@ import {
 } from "~/features/editorial/queries/entries";
 import { formatDate } from "~/lib/dates";
 import { articleFilters, articleMeta } from "~/features/editorial/presenters";
-import { articleCategoryLabel } from "~/features/editorial/taxonomy";
+import {
+  loadTermLabels,
+  loadTerms,
+} from "~/features/editorial/queries/taxonomy";
 import SiteLayout from "~/layouts/SiteLayout.astro";
 
 const section = editorialSections.articles;
-const articles = await loadEditorialEntries("articles");
+const [articles, categories, articleCategoryLabel] = await Promise.all([
+  loadEditorialEntries("articles"),
+  loadTerms("categories"),
+  loadTermLabels("categories"),
+]);
 const { lead, rest } = splitLeadEntry(articles);
 ---
 
@@ -23,9 +30,11 @@ const { lead, rest } = splitLeadEntry(articles);
     eyebrow={section.eyebrow}
     title={section.title}
     description={section.description}
-    count={`${articles.length} ${articles.length === 1 ? "article" : "articles"}`}
-    filters={articleFilters(articles)}
+    countNoun={{ one: "article", other: "articles" }}
+    filters={articleFilters(articles, categories)}
     filtersLabel="Filter articles by category"
+    filterKey="category"
+    leadTerm={lead?.data.category}
     empty={section.empty}
     isEmpty={articles.length === 0}
     itemCount={rest.length}
@@ -50,7 +59,7 @@ const { lead, rest } = splitLeadEntry(articles);
     }
     {
       rest.map((article) => (
-        <li>
+        <li data-filter-term={article.data.category}>
           <EntryCard
             href={entryHref("articles", article.id)}
             title={article.data.title}

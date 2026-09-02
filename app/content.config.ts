@@ -10,6 +10,7 @@ import {
 } from "~/schemas/editorial";
 import { generalBodyMeetings } from "~/schemas/organization";
 import { pages } from "~/schemas/pages";
+import { categories, topics } from "~/schemas/taxonomy";
 
 /**
  * Every content collection on the site, in one place because Astro requires it.
@@ -21,6 +22,8 @@ import { pages } from "~/schemas/pages";
  */
 export const collections = {
   pages,
+  topics,
+  categories,
   books,
   authors,
   bookReadings,

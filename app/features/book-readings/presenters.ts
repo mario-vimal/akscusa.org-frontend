@@ -20,13 +20,19 @@ import {
 } from "~/lib/dates";
 import type { AuthorLink } from "~/features/authors/links";
 import type { Badge, Detail } from "~/features/editorial/presenters";
-import { topicLabel } from "~/features/editorial/taxonomy";
 import { bookAuthorLinks, bookByline } from "~/features/books/presenters";
 import { bookHref, type BookWithAuthors } from "~/features/books/queries/books";
 import { isUpcoming } from "~/lib/collections";
 import { sessionLabel } from "~/features/book-readings/titles";
 
 type Reading = EditorialEntry<"bookReadings">;
+
+/**
+ * Turns a stored topic id into the label the log prints. Topics are content an
+ * editor maintains, so the lookup is loaded from the collection and passed in
+ * rather than imported: these functions stay strings in, strings out.
+ */
+type TopicLabel = (id: string) => string;
 
 const list = (values: readonly string[]) => values.join(", ");
 
@@ -232,6 +238,7 @@ function entrySearch(
 function bookEntry(
   entry: BookWithAuthors,
   unordered: readonly Reading[],
+  topicLabel: TopicLabel,
 ): ReadingEntry {
   const { book } = entry;
   const run = chronological(unordered);
@@ -279,7 +286,7 @@ function bookEntry(
 }
 
 /** A sitting that worked through no book, which stands as its own entry. */
-function articlesEntry(reading: Reading): ReadingEntry {
+function articlesEntry(reading: Reading, topicLabel: TopicLabel): ReadingEntry {
   const topics = reading.data.topics.map(topicLabel);
   const sessions = [reading];
 
@@ -316,6 +323,7 @@ function articlesEntry(reading: Reading): ReadingEntry {
 export function readingEntries(
   readings: readonly Reading[],
   books: ReadonlyMap<string, BookWithAuthors>,
+  topicLabel: TopicLabel,
 ): ReadingEntry[] {
   const sessionsByBook = new Map<string, Reading[]>();
 
@@ -335,14 +343,16 @@ export function readingEntries(
     const entry = books.get(reading.id);
 
     if (!entry) {
-      entries.push(articlesEntry(reading));
+      entries.push(articlesEntry(reading, topicLabel));
       continue;
     }
 
     const { id } = entry.book;
     if (emitted.has(id)) continue;
     emitted.add(id);
-    entries.push(bookEntry(entry, sessionsByBook.get(id) ?? [reading]));
+    entries.push(
+      bookEntry(entry, sessionsByBook.get(id) ?? [reading], topicLabel),
+    );
   }
 
   return entries;
