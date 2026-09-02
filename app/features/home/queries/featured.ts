@@ -14,6 +14,11 @@ import {
   type EditorialEntry,
 } from "~/features/editorial/sections";
 import { loadEditorialEntries } from "~/features/editorial/queries/entries";
+import {
+  loadShelf,
+  type Shelf,
+  type ShelfBook,
+} from "~/features/home/queries/shelf";
 import { bySoonestFirst, isUpcoming, type Dated } from "~/lib/collections";
 
 /**
@@ -299,6 +304,9 @@ export interface HomeFeatures {
   writing: Writing;
   reading?: ReadingFeature;
   book?: BookFeature;
+  /** The book read before the current one, set beside it rather than in the row. */
+  previous?: ShelfBook;
+  shelf: Shelf;
   comics: ComicSummary[];
   recent: FeaturedRef[];
 }
@@ -309,13 +317,26 @@ export interface HomeFeatures {
  * knows how they are chosen.
  */
 export async function loadHomeFeatures(): Promise<HomeFeatures> {
-  const [spotlight, writing, reading, book, drawn] = await Promise.all([
-    loadSpotlight(),
-    loadWriting(),
-    loadReading(),
-    loadCurrentBook(),
-    loadComicsIndex(),
-  ]);
+  const [spotlight, writing, reading, book, wholeShelf, drawn] =
+    await Promise.all([
+      loadSpotlight(),
+      loadWriting(),
+      loadReading(),
+      loadCurrentBook(),
+      loadShelf(),
+      loadComicsIndex(),
+    ]);
+
+  /*
+   * The book on now is set at size, and the one before it fills the column
+   * beside it, so neither is also a cover in the row beneath them. The counts
+   * still describe the whole shelf, because they are the circle's record and
+   * not a caption for the row.
+   */
+  const [previous, ...rest] = wholeShelf.books.filter(
+    (entry) => entry.href !== book?.href,
+  );
+  const shelf: Shelf = { ...wholeShelf, books: rest };
 
   // Nothing already shown above should reappear in the closing index.
   const shown = [
@@ -330,6 +351,8 @@ export async function loadHomeFeatures(): Promise<HomeFeatures> {
     writing,
     reading,
     book,
+    previous,
+    shelf,
     // The homepage shows the covers, not the whole shelf; the index is one
     // click away and is the place that lists everything.
     comics: drawn.comics.slice(0, 2),

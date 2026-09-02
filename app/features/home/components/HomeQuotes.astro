@@ -12,7 +12,9 @@ const { quotes } = Astro.props;
 <section
   class="on-dark relative isolate overflow-hidden bg-ambedkar-950 text-white"
   aria-labelledby="voices-title"
-  data-quote-carousel
+  data-carousel
+  data-carousel-noun="quotation"
+  data-carousel-rotation="quotations"
 >
   <div
     class="absolute inset-0 -z-10 bg-linear-to-b from-ambedkar-950 to-ambedkar-1000"
@@ -115,7 +117,7 @@ const { quotes } = Astro.props;
       make them one more tile on a page of tiles.
     -->
     <div
-      class="quotes-viewport mt-14 snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth sm:mt-16"
+      class="carousel-viewport mt-14 sm:mt-16"
       role="region"
       aria-roledescription="carousel"
       aria-label="Quotations by revolutionary leaders"
@@ -147,7 +149,10 @@ const { quotes } = Astro.props;
                 </blockquote>
 
                 <figcaption class="mt-8 border-t border-white/20 pt-4 sm:mt-10">
-                  <p class="font-display text-xs font-semibold tracking-[0.16em] text-accent-300 uppercase">
+                  <p
+                    class="font-display text-xs font-semibold tracking-[0.16em] text-accent-300 uppercase"
+                    data-carousel-label
+                  >
                     {quote.author}
                   </p>
                   <cite class="mt-1.5 block text-sm text-white/55 not-italic">
@@ -172,23 +177,7 @@ const { quotes } = Astro.props;
 </section>
 
 <script>
-  import { mountQuoteCarousels } from "~/features/home/quote-carousel";
+  import { mountCarousels } from "~/features/home/carousel";
 
-  mountQuoteCarousels();
+  mountCarousels();
 </script>
-
-<style>
-  .quotes-viewport {
-    scrollbar-width: none;
-  }
-
-  .quotes-viewport::-webkit-scrollbar {
-    display: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .quotes-viewport {
-      scroll-behavior: auto;
-    }
-  }
-</style>

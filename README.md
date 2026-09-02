@@ -120,9 +120,9 @@ readable on its own:
 
 ```astro
 <script>
-  import { mountQuoteCarousels } from "~/features/home/quote-carousel";
+  import { mountCarousels } from "~/features/home/carousel";
 
-  mountQuoteCarousels();
+  mountCarousels();
 </script>
 ```
 

@@ -1,31 +1,28 @@
 ---
 import Container from "~/components/ui/Container.astro";
-import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
-import { COVER_ALT, COVER_WIDTHS } from "~/features/books/covers";
 import { formatDate, isoDate } from "~/lib/dates";
 import type {
-  BookFeature,
   FeaturedRef,
   LeadArticle,
-  ReadingFeature,
 } from "~/features/home/queries/featured";
 
 interface Props {
   lead?: LeadArticle;
   more: readonly FeaturedRef[];
-  reading?: ReadingFeature;
-  book?: BookFeature;
   recent: readonly FeaturedRef[];
 }
 
-const { lead, more, reading, book, recent } = Astro.props;
+const { lead, more, recent } = Astro.props;
 ---
 
 <!--
-  The latest work, in three different shapes rather than three of the same
-  card. An essay is a piece of writing, so it leads at the size of writing; a
-  book is an object, so it is shown as one; and the rest is an index, because a
-  list of recent things is a list.
+  The latest work, in two different shapes rather than two of the same card. An
+  essay is a piece of writing, so it leads at the size of writing, and the rest
+  is an index, because a list of recent things is a list.
+
+  The reading circle used to be the right-hand column here. It now opens the
+  page, in HomeReading: a study circle's books are not one of three things it
+  did lately.
 -->
 <section class="bg-paper" aria-labelledby="latest-title">
   <Container class="py-24 sm:py-32">
@@ -35,7 +32,7 @@ const { lead, more, reading, book, recent } = Astro.props;
         id="latest-title"
         class="font-display text-display-sm leading-[1.04] font-bold tracking-display text-balance text-ambedkar-950"
       >
-        What the circle is writing, reading, and taking on.
+        What the circle is writing and taking on.
       </h2>
     </div>
 
@@ -98,88 +95,6 @@ const { lead, more, reading, book, recent } = Astro.props;
       </div>
 
       <div class="reveal-children flex flex-col gap-12">
-        {
-          (book || reading) && (
-            <article>
-              <p class="label text-accent-700">Reading circle</p>
-
-              {book && (
-                <div class="mt-5 flex gap-5">
-                  {book.cover && (
-                    <a class="shrink-0 self-start" href={book.href}>
-                      <ResponsiveImage
-                        class="w-24 rounded-md shadow-lift sm:w-28"
-                        src={book.cover}
-                        alt={COVER_ALT}
-                        sizes="(min-width: 640px) 112px, 96px"
-                        widths={COVER_WIDTHS}
-                      />
-                    </a>
-                  )}
-                  <div class="min-w-0">
-                    <p class="label label-sm text-ambedkar-900/70">
-                      Current book
-                    </p>
-                    <h3 class="mt-2 font-display text-xl leading-[1.16] font-bold tracking-title text-balance text-ambedkar-950">
-                      <a class="link-underline" href={book.href}>
-                        {book.title}
-                      </a>
-                    </h3>
-                    {book.authors && (
-                      <p class="mt-2 font-serif text-base leading-6 text-ambedkar-900/80 italic">
-                        {book.authors}
-                      </p>
-                    )}
-                    {/*
-                      Stated without tense, and dated, because this page is
-                      built once and then stands. "Latest book read" and "read
-                      over three sessions" were both false the moment the
-                      circle announced a session it had not yet held, and a
-                      label that toggles on the build date would go on to
-                      falsify itself the day that session passed. A count and a
-                      date can only be overtaken by a new reading, which is a
-                      rebuild.
-                    */}
-                    <p class="mt-3 text-sm leading-6 text-ambedkar-900/70">
-                      {book.sessions}{" "}
-                      {book.sessions === 1 ? "session" : "sessions"}
-                      <span> · </span>
-                      <time datetime={isoDate(book.sessionOn)}>
-                        {formatDate(book.sessionOn)}
-                      </time>
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {reading && (
-                <div class="mt-7 border-t border-rule pt-6">
-                  <p class="label label-sm text-ambedkar-900/70">
-                    {reading.upcoming ? "Next session" : "Last met"}
-                  </p>
-                  <h3 class="mt-2 font-display text-lg leading-[1.25] font-bold tracking-title text-balance text-ambedkar-950">
-                    <a class="link-underline" href={reading.href}>
-                      {reading.title}
-                    </a>
-                  </h3>
-                  <p class="mt-2 text-sm leading-6 text-ambedkar-900/70">
-                    <time datetime={isoDate(reading.date)}>
-                      {formatDate(reading.date)}
-                    </time>
-                    <span class="block">{reading.location}</span>
-                  </p>
-                </div>
-              )}
-
-              <p class="mt-6">
-                <a class="btn btn-outline btn-sm" href="/book-readings/">
-                  All readings
-                </a>
-              </p>
-            </article>
-          )
-        }
-
         {
           recent.length > 0 && (
             <div>

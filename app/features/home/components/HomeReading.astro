@@ -1,0 +1,395 @@
+---
+import Container from "~/components/ui/Container.astro";
+import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
+import { COVER_ALT, COVER_WIDTHS } from "~/features/books/covers";
+import type {
+  BookFeature,
+  ReadingFeature,
+} from "~/features/home/queries/featured";
+import type { Shelf, ShelfBook } from "~/features/home/queries/shelf";
+import { formatDate, formatMonth, isoDate } from "~/lib/dates";
+
+interface Props {
+  book?: BookFeature;
+  reading?: ReadingFeature;
+  previous?: ShelfBook;
+  shelf: Shelf;
+}
+
+const { book, reading, previous, shelf } = Astro.props;
+const { books, read, sessions } = shelf;
+
+const record = `${read} ${read === 1 ? "book" : "books"} read over ${sessions} ${
+  sessions === 1 ? "session" : "sessions"
+}.`;
+---
+
+<!--
+  The reading circle, directly under the hero, because a study circle is what
+  it has studied. This band used to be a column inside "Latest from AKSC",
+  three sections down, which put the newest press release above the thing the
+  organisation is named for.
+
+  It reads in the order a reader asks: what are you on now, and what have you
+  read? The book on now is set once, at size, with its session beneath it. The
+  shelf behind it is a row of covers that rotates, because a shelf is a thing
+  you push along rather than a grid of three cards that stops.
+
+  It opens on an eyebrow and a heading and the spotlight beneath it opens on
+  the rule alone and then a date, so the two bands at the top of the page do
+  not arrive in the same shape.
+-->
+<section
+  class="bg-paper"
+  aria-labelledby="reading-title"
+  data-carousel
+  data-carousel-noun="book"
+  data-carousel-rotation="the shelf"
+  data-carousel-interval="5000"
+>
+  <Container class="py-16 sm:py-20">
+    <div class="reveal section-head">
+      <p class="eyebrow">The reading circle</p>
+
+      <h2
+        id="reading-title"
+        class="max-w-2xl font-display text-display-sm leading-[1.04] font-bold tracking-display text-balance text-ambedkar-950"
+      >
+        Every argument here was read together first.
+      </h2>
+    </div>
+
+    {
+      book && (
+        <div
+          class:list={[
+            "reveal mt-12 grid gap-10 sm:mt-14",
+            previous &&
+              "lg:grid-cols-[minmax(0,1fr)_minmax(0,19rem)] lg:gap-14",
+          ]}
+        >
+          <div class="flex flex-col gap-7 sm:flex-row sm:gap-10">
+            {book.cover && (
+              <a class="shrink-0 self-start" href={book.href} tabindex="-1">
+                <ResponsiveImage
+                  class="w-32 rounded-md shadow-lift sm:w-40 lg:w-44"
+                  src={book.cover}
+                  alt={COVER_ALT}
+                  sizes="(min-width: 1024px) 176px, (min-width: 640px) 160px, 128px"
+                  widths={COVER_WIDTHS}
+                />
+              </a>
+            )}
+
+            <div class="max-w-2xl min-w-0">
+              <p class="label text-accent-700">Current book</p>
+
+              <h3 class="mt-4 font-display text-3xl leading-[1.08] font-bold tracking-title text-balance text-ambedkar-950">
+                <a class="link-underline" href={book.href}>
+                  {book.title}
+                </a>
+              </h3>
+
+              {book.authors && (
+                <p class="mt-3 font-serif text-lg leading-7 text-ambedkar-900/80 italic">
+                  {book.authors}
+                </p>
+              )}
+
+              {/*
+              Stated without tense, and dated, because this page is built once
+              and then stands. "Latest book read" and "read over three
+              sessions" were both false the moment the circle announced a
+              session it had not yet held, and a label that toggles on the
+              build date would go on to falsify itself the day that session
+              passed. A count and a date can only be overtaken by a new
+              reading, which is a rebuild.
+            */}
+              <p class="mt-4 text-sm leading-6 text-ambedkar-900/70">
+                {book.sessions} {book.sessions === 1 ? "session" : "sessions"}
+                <span> · </span>
+                <time datetime={isoDate(book.sessionOn)}>
+                  {formatDate(book.sessionOn)}
+                </time>
+              </p>
+
+              {reading && (
+                <div class="mt-7 border-t border-rule pt-6">
+                  <p class="label label-sm text-ambedkar-900/70">
+                    {reading.upcoming ? "Next session" : "Last met"}
+                  </p>
+                  <h4 class="mt-2 font-display text-lg leading-[1.25] font-bold tracking-title text-balance text-ambedkar-950">
+                    <a class="link-underline" href={reading.href}>
+                      {reading.title}
+                    </a>
+                  </h4>
+                  <p class="mt-2 text-sm leading-6 text-ambedkar-900/70">
+                    <time datetime={isoDate(reading.date)}>
+                      {formatDate(reading.date)}
+                    </time>
+                    <span class="block">{reading.location}</span>
+                  </p>
+                </div>
+              )}
+
+              <p class="mt-7">
+                <a class="btn btn-outline btn-sm" href="/book-readings/">
+                  All readings
+                </a>
+              </p>
+            </div>
+          </div>
+
+          {/*
+            The column beside the current book, which was empty because the
+            measure of the text is narrower than the band. What belongs in it
+            is the book before this one: the pair reads as where the circle is
+            and where it has just been. It is therefore not also the first
+            cover in the row below, which would be the same book twice within
+            one band.
+
+            The rule is the divider between two columns rather than an
+            ornament: it turns to a top border below `lg`, where the two
+            columns become one.
+          */}
+          {previous && (
+            <aside class="border-t border-rule pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-14">
+              <p class="label text-ambedkar-900/70">Read before this</p>
+
+              <div class="mt-5 flex gap-5">
+                {previous.cover && (
+                  <a
+                    class="shrink-0 self-start"
+                    href={previous.href}
+                    tabindex="-1"
+                  >
+                    <ResponsiveImage
+                      class="w-20 rounded-md shadow-lift sm:w-24"
+                      src={previous.cover}
+                      alt={COVER_ALT}
+                      sizes="(min-width: 640px) 96px, 80px"
+                      widths={COVER_WIDTHS}
+                    />
+                  </a>
+                )}
+
+                <div class="min-w-0">
+                  <h3 class="font-display text-lg leading-[1.2] font-semibold tracking-title text-balance text-ambedkar-950">
+                    <a class="link-underline" href={previous.href}>
+                      {previous.title}
+                    </a>
+                  </h3>
+
+                  {previous.authors && (
+                    <p class="mt-2 font-serif text-[0.9375rem] leading-6 text-ambedkar-900/75 italic">
+                      {previous.authors}
+                    </p>
+                  )}
+
+                  <p class="label label-sm mt-3 text-ambedkar-900/70">
+                    {previous.sessions}{" "}
+                    {previous.sessions === 1 ? "session" : "sessions"}
+                    <span> · </span>
+                    <time datetime={isoDate(previous.lastReadOn)}>
+                      {formatMonth(previous.lastReadOn)}
+                    </time>
+                  </p>
+                </div>
+              </div>
+            </aside>
+          )}
+        </div>
+      )
+    }
+
+    {
+      books.length > 0 && (
+        <div class="reveal mt-16 flex flex-wrap items-end justify-between gap-6 sm:mt-20">
+          <div>
+            <p class="eyebrow">The shelf</p>
+            <p class="mt-4 font-display text-xl leading-tight font-semibold tracking-title text-ambedkar-950">
+              {record}
+            </p>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <a class="btn btn-outline btn-sm" href="/books/">
+              All books
+            </a>
+
+            {/*
+              Hidden until the script is ready, and hidden again whenever the
+              row already fits, so the band never offers a control that would
+              do nothing. Without JavaScript the covers stay a
+              touch-scrollable, scroll-snapping row.
+            */}
+            <div class="flex items-center" data-carousel-controls hidden>
+              <button
+                class="inline-flex size-10 items-center justify-center border border-rule-strong text-ambedkar-950 transition-colors hover:border-ambedkar-800 hover:bg-mist"
+                type="button"
+                aria-label="Previous book"
+                data-carousel-previous
+              >
+                <svg
+                  class="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m15 18-6-6 6-6" />
+                </svg>
+              </button>
+
+              <button
+                class="-ml-px inline-flex size-10 items-center justify-center border border-rule-strong text-ambedkar-950 transition-colors hover:border-ambedkar-800 hover:bg-mist"
+                type="button"
+                aria-label="Pause the shelf"
+                data-carousel-toggle
+              >
+                <svg
+                  class="size-4"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  data-carousel-pause-icon
+                >
+                  <path d="M6.5 5h3v14h-3zM14.5 5h3v14h-3z" />
+                </svg>
+                <svg
+                  class="hidden size-4"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                  data-carousel-play-icon
+                >
+                  <path d="m8 5 11 7-11 7z" />
+                </svg>
+              </button>
+
+              <button
+                class="-ml-px inline-flex size-10 items-center justify-center border border-rule-strong text-ambedkar-950 transition-colors hover:border-ambedkar-800 hover:bg-mist"
+                type="button"
+                aria-label="Next book"
+                data-carousel-next
+              >
+                <svg
+                  class="size-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    {
+      books.length > 0 && (
+        <div
+          class="carousel-viewport mt-8 sm:mt-10"
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Books the reading circle has read"
+          aria-live="off"
+          tabindex="0"
+          data-carousel-viewport
+        >
+          <ul class="flex">
+            {books.map((entry, index) => (
+              <li
+                class="w-full shrink-0 snap-start pr-6 sm:w-[70%] sm:pr-8 lg:w-[64%]"
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${index + 1} of ${books.length}`}
+                data-carousel-slide
+              >
+                <article class="group flex h-full flex-col gap-4 sm:flex-row sm:gap-6">
+                  {entry.cover ? (
+                    <a
+                      class="shrink-0 self-start"
+                      href={entry.href}
+                      tabindex="-1"
+                    >
+                      <ResponsiveImage
+                        class="w-24 rounded-md shadow-lift transition-[translate] duration-300 group-hover:-translate-y-1 sm:w-28 lg:w-32"
+                        src={entry.cover}
+                        alt={COVER_ALT}
+                        sizes="(min-width: 1024px) 128px, (min-width: 640px) 112px, 96px"
+                        widths={COVER_WIDTHS}
+                      />
+                    </a>
+                  ) : (
+                    <div
+                      class="flex w-24 shrink-0 items-center justify-center self-start rounded-md border border-dashed border-rule-strong bg-ambedkar-50 px-2 py-10 text-center text-xs font-semibold text-ambedkar-800/70 sm:w-28 lg:w-32"
+                      aria-hidden="true"
+                    >
+                      No cover
+                    </div>
+                  )}
+
+                  <div class="min-w-0">
+                    <p class="label label-sm text-ambedkar-900/70">
+                      {entry.sessions}{" "}
+                      {entry.sessions === 1 ? "session" : "sessions"}
+                      <span> · </span>
+                      <time datetime={isoDate(entry.lastReadOn)}>
+                        {formatMonth(entry.lastReadOn)}
+                      </time>
+                    </p>
+
+                    <h3
+                      class="mt-2 font-display text-xl leading-[1.16] font-semibold tracking-title text-balance text-ambedkar-950"
+                      data-carousel-label
+                    >
+                      <a class="link-underline" href={entry.href}>
+                        {entry.title}
+                      </a>
+                    </h3>
+
+                    {entry.authors && (
+                      <p class="mt-2 font-serif text-[0.9375rem] leading-6 text-ambedkar-900/75 italic">
+                        {entry.authors}
+                      </p>
+                    )}
+
+                    {entry.summary && (
+                      <p class="mt-3 line-clamp-4 text-sm leading-6 text-ambedkar-900/70">
+                        {entry.summary}
+                      </p>
+                    )}
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+
+    <p
+      class="sr-only"
+      aria-live="polite"
+      aria-atomic="true"
+      data-carousel-status
+    >
+    </p>
+  </Container>
+</section>
+
+<script>
+  import { mountCarousels } from "~/features/home/carousel";
+
+  mountCarousels();
+</script>

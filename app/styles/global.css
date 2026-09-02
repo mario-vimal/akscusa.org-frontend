@@ -711,6 +711,31 @@
     line-height: 1.5rem;
     color: color-mix(in srgb, var(--color-ambedkar-900) 70%, transparent);
   }
+
+  /*
+   * The scrolling row behind a carousel. Its own scrollbar is hidden because
+   * the band carries previous/next controls and a scroll-snapped row of slides
+   * that is obviously draggable; the bar under it would sit across the design
+   * and say the same thing a third time. Keyboard reach is unaffected: the
+   * viewport is focusable and answers the arrow keys.
+   */
+  .carousel-viewport {
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .carousel-viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .carousel-viewport {
+      scroll-behavior: auto;
+    }
+  }
 }
 
 /*
