@@ -564,7 +564,6 @@
   .section-head::before {
     height: 2px;
     background: var(--color-accent-600);
-    transform: scaleX(0);
     transform-origin: left;
   }
 
@@ -578,29 +577,33 @@
     background: var(--color-accent-300);
   }
 
+  /*
+   * The collapsed state lives in the keyframes rather than on the rule itself,
+   * for the same reason `reveal-rise` keeps its starting opacity there: a rule
+   * that is never animated must never be invisible.
+   *
+   * This is not hypothetical. Every accent rule on the site once collapsed to
+   * nothing in a production build while looking correct in dev, because the
+   * minifier folded `animation-timeline` into the `animation` shorthand and
+   * the browser dropped the result. Keeping the base state drawn means the
+   * worst a lost animation can do is show the rule without drawing it.
+   *
+   * Which is also why the animation is set in longhands below and not as
+   * `animation: draw-rule linear both`. The minifier only folds the timeline
+   * into a shorthand that is already there; given longhands it leaves
+   * `animation-timeline` alone. The shorthand cannot carry a timeline — it
+   * resets it — so the fold produces a declaration no browser accepts.
+   */
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
       .rule-draw,
       .section-head::before {
-        animation: draw-rule linear both;
+        animation-name: draw-rule;
+        animation-timing-function: linear;
+        animation-fill-mode: both;
         animation-timeline: view();
         animation-range: entry 10% entry 55%;
       }
-    }
-  }
-
-  /* No scroll timeline, or motion turned down: the rule is simply there. */
-  @supports not (animation-timeline: view()) {
-    .rule-draw,
-    .section-head::before {
-      transform: scaleX(1);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .rule-draw,
-    .section-head::before {
-      transform: scaleX(1);
     }
   }
 
@@ -1072,15 +1075,20 @@
  * otherwise commit whatever opacity each element happened to be sitting at.
  */
 @media screen and (prefers-reduced-motion: no-preference) {
+  /* Longhands, not the `animation` shorthand — see the note on `rule-draw`. */
   @supports (animation-timeline: view()) {
     .reveal {
-      animation: reveal-rise linear both;
+      animation-name: reveal-rise;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-timeline: view();
       animation-range: entry 5% entry 40%;
     }
 
     .reveal-children > * {
-      animation: reveal-rise linear both;
+      animation-name: reveal-rise;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-timeline: view();
       animation-range: entry 5% entry 35%;
     }

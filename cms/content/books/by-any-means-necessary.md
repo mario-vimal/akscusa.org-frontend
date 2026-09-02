@@ -4,6 +4,10 @@ subtitle: ""
 authors:
   - "malcolm-x"
 isbn: "9780873487542"
+cover: "/media/books/by-any-means-necessary.jpg"
+coverSource:
+  label: "Open Library"
+  url: "https://openlibrary.org/isbn/9780873487542"
 publisher: "Pathfinder Press"
 publishedYear: 1992
 firstPublishedYear: 1970

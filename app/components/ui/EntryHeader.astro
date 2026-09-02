@@ -1,0 +1,65 @@
+---
+import BackLink from "./BackLink.astro";
+
+interface Props {
+  /** The section this entry belongs to, such as "Book" or "Book reading". */
+  eyebrow: string;
+  title: string;
+  /** The entry's own summary, set as the lede. */
+  lede?: string;
+  /** A short line of counts or dates, printed under the lede. */
+  meta?: string;
+  backHref: string;
+  backLabel: string;
+  class?: string;
+}
+
+const { eyebrow, title, lede, meta, backHref, backLabel } = Astro.props;
+---
+
+<!--
+  The header an individual entry opens with: one book, one author, one reading.
+
+  It is deliberately not `PageMasthead`. That component's job is to say which
+  section of the site you are in, and on an index — Books, Book readings — that
+  is the most useful thing the top of the page can do. On a single entry it is
+  the least: the visitor arrived from a card they clicked and already knows, so
+  a full-bleed blue band spent a screen restating the title and summary before
+  the book's own details, cover, or portrait could begin. Worse, it printed the
+  byline twice, once under the title in the band and again in the facts list
+  below it.
+
+  So the entry pages open on the entry instead. The section is still named, in
+  an eyebrow rather than a band, and the back link above it still leads out to
+  the index. What follows sits in the page's own column, which is what lets a
+  cover or a portrait sit beside the title rather than a screen below it.
+
+  The brand blue still leads every index and every landing page, and the dark
+  panels further down these pages — a reading's callout, the shelf — keep an
+  entry page from being one unbroken field of white.
+-->
+<header>
+  <BackLink href={backHref}>Back to {backLabel}</BackLink>
+
+  {/* The same accent rule that opens a section, opening the page. */}
+  <div class="rule-draw mt-8" aria-hidden="true"></div>
+
+  <p class="eyebrow mt-7">{eyebrow}</p>
+  <h1
+    class="mt-4 max-w-3xl font-display text-display-md leading-[1.02] font-bold tracking-display text-balance text-ambedkar-950"
+  >
+    {title}
+  </h1>
+
+  <slot />
+
+  {
+    lede && (
+      <p class="mt-6 max-w-2xl font-serif text-xl leading-[1.6] text-ambedkar-900/80">
+        {lede}
+      </p>
+    )
+  }
+
+  {meta && <p class="label mt-7 text-ambedkar-700">{meta}</p>}
+</header>

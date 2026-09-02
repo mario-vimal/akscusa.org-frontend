@@ -1,9 +1,8 @@
 /**
  * The strings a page prints about a book.
  *
- * A book entry states its ISBN and lets the catalogue answer for the rest, so
- * everything except the title and the ISBN may be missing on the day it is
- * created. The two places that cannot simply print nothing — a byline and the
+ * A book entry carries the metadata the site publishes. The two places that
+ * cannot simply print nothing — a byline and the
  * meta description of the book's own page — are built here, once, rather than
  * each component deciding for itself what an absent field looks like.
  *

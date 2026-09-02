@@ -37,7 +37,7 @@ export interface ShelfBook {
    */
   coAuthors?: string;
   summary?: string;
-  isbn: string;
+  cover?: string;
   sessions: ShelfSession[];
   /** True while any of this book's sittings is still ahead of us. */
   upcoming: boolean;
@@ -45,12 +45,26 @@ export interface ShelfBook {
 
 /** An author's page, as the component prints it. */
 export interface AuthorPage {
-  /** The entry's id, which the archival portrait is also keyed by. */
+  /** The entry's id, which is also its address. */
   slug: string;
   name: string;
   /** Paragraphs, split on the blank lines the CMS text field carries. */
   bio: string[];
-  portrait?: { src: string; alt: string };
+  /**
+   * The uploaded portrait, with whatever a borrowed photograph obliges the
+   * page to print under it. `credit` is absent for a picture AKSC owns.
+   */
+  portrait?: {
+    src: string;
+    alt: string;
+    credit?: {
+      creator: string;
+      sourceUrl: string;
+      license: string;
+      licenseUrl?: string;
+      note?: string;
+    };
+  };
   sourceUrl?: string;
   books: ShelfBook[];
   /** "3 books · 7 sessions", or the honest half of it when there are none. */
@@ -83,7 +97,7 @@ export function authorPage(shelf: AuthorShelf): AuthorPage {
       authors: entry.authors.filter((other) => other.id !== author.id),
     }),
     summary: entry.book.data.summary,
-    isbn: entry.book.data.isbn,
+    cover: entry.book.data.cover,
     upcoming: entry.readings.some(isUpcoming),
     sessions: entry.readings.map((reading) => ({
       href: entryHref("bookReadings", reading.id),

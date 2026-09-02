@@ -22,7 +22,7 @@ describe("bookByline", () => {
     expect(bookByline(book("Ambedkar", ["A", "B"]))).toBe("A, B");
   });
 
-  it("names nobody for an entry Open Library could not fill", () => {
+  it("names nobody for an entry without authors", () => {
     expect(bookByline(book("Why Were Women Enslaved?", []))).toBeUndefined();
   });
 });

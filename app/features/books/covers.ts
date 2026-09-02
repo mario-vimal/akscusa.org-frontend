@@ -1,29 +1,14 @@
-import type { ImageMetadata } from "astro";
-
 /**
- * Cover art, keyed by the ISBN of the edition read. The files are fetched by
- * `scripts/enrich-books.mjs` and committed, so Astro optimizes them at build
- * time rather than the page depending on a third party at runtime. An edition
- * Open Library does not hold is committed by hand under the same name; the
- * script never refetches a cover already on disk.
+ * What every place that prints a cover agrees about it.
  *
- * A book with no cover file simply renders without one.
+ * The cover itself belongs to the book entry: it is uploaded through the CMS,
+ * committed under `cms/public/media/books/`, and read straight off
+ * `book.data.cover`. There is no lookup here because there is nothing to look
+ * up — a cover keyed by ISBN in code is a picture no editor can change, and a
+ * book whose cover is missing then needs a developer rather than an upload.
+ *
+ * A book with no cover renders without one.
  */
-const covers = import.meta.glob<{ default: ImageMetadata }>(
-  "./assets/covers/*.{jpg,jpeg,png,webp}",
-  { eager: true },
-);
-
-const byIsbn = new Map(
-  Object.entries(covers).map(([file, module]) => [
-    // "./assets/covers/9788189059637.jpg" -> "9788189059637"
-    file.slice(file.lastIndexOf("/") + 1, file.lastIndexOf(".")),
-    module.default,
-  ]),
-);
-
-export const coverForIsbn = (isbn: string): ImageMetadata | undefined =>
-  byIsbn.get(isbn);
 
 /**
  * The cover sits beside the title and author everywhere it is used, so naming

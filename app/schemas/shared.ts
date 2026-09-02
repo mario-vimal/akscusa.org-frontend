@@ -42,6 +42,27 @@ export const remoteImageSchema = z.object({
   alt: z.string(),
 });
 
+// One rule for an image the CMS uploads and Astro serves unchanged out of
+// `cms/public/`. A cover, a portrait, and a flyer are the same kind of thing —
+// a committed file under `/media/<collection>/` — so they are checked in one
+// place. Three copies of this regex is how they come to disagree about which
+// extensions and filenames are allowed.
+export const mediaImagePath = (collection: string) =>
+  z
+    .string()
+    .regex(
+      new RegExp(`^/media/${collection}/[a-z0-9-]+\\.(?:png|jpe?g|webp)$`),
+      `Must be a lowercase kebab-case image under /media/${collection}/.`,
+    );
+
+// An uploaded image with its alternative text, for a portrait or any other
+// single image an editor attaches rather than a list of them.
+export const localImageSchema = (collection: string) =>
+  z.object({
+    src: mediaImagePath(collection),
+    alt: z.string().min(1),
+  });
+
 // A hero image, portrait, or other optional image object is collapsed by
 // Sveltia to `null` as a whole when an editor never opens the group, rather
 // than sending an object with blank fields.
@@ -115,12 +136,7 @@ export function posterListSchema(collection: string) {
     z
       .array(
         z.object({
-          src: z
-            .string()
-            .regex(
-              new RegExp(`^/media/${collection}/[a-z0-9-]+\\.jpg$`),
-              `Must be a lowercase kebab-case JPG under /media/${collection}/.`,
-            ),
+          src: mediaImagePath(collection),
           alt: z.string().min(1),
           caption: optionalCmsField(z.string()),
         }),
@@ -129,10 +145,11 @@ export function posterListSchema(collection: string) {
   );
 }
 
-// ISBN-13 identifies the edition a book entry names, so it is normalized and
-// checked here rather than trusted. An invalid ISBN fails the build. It is
-// bibliographic metadata rather than a relationship key: a reading names its
-// book by the book entry's stable id, not by this field.
+// ISBN-13 identifies the edition a book entry names, so where one is given it
+// is normalized and checked here rather than trusted. An invalid ISBN fails
+// the build. It is bibliographic metadata rather than a relationship key, and
+// it is optional for that reason: a reading names its book by the book entry's
+// stable id, so a pamphlet with no ISBN is still a book the site can carry.
 export const isbn13 = z
   .string()
   .transform(normalizeIsbn)

@@ -4,7 +4,7 @@ import { checkUniqueIsbns, resolveReadings } from "./resolve";
 
 interface Book {
   id: string;
-  isbn: string;
+  isbn?: string;
 }
 
 interface Reading {
@@ -12,7 +12,7 @@ interface Reading {
   book?: string;
 }
 
-const book = (id: string, isbn: string): Book => ({ id, isbn });
+const book = (id: string, isbn?: string): Book => ({ id, isbn });
 const reading = (id: string, book?: string): Reading => ({ id, book });
 
 describe("checkUniqueIsbns", () => {
@@ -29,6 +29,13 @@ describe("checkUniqueIsbns", () => {
     expect(() => checkUniqueIsbns(books, (entry) => entry.isbn)).toThrow(
       /annihilation-of-caste.*riddles-in-hinduism/,
     );
+  });
+
+  it("lets any number of books have no ISBN at all", () => {
+    // A pamphlet and a PDF of an out-of-print text both lack an ISBN, and
+    // that is not the two of them claiming the same one.
+    const books = [book("a-pamphlet"), book("an-out-of-print-text")];
+    expect(() => checkUniqueIsbns(books, (entry) => entry.isbn)).not.toThrow();
   });
 });
 

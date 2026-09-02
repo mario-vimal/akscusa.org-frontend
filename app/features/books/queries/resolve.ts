@@ -22,14 +22,21 @@ export interface ResolvableReading {
  * is caught here rather than silently resolving to whichever loaded first.
  * The clash is checked across every book, drafts included, so drafting one
  * cannot hide it.
+ *
+ * A book without an ISBN is skipped rather than treated as a book whose ISBN
+ * is "missing": absence is not a value, and two pamphlets that both lack one
+ * are not the same pamphlet. A book is identified by its slug, and this check
+ * only guards the ISBN's own promise of naming a single edition.
  */
 export function checkUniqueIsbns<B extends ResolvableBook>(
   books: readonly B[],
-  isbnOf: (book: B) => string,
+  isbnOf: (book: B) => string | undefined,
 ): void {
   const seen = new Map<string, string>();
   for (const book of books) {
     const isbn = isbnOf(book);
+    if (!isbn) continue;
+
     const previous = seen.get(isbn);
     if (previous) {
       throw new Error(

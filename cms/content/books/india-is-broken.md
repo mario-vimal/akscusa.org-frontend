@@ -4,6 +4,10 @@ subtitle: "A People Betrayed, Independence to Today"
 authors:
   - "ashoka-mody"
 isbn: "9781503630055"
+cover: "/media/books/india-is-broken.jpg"
+coverSource:
+  label: "Open Library"
+  url: "https://openlibrary.org/isbn/9781503630055"
 publisher: "Stanford University Press"
 publishedYear: 2023
 firstPublishedYear: 2023

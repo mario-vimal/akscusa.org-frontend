@@ -4,6 +4,10 @@ subtitle: "The Annotated Critical Selection"
 authors:
   - "dr-b-r-ambedkar"
 isbn: "9788189059774"
+cover: "/media/books/riddles-in-hinduism.jpg"
+coverSource:
+  label: "Open Library"
+  url: "https://openlibrary.org/isbn/9788189059774"
 publisher: "Navayana"
 publishedYear: 2016
 firstPublishedYear: 1987

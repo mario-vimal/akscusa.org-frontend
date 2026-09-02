@@ -17,9 +17,10 @@ import {
   editorialBase,
   isbn13,
   linkSchema,
+  localImageSchema,
+  mediaImagePath,
   optionalCmsField,
   optionalCmsList,
-  optionalRemoteImage,
   optionalUrl,
   posterListSchema,
   slugReferences,
@@ -41,16 +42,39 @@ export const authors = defineCollection({
     /** The name as a byline prints it: "bell hooks", "B. R. Ambedkar". */
     name: z.string().min(1),
     /**
-     * Other spellings a catalogue returns for the same person — "Kancha
-     * Ilaiah" and "Kancha Ilaiah Shepherd" are one author with two names in
-     * print. `scripts/enrich-books.mjs` matches a fetched name against these
-     * before creating an entry, which is what stops a second spelling minting
-     * a second author and splitting their books across two pages.
+     * Other spellings for the same person — "Kancha Ilaiah" and "Kancha
+     * Ilaiah Shepherd" are one author with two names in print.
      */
     aliases: optionalCmsList(z.array(z.string().min(1)).default([])),
     /** Paragraphs are separated by blank lines, as they are for a speaker. */
     bio: optionalCmsField(z.string()),
-    portrait: optionalRemoteImage,
+    /**
+     * The portrait an author's page opens with, uploaded through the CMS and
+     * committed under `cms/public/media/authors/`.
+     *
+     * `credit` carries what a borrowed photograph obliges us to say: who made
+     * it, where it came from, and on what terms. It is optional because a
+     * photograph AKSC owns has nobody to credit, and it is here rather than in
+     * code because a licence is a fact about the picture an editor chose, not
+     * a fact about the site. Without it there would be no way to publish a
+     * CC BY-SA portrait without hard-coding its attribution.
+     */
+    portrait: optionalCmsField(
+      localImageSchema("authors").extend({
+        credit: optionalCmsField(
+          z.object({
+            creator: z.string().min(1),
+            /** Where the picture came from, which is where its licence is stated. */
+            sourceUrl: z.url(),
+            license: z.string().min(1),
+            /** Absent for public domain, which has no licence deed to link. */
+            licenseUrl: optionalUrl,
+            /** What was done to it, such as "cropped". */
+            note: optionalCmsField(z.string()),
+          }),
+        ),
+      }),
+    ),
     sourceUrl: optionalUrl,
     draft: z.boolean().default(false),
   }),
@@ -66,42 +90,47 @@ export const books = defineCollection({
   }),
   schema: z.object({
     /**
-     * A book must name itself: blank is rejected rather than defaulted,
-     * because an untitled book would render an empty card and an empty
-     * heading. An entry saved with no title has one written into it from its
-     * ISBN before it is merged, so this fails only when the catalogue had no
-     * record either — which is exactly when a person should look at it.
+     * A book must name itself so it never renders an empty card or heading.
      */
     title: z.string().min(1),
     subtitle: optionalCmsField(z.string()),
     /**
-     * The stable slugs of the authors' entries, not their names. Filled from
-     * the ISBN when the entry does not state them — the enrichment script
-     * matches each fetched name to an author entry, or creates one, so what
-     * lands here is always a slug. A book with no authors is one Open Library
-     * had nothing for. Pages print the byline only when there is one rather
-     * than an empty line.
+     * Stable slugs of the authors' entries, not names typed into a book.
      */
     authors: slugReferences(
       "author",
       "A book cannot list the same author twice.",
     ),
     /**
-     * Identifies the edition the circle read, for bibliographic lookup and
-     * cover naming. Correcting it does not affect a reading's link to this
-     * book, which is by this entry's stable id instead.
+     * Identifies the edition the circle read, when we know it. Optional
+     * because a book is identified by its slug, not by an ISBN: the circle
+     * reads pamphlets, PDFs of out-of-print texts, and editions predating the
+     * scheme, and requiring an ISBN would mean either leaving those out of the
+     * catalogue or inventing a number for them. Correcting it does not affect
+     * a reading's link to this book, which is by this entry's stable id.
      */
-    isbn: isbn13,
+    isbn: optionalCmsField(isbn13),
+    /**
+     * Cover art an editor uploaded, committed under `cms/public/media/books/`
+     * and served as uploaded. A book without one simply renders no cover.
+     */
+    cover: optionalCmsField(mediaImagePath("books")),
+    /**
+     * Where the cover file came from, printed under the picture. It is content
+     * rather than a rule in code because the source is a fact about the file
+     * an editor chose: the covers here were taken from Open Library, and the
+     * next one may not be. A book whose cover AKSC photographed itself has
+     * nothing to name and prints the generic caption instead.
+     */
+    coverSource: optionalCmsField(linkSchema),
     publisher: optionalCmsField(z.string()),
     /** Year of this edition, which for a reprint is not the year written. */
     publishedYear: optionalCmsField(z.number().int()),
     /** Year the text first appeared, kept for posthumous works. */
     firstPublishedYear: optionalCmsField(z.number().int()),
     /**
-     * AKSC's own sentence or two, the one thing about a book that cannot come
-     * from its ISBN: a catalogue summary is the publisher's marketing copy.
-     * Optional so an entry can be saved from the ISBN alone and written up
-     * afterwards, rather than an editor filling the field with a blurb.
+     * AKSC's own sentence or two. A catalogue summary is the publisher's
+     * marketing copy, so it is not imported into this field.
      */
     summary: optionalCmsField(z.string()),
     topics: topicsSchema,

@@ -4,6 +4,10 @@ subtitle: "towards an enlightened India"
 authors:
   - "gail-omvedt"
 isbn: '9780670049912'
+cover: "/media/books/ambedkar.jpg"
+coverSource:
+  label: "Open Library"
+  url: "https://openlibrary.org/isbn/9780670049912"
 publisher: "Penguin"
 publishedYear: 2004
 firstPublishedYear: 2004

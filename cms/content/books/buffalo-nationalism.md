@@ -4,6 +4,10 @@ subtitle: "A Critique of Spiritual Fascism"
 authors:
   - "kancha-ilaiah"
 isbn: '9789353282561'
+cover: "/media/books/buffalo-nationalism.jpg"
+coverSource:
+  label: "Open Library"
+  url: "https://openlibrary.org/isbn/9789353282561"
 publisher: "SAGE Publications, Incorporated"
 publishedYear: 2019
 firstPublishedYear: null

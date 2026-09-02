@@ -81,9 +81,13 @@
   in. Alternate ruled indexes, editorial lists, full-bleed ink panels, and
   card grids, and alternate light and dark bands. Two sections in a row that
   open the same way are already one too many.
-- Open every page with `PageMasthead`, so the brand blue leads a page rather
-  than only edging it. Mark any dark panel with `on-dark` so the focus ring
-  and `btn-primary` switch to the light end of the scale.
+- Open an index or a landing page with `PageMasthead`, so the brand blue leads
+  it rather than only edging it. Open a single entry — one book, one author,
+  one reading — with `EntryHeader` instead: a visitor who clicked a card
+  already knows which section they are in, so a blue band there spends a screen
+  restating the title before the entry's own cover, portrait, or details can
+  begin. Mark any dark panel with `on-dark` so the focus ring and `btn-primary`
+  switch to the light end of the scale.
 - Prefer `translate` over `transform` for hover lifts. A scroll-driven reveal
   animation owns `transform`, and an animated property always beats a hover
   rule.

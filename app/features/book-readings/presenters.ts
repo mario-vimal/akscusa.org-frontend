@@ -59,7 +59,9 @@ export function bookReadingDetails(
       description: bookTitleAndAuthors(entry),
       href: bookHref(entry.book),
     });
-    details.push({ term: "ISBN", description: entry.book.data.isbn });
+    if (entry.book.data.isbn) {
+      details.push({ term: "ISBN", description: entry.book.data.isbn });
+    }
   }
 
   if (reading.data.participants.length > 0) {
@@ -127,8 +129,8 @@ export interface ReadingEntry {
    * one person under two names the moment a catalogue spells them differently.
    */
   authors: AuthorLink[];
-  /** Absent for an entry with no book; the component resolves the cover. */
-  isbn?: string;
+  /** The uploaded cover, absent for an entry with no book or no cover. */
+  cover?: string;
   summary?: string;
   sessionCount: number;
   /** "June – October 2025", or one month when the run stayed inside it. */
@@ -261,7 +263,7 @@ function bookEntry(
     subtitle: book.data.subtitle,
     byline: bookByline(entry),
     authors: bookAuthorLinks(entry),
-    isbn: book.data.isbn,
+    cover: book.data.cover,
     summary: book.data.summary,
     sessionCount: run.length,
     spanLabel: formatPacificMonthRange(first.data.date, last.data.date),
@@ -372,7 +374,7 @@ export interface NextSession {
     /** The authors on one line, absent when the entry names none. */
     byline?: string;
     href: string;
-    isbn: string;
+    cover?: string;
   };
 }
 
@@ -393,7 +395,7 @@ export function nextSession(
           title: entry.book.data.title,
           byline: bookByline(entry),
           href: bookHref(entry.book),
-          isbn: entry.book.data.isbn,
+          cover: entry.book.data.cover,
         }
       : undefined,
   };

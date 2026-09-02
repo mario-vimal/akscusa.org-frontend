@@ -1,13 +1,12 @@
 ---
-import BackLink from "~/components/ui/BackLink.astro";
 import Container from "~/components/ui/Container.astro";
-import PageMasthead from "~/components/ui/PageMasthead.astro";
+import EntryHeader from "~/components/ui/EntryHeader.astro";
 import Poster from "~/components/ui/Poster.astro";
 import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
 import { formatPacificDate } from "~/lib/dates";
 import { topicLabel } from "~/features/editorial/taxonomy";
 import AuthorByline from "~/features/authors/components/AuthorByline.astro";
-import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
+import { COVER_ALT, COVER_WIDTHS } from "~/features/books/covers";
 import { openLibraryUrl } from "~/features/books/isbn";
 import { bookAuthorLinks } from "~/features/books/presenters";
 import type { BookWithReadings } from "~/features/books/queries/books";
@@ -21,7 +20,7 @@ const { book, readings } = entry;
 const { data } = book;
 
 const authors = bookAuthorLinks(entry);
-const cover = coverForIsbn(data.isbn);
+const cover = data.cover;
 
 const facts = [
   data.publisher ? { term: "Publisher", description: data.publisher } : null,
@@ -32,76 +31,76 @@ const facts = [
     ? { term: "First published", description: String(data.firstPublishedYear) }
     : null,
 ].filter((fact) => fact !== null);
+
+const hasFacts = facts.length > 0 || data.isbn !== undefined;
 ---
 
 <article>
-  <PageMasthead
-    eyebrow="Book"
-    title={data.title}
-    description={data.summary}
-    size="large"
-  >
-    <BackLink slot="above" href="/books/" tone="light">Back to Books</BackLink>
-
-    {
-      data.subtitle && (
-        <p class="mt-5 max-w-2xl font-display text-xl text-white/70 italic">
-          {data.subtitle}
-        </p>
-      )
-    }
-    {
-      authors.length > 0 && (
-        <p class="mt-5 text-lg font-semibold text-white/80">
-          By <AuthorByline authors={authors} tone="light" />
-        </p>
-      )
-    }
-  </PageMasthead>
-
-  <Container class="pt-12 pb-20 sm:pt-14 sm:pb-28">
+  <Container class="pt-10 pb-20 sm:pt-12 sm:pb-28">
     <div class="gap-10 lg:flex lg:items-start">
       <div class="min-w-0 lg:flex-1">
-        <dl
-          class="card max-w-3xl gap-x-8 gap-y-5 p-6 sm:grid sm:grid-cols-2 sm:p-8"
+        <EntryHeader
+          eyebrow="Book"
+          title={data.title}
+          lede={data.summary}
+          backHref="/books/"
+          backLabel="Books"
         >
           {
-            authors.length > 0 && (
-              <div>
-                <dt class="label text-ambedkar-700">
-                  {authors.length === 1 ? "Author" : "Authors"}
-                </dt>
-                <dd class="mt-1 leading-7 text-ambedkar-900/80">
-                  <AuthorByline authors={authors} />
-                </dd>
-              </div>
+            data.subtitle && (
+              <p class="mt-4 max-w-2xl font-display text-xl text-ambedkar-900/65 italic">
+                {data.subtitle}
+              </p>
             )
           }
           {
-            facts.map((fact) => (
-              <div>
-                <dt class="label text-ambedkar-700">{fact.term}</dt>
-                <dd class="mt-1 leading-7 text-ambedkar-900/80">
-                  {fact.description}
-                </dd>
-              </div>
-            ))
+            authors.length > 0 && (
+              <p class="mt-5 text-lg font-semibold text-ambedkar-900/80">
+                By <AuthorByline authors={authors} />
+              </p>
+            )
           }
-          <div>
-            <dt class="label text-ambedkar-700">ISBN</dt>
-            <dd class="mt-1 leading-7 wrap-break-word text-ambedkar-900/80">
-              <a
-                class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
-                href={openLibraryUrl(data.isbn)}
-              >
-                {data.isbn}
-              </a>
-              <span class="mt-1 block text-sm text-ambedkar-900/70">
-                Look this edition up on Open Library.
-              </span>
-            </dd>
-          </div>
-        </dl>
+        </EntryHeader>
+
+        {
+          /*
+          No "Author" row: the byline is three lines above it in the header
+          now that the masthead is gone, and the two sat a screen apart only
+          because the blue band separated them. That leaves the card able to
+          come out empty, for a book with no edition details and no ISBN, so
+          it is only printed when it has something to say.
+        */
+        }
+        {
+          hasFacts && (
+            <dl class="card mt-10 max-w-3xl gap-x-8 gap-y-5 p-6 sm:grid sm:grid-cols-2 sm:p-8">
+              {facts.map((fact) => (
+                <div>
+                  <dt class="label text-ambedkar-700">{fact.term}</dt>
+                  <dd class="mt-1 leading-7 text-ambedkar-900/80">
+                    {fact.description}
+                  </dd>
+                </div>
+              ))}
+              {data.isbn && (
+                <div>
+                  <dt class="label text-ambedkar-700">ISBN</dt>
+                  <dd class="mt-1 leading-7 wrap-break-word text-ambedkar-900/80">
+                    <a
+                      class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                      href={openLibraryUrl(data.isbn)}
+                    >
+                      {data.isbn}
+                    </a>
+                    <span class="mt-1 block text-sm text-ambedkar-900/70">
+                      Look this edition up on Open Library.
+                    </span>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          )
+        }
       </div>
 
       {
@@ -116,14 +115,20 @@ const facts = [
               loading="eager"
             />
             <figcaption class="mt-3 max-w-56 text-xs text-ambedkar-900/70">
-              Cover art via{" "}
-              <a
-                class="underline underline-offset-2 hover:text-ambedkar-900"
-                href={openLibraryUrl(data.isbn)}
-              >
-                Open Library
-              </a>
-              .
+              {data.coverSource ? (
+                <>
+                  Cover art via{" "}
+                  <a
+                    class="underline underline-offset-2 hover:text-ambedkar-900"
+                    href={data.coverSource.url}
+                  >
+                    {data.coverSource.label}
+                  </a>
+                  .
+                </>
+              ) : (
+                <>Cover of the edition the circle read.</>
+              )}
             </figcaption>
           </figure>
         )

@@ -1,7 +1,6 @@
 ---
-import BackLink from "~/components/ui/BackLink.astro";
 import Container from "~/components/ui/Container.astro";
-import PageMasthead from "~/components/ui/PageMasthead.astro";
+import EntryHeader from "~/components/ui/EntryHeader.astro";
 import Poster from "~/components/ui/Poster.astro";
 import {
   editorialSections,
@@ -49,43 +48,23 @@ const {
 
 const { path, label } = editorialSections[section];
 
+/*
+ * The badge now sits on the page's own white rather than on the masthead's
+ * ink, so both tones are the dark end of their scale. The light-on-dark pair
+ * this replaced — white/40 borders and accent-300 text — would be all but
+ * invisible here.
+ */
 const badgeClasses =
   badge?.tone === "muted"
-    ? "border-white/40 text-white/85"
-    : "border-accent-400/70 text-accent-300";
+    ? "border-ambedkar-900/25 text-ambedkar-900/70"
+    : "border-accent-600/50 text-accent-700";
 
 const hasPosters = posters.length > 0;
 const hasMultiplePosters = posters.length > 1;
 ---
 
 <article>
-  <PageMasthead
-    eyebrow={label}
-    title={title}
-    description={summary}
-    size="large"
-  >
-    <BackLink slot="above" href={`${path}/`} tone="light">
-      Back to {label}
-    </BackLink>
-
-    {
-      badge && (
-        <p class="mt-8">
-          <span
-            class:list={[
-              "inline-block rounded-sm border px-1.5 py-0.5 font-display text-[0.625rem] font-semibold tracking-[0.1em] uppercase",
-              badgeClasses,
-            ]}
-          >
-            {badge.label}
-          </span>
-        </p>
-      )
-    }
-  </PageMasthead>
-
-  <Container class="pt-12 pb-20 sm:pt-14 sm:pb-28">
+  <Container class="pt-10 pb-20 sm:pt-12 sm:pb-28">
     <div
       class:list={[
         "items-start gap-10 lg:gap-14",
@@ -114,9 +93,32 @@ const hasMultiplePosters = posters.length > 1;
       }
 
       <div class:list={["min-w-0", hasPosters && "lg:order-1"]}>
+        <EntryHeader
+          eyebrow={label}
+          title={title}
+          lede={summary}
+          backHref={`${path}/`}
+          backLabel={label}
+        >
+          {
+            badge && (
+              <p class="mt-5">
+                <span
+                  class:list={[
+                    "inline-block rounded-sm border px-1.5 py-0.5 font-display text-[0.625rem] font-semibold tracking-[0.1em] uppercase",
+                    badgeClasses,
+                  ]}
+                >
+                  {badge.label}
+                </span>
+              </p>
+            )
+          }
+        </EntryHeader>
+
         {
           details.length > 0 && (
-            <dl class="max-w-3xl border-t border-ambedkar-950 sm:grid sm:grid-cols-2 sm:gap-x-10">
+            <dl class="mt-10 max-w-3xl border-t border-ambedkar-950 sm:grid sm:grid-cols-2 sm:gap-x-10">
               {details.map((detail) => (
                 <div class="border-b border-rule py-4">
                   <dt class="label text-ambedkar-700">{detail.term}</dt>

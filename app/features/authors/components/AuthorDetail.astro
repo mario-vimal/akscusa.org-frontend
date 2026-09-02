@@ -1,10 +1,8 @@
 ---
-import BackLink from "~/components/ui/BackLink.astro";
 import Container from "~/components/ui/Container.astro";
-import PageMasthead from "~/components/ui/PageMasthead.astro";
+import EntryHeader from "~/components/ui/EntryHeader.astro";
 import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
-import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
-import { archivalPortrait } from "~/features/authors/portraits";
+import { COVER_ALT, COVER_WIDTHS } from "~/features/books/covers";
 import type { AuthorPage } from "~/features/authors/presenters";
 
 interface Props {
@@ -13,14 +11,13 @@ interface Props {
 
 const { page } = Astro.props;
 
-/*
- * An entry's own portrait is a photograph AKSC holds and has chosen, so it
- * beats the archival one this site keeps for the figures it could find a
- * freely licensed picture of.
- */
-const archival = page.portrait ? undefined : archivalPortrait(page.slug);
-const hasPortrait = page.portrait !== undefined || archival !== undefined;
-const hasIntroduction = page.bio.length > 0 || hasPortrait;
+const portrait = page.portrait;
+const credit = portrait?.credit;
+
+/* An author with neither a picture nor a biography skips the row entirely,
+ * rather than printing an empty one whose margin still spaces the page. */
+const hasIntroduction =
+  portrait !== undefined || page.bio.length > 0 || page.sourceUrl !== undefined;
 
 /*
  * The running figures down the index are the count of this author's books, so
@@ -45,21 +42,28 @@ const figure = (index: number) => String(index + 1).padStart(2, "0");
   gathers every sitting the circle held on that work in one place.
 -->
 <article>
-  <PageMasthead
-    eyebrow="Author"
-    title={page.name}
-    meta={page.shelfLine}
-    size="large"
-  >
-    <BackLink slot="above" href="/books/" tone="light">Back to Books</BackLink>
-  </PageMasthead>
+  <Container class="pt-10 pb-2 sm:pt-12">
+    <EntryHeader
+      eyebrow="Author"
+      title={page.name}
+      meta={page.shelfLine}
+      backHref="/books/"
+      backLabel="Books"
+    />
 
-  {
-    hasIntroduction && (
-      <Container class="pt-12 pb-2 sm:pt-16">
-        <div class="rule-draw max-w-3xl" aria-hidden="true" />
-        <div class="mt-8 gap-10 lg:flex lg:items-start">
-          {hasPortrait && (
+    {
+      /*
+      The header runs across the top rather than beside the portrait so that a
+      phone, where this is one column, opens on the back link and the name
+      instead of on a face with no heading above it. The portrait then sits
+      between the name and the biography, which is where it belongs on any
+      width; from `lg` it moves to the right of the biography.
+    */
+    }
+    {
+      hasIntroduction && (
+        <div class="mt-10 gap-10 lg:flex lg:items-start">
+          {portrait && (
             <figure class="mb-8 w-40 shrink-0 sm:w-48 lg:order-last lg:mb-0 lg:w-56">
               {/*
                   `duotone-light` only drains the colour out of a photograph;
@@ -68,53 +72,47 @@ const figure = (index: number) => String(index + 1).padStart(2, "0");
                   band is white and nothing is laid over the picture.
                 */}
               <div class="relative isolate aspect-4/5 overflow-hidden rounded-xl">
-                {archival ? (
-                  <ResponsiveImage
-                    class="size-full object-cover object-top duotone-light"
-                    src={archival.image}
-                    alt={archival.alt}
-                    sizes="(min-width: 1024px) 14rem, (min-width: 640px) 12rem, 10rem"
-                    widths={[160, 224, 320, 448]}
-                    loading="eager"
-                  />
-                ) : (
-                  page.portrait && (
-                    <img
-                      class="size-full object-cover object-top duotone-light"
-                      src={page.portrait.src}
-                      alt={page.portrait.alt}
-                      loading="eager"
-                      decoding="async"
-                    />
-                  )
-                )}
+                <ResponsiveImage
+                  class="size-full object-cover object-top duotone-light"
+                  src={portrait.src}
+                  alt={portrait.alt}
+                  sizes="(min-width: 1024px) 14rem, (min-width: 640px) 12rem, 10rem"
+                  widths={[160, 224, 320, 448]}
+                  loading="eager"
+                />
                 <div
                   class="absolute inset-0 bg-ambedkar-700 mix-blend-color"
                   aria-hidden="true"
                 />
               </div>
-              {archival && (
+              {credit && (
                 <figcaption class="mt-3 text-xs leading-5 text-ambedkar-900/65">
                   Image:{" "}
                   <a
                     class="underline underline-offset-2 hover:text-ambedkar-900"
-                    href={archival.credit.sourceHref}
+                    href={credit.sourceUrl}
                   >
-                    {archival.credit.creator}
+                    {credit.creator}
                   </a>{" "}
                   ·{" "}
-                  {archival.credit.licenseHref ? (
+                  {credit.licenseUrl ? (
                     <a
                       class="underline underline-offset-2 hover:text-ambedkar-900"
-                      href={archival.credit.licenseHref}
+                      href={credit.licenseUrl}
                       rel="license"
                     >
-                      {archival.credit.license}
+                      {credit.license}
                     </a>
                   ) : (
-                    archival.credit.license
+                    credit.license
                   )}{" "}
-                  · cropped and recolored
+                  {/*
+                    The recolouring is the `duotone-light` above, which this
+                    component applies to every portrait, so it is stated here
+                    rather than left to an editor to remember. Anything done to
+                    the file itself before upload is the entry's own `note`.
+                  */}
+                  · {credit.note ? `${credit.note} and ` : ""}recoloured
                 </figcaption>
               )}
             </figure>
@@ -138,9 +136,9 @@ const figure = (index: number) => String(index + 1).padStart(2, "0");
             )}
           </div>
         </div>
-      </Container>
-    )
-  }
+      )
+    }
+  </Container>
 
   <Container class="pt-12 pb-20 sm:pt-16 sm:pb-28">
     <div class="section-head">
@@ -155,18 +153,16 @@ const figure = (index: number) => String(index + 1).padStart(2, "0");
     <ol class="reveal-children mt-10 border-t border-rule">
       {
         page.books.map((entry, index) => {
-          const cover = coverForIsbn(entry.isbn);
-
           return (
             <li class="border-b border-rule">
               <article class="gap-6 py-8 sm:flex sm:gap-8 sm:py-10">
                 <div class="mb-5 flex items-start gap-4 sm:mb-0 sm:block sm:w-28 sm:shrink-0">
                   <span class="index-figure sm:mb-3">{figure(index)}</span>
-                  {cover ? (
+                  {entry.cover ? (
                     <a class="block shrink-0" href={entry.href} tabindex="-1">
                       <ResponsiveImage
                         class="w-20 rounded-md shadow-lift sm:w-full"
-                        src={cover}
+                        src={entry.cover}
                         alt={COVER_ALT}
                         sizes="(min-width: 640px) 112px, 80px"
                         widths={COVER_WIDTHS}

@@ -1,7 +1,7 @@
 ---
 import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
 import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
-import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
+import { COVER_ALT, COVER_WIDTHS } from "~/features/books/covers";
 
 interface Props {
   href: string;
@@ -9,7 +9,8 @@ interface Props {
   subtitle?: string;
   authors?: string;
   summary?: string;
-  isbn: string;
+  isbn?: string;
+  cover?: string;
   publisher?: string;
   sessions: number;
   topics?: readonly EditorialTopic[];
@@ -22,12 +23,11 @@ const {
   authors,
   summary,
   isbn,
+  cover,
   publisher,
   sessions,
   topics = [],
 } = Astro.props;
-
-const cover = coverForIsbn(isbn);
 
 const sessionLabel =
   sessions === 0
@@ -100,10 +100,14 @@ const sessionLabel =
     )
   }
 
-  <ul class="mt-4 space-y-1 text-sm text-ambedkar-900/70">
-    <li class="wrap-break-word">ISBN {isbn}</li>
-    {publisher && <li>{publisher}</li>}
-  </ul>
+  {
+    (isbn || publisher) && (
+      <ul class="mt-4 space-y-1 text-sm text-ambedkar-900/70">
+        {isbn && <li class="wrap-break-word">ISBN {isbn}</li>}
+        {publisher && <li>{publisher}</li>}
+      </ul>
+    )
+  }
 
   {/* See EntryCard: the repeated "Read more →" is gone from every index. */}
   {

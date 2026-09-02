@@ -230,8 +230,9 @@ sever every reading that names it. A book names its authors the same way, by
 the slug of an entry in the authors collection. Three checks keep those links
 honest and fail the build rather than degrading quietly:
 
-- an ISBN-13 must pass its check digit, so a typo cannot slip through
-  (`app/features/books/isbn.ts`), and no two books may claim the same ISBN;
+- an ISBN-13, where a book has one, must pass its check digit, so a typo cannot
+  slip through (`app/features/books/isbn.ts`), and no two books may claim the
+  same ISBN;
 - a reading may not reference a book slug that no book entry claims;
 - a book may not reference an author slug that no author entry claims.
 
@@ -242,62 +243,31 @@ entries, because a visitor scanning the page is asking what has been read. A
 reading whose book is only a draft renders without the book rather than failing
 the build, so drafting a book cannot take the site down.
 
+A book identifies itself by its slug, not by its ISBN, so the ISBN is optional:
+the circle reads pamphlets, PDFs of out-of-print texts, and editions older than
+the scheme, and requiring a number would mean either keeping those out of the
+catalogue or inventing one. A book without an ISBN prints no ISBN row and no
+Open Library link; everything else about it works unchanged. Any number of books
+may have none, since an absent ISBN is not a value two of them can share.
+
 ISBNs are printed as bare digits. Where an ISBN-13 breaks into its registration
 group and registrant depends on the ISBN range tables rather than fixed offsets,
 so the site does not invent hyphenation; the reading log's search accepts an
 ISBN typed either way.
 
-A new book needs its ISBN and its authors. The title and the rest of the
-edition — cover art, subtitle, publisher, edition year, first publication
-year — are looked up from the ISBN on Open Library and committed, so Astro
-optimizes the cover at build time instead of the page depending on a third
-party at runtime.
-An entry saved with no title is also renamed to the file that title names, so
-it reaches a readable URL rather than keeping the random id the CMS gives a
-file it has no title to name. Typing the title yourself is how you choose that
-URL, and it is the only reason to:
+A new book is entered as a complete record: title, authors, edition details, an
+ISBN if the edition has one, and an AKSC-written summary. The filename is chosen
+before publishing, because it is the book's permanent address and what every
+reading links to. The cover belongs to the entry: it is
+uploaded from the Books collection, committed under `cms/public/media/books/`,
+and served from `/media/books/`. An optional `coverSource` names where the file
+came from — the current set was taken from Open Library — and prints under the
+picture; a book with none prints the generic caption instead, and a book with
+no cover shows none. No external catalogue is contacted during a build.
 
-```
-npm run enrich:books                        # fill in every blank field and missing cover
-node scripts/enrich-books.mjs --force       # refetch every cover
-node scripts/enrich-books.mjs --covers-only # covers only, leaving frontmatter alone
-```
-
-`.github/workflows/enrich-books.yml` runs this on the pull request Sveltia opens
-for a book and commits what it finds, so an editor who knows only the ISBN still
-gets a complete entry. The build itself never calls Open Library.
-
-Only an entry that had no title of its own is renamed: the filename is the
-entry's id, so a title an editor typed chose that id and a catalogue does not
-overrule it later. The rename is refused, and reported, when another book
-already has that filename or a reading already names this entry, because a
-tidier URL is not worth breaking the link between a reading and its book. A
-book that reaches the build with no title fails it rather than publishing an
-empty heading, which is the case where Open Library had no record at all.
-
-A fetched value only ever fills a blank field; nothing an editor typed is
-replaced. `isbn` is the question being asked, `topics`, `resources`, and `draft`
-are editorial judgement, and two fields are deliberately never fetched.
-`summary`, because a catalogue summary is the publisher's marketing copy, which
-is both the wrong voice for this site and not ours to copy. `authors`, because
-a book stores author slugs and a name off a catalogue is not one: turning a
-name into a slug means deciding whether that person already has an entry, which
-is a judgement about who two spellings refer to rather than a lookup. The summary is optional for the same
-reason — an entry saved from its ISBN alone is written up in AKSC's own words
-afterwards, rather than an editor filling a required field with a blurb. A
-free-text publication date yields a year only when it names exactly one, so a
-reprint cannot come to claim it was written the year it was reprinted.
-
-A book that names no authors and a book with no summary yet both render: the
-byline and the summary paragraph are printed only when there is one, and the
-page's meta description falls back to the book and its authors.
-
-Covers land in `app/features/books/assets/covers/<isbn>.jpg`, are trimmed of the
-flat padding Open Library adds to some images, and are matched to a book by
-filename. A book with no cover file renders without one, so nothing breaks when
-Open Library has nothing for an ISBN; the run lists those books rather than
-failing. A cover already on disk is never refetched, so one committed by hand
-stands.
+Authors can upload portraits under `cms/public/media/authors/`, and book
+readings can upload flyers under `cms/public/media/book-readings/`. These local
+uploads are validated as media paths and remain available without R2.
 
 ### Authors, and the page each one gets
 
@@ -330,16 +300,15 @@ There is no `/authors/` index. The books index and the reading log are already
 lists of the same reading, and a second list of it ordered by author would be a
 page duplicating what those two say.
 
-Portraits come from two places, and which one is used says who owns the
-picture. An author entry's own `portrait` is an R2 URL for a photograph AKSC
-holds. Everything else is an archival portrait listed in
-`app/features/authors/portraits.ts` and committed under
-`app/features/authors/assets/portraits/`, with its photographer, licence, and
-Commons source recorded beside it in `SOURCES.md` and printed under the picture
-on the page. Those credits are why the list is in code: the CMS field holds a
-URL and an alt text, and a CC BY-SA photograph needs more than that said about
-it. An entry's own portrait wins where there is one, and an author with neither
-shows no picture — the page opens on a name rather than a face.
+Portraits belong to the author entry. Its `portrait` is an image the editor
+uploads, committed under `cms/public/media/authors/`, and its optional `credit`
+records the photographer, the licence, and the source page, which the site
+prints under the picture. The credit is what lets a borrowed photograph be
+published at all: a CC BY-SA portrait needs its attribution shown, and an
+editor who can upload the picture can therefore also supply what must be said
+about it. A photograph AKSC holds needs no credit and prints none. An author
+with no portrait shows no picture — the page opens on a name rather than a
+face.
 
 ### Comics and toolkit scenarios, published as panels
 
@@ -404,8 +373,6 @@ them would fail every pull request the CMS opens.
 | `npm test`               | Run Vitest once                               |
 | `npm run generate-types` | Generate Cloudflare runtime binding types     |
 | `npm run verify:pages`   | Smoke-test `dist` through Wrangler Pages      |
-| `npm run enrich:books`   | Fetch book covers and details by ISBN         |
-| `npm run fetch:covers`   | Fetch missing book covers only                |
 | `npm run deploy:pages`   | Deploy `dist` with the Pages command          |
 | `npm run validate`       | Run all checks, build, and Pages verification |
 
@@ -542,11 +509,6 @@ validate`, and skips draft pull requests: the CMS opens one per saved entry, and
 validation waits until the entry leaves Draft and the request is marked ready
 for review. Set the `CMS_REPO` repository variable so that build matches the
 deployed one.
-
-The one other workflow is `.github/workflows/enrich-books.yml`, which fills in a
-new book's title, cover and bibliographic details from its ISBN and commits them
-to the branch. It is the only workflow with write access, and it refuses to run
-on a pull request from a fork.
 
 ## Figma
 

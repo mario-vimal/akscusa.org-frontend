@@ -2,7 +2,7 @@
 import Container from "~/components/ui/Container.astro";
 import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
 import AuthorByline from "~/features/authors/components/AuthorByline.astro";
-import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
+import { COVER_ALT, COVER_WIDTHS } from "~/features/books/covers";
 import type { ReadingEntry } from "~/features/book-readings/presenters";
 import {
   facetSet,
@@ -145,8 +145,6 @@ const filters = [
 
           <ol class="reveal-children mt-4 border-t border-rule">
             {entries.map((entry) => {
-              const cover = entry.isbn ? coverForIsbn(entry.isbn) : undefined;
-
               return (
                 <li
                   class="border-b border-rule"
@@ -160,7 +158,7 @@ const filters = [
                 >
                   <article class="grid gap-8 py-8 sm:py-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-12">
                     <div class="flex gap-4 sm:gap-8">
-                      {cover ? (
+                      {entry.cover ? (
                         <a
                           class="shrink-0 self-start"
                           href={entry.href}
@@ -168,7 +166,7 @@ const filters = [
                         >
                           <ResponsiveImage
                             class="w-16 rounded-md shadow-lift sm:w-28"
-                            src={cover}
+                            src={entry.cover}
                             alt={COVER_ALT}
                             sizes="(min-width: 640px) 112px, 64px"
                             widths={COVER_WIDTHS}

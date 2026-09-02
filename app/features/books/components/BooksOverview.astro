@@ -31,6 +31,7 @@ const entries = await loadBooksWithReadings();
           authors={bookByline(entry)}
           summary={entry.book.data.summary}
           isbn={entry.book.data.isbn}
+          cover={entry.book.data.cover}
           publisher={entry.book.data.publisher}
           sessions={entry.readings.length}
           topics={entry.book.data.topics}

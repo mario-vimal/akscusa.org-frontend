@@ -482,27 +482,53 @@ collections:
     label_singular: Book
     icon: book_2
     description: >-
-      One record per book the circle reads, identified by ISBN. The ISBN is
-      nearly the only field you have to fill: the title, cover art, subtitle,
-      publisher and years are all fetched from it after you save, and nothing
-      needs uploading here. Authors are the exception — pick them from the
-      Authors collection, and add the author there first if they are new.
+      One complete record per book the circle reads. The filename is the book's
+      permanent address and what readings link to, so choose it before
+      publishing. Enter the title, edition details, and AKSC's own summary here.
+      Upload a cover to this collection when one is available. Authors are
+      selected from the Authors collection, and should be added there first if
+      they are new.
     folder: cms/content/books
+    media_folder: /cms/public/media/books
+    public_folder: /media/books
     create: true
     slug: "{{slug}}"
     sortable_fields: [title]
-    summary: "{{title}} — {{isbn}}"
+    summary: "{{title}}"
     fields:
       - name: title
         label: Title
         widget: string
-        required: false
-        hint: "Leave blank to take the title listed for this ISBN. The page's web address is named from the title either way, so type it here if you want to choose that address yourself."
+        hint: "The book's title. Choose the filename before publishing because it sets the web address."
       - name: subtitle
         label: Subtitle
         widget: string
         required: false
-        hint: "Leave blank to take the subtitle listed for this ISBN."
+        hint: "Subtitle on the edition, if it has one."
+      - name: cover
+        label: Cover
+        widget: image
+        required: false
+        hint: "Upload the cover of the edition the circle read. Keep the artwork in its original colors. A book with no cover simply shows none."
+      - name: coverSource
+        label: Cover source
+        widget: object
+        required: false
+        collapsed: true
+        hint: "Where the cover file came from. It prints under the picture. Leave empty if AKSC photographed the book itself."
+        fields:
+          - {
+              name: label,
+              label: Name of the source,
+              widget: string,
+              hint: "How the page should name it — “Open Library”.",
+            }
+          - {
+              name: url,
+              label: Link,
+              widget: string,
+              hint: "The page the file came from.",
+            }
       - name: authors
         label: Authors
         widget: relation
@@ -516,34 +542,35 @@ collections:
       - name: isbn
         label: ISBN-13
         widget: string
+        required: false
         pattern:
           [
             "^(97(8|9))?[0-9-]{10,17}$",
             "Enter the 13 digit ISBN of the edition read.",
           ]
-        hint: "ISBN-13 of the edition the circle read. It links every reading to this book, so it must be correct."
+        hint: "ISBN-13 of the edition the circle read, if it has one. Leave blank for a pamphlet, a PDF, or an edition older than the ISBN system — the book is identified by its filename, not by this. Two books may not share an ISBN."
       - name: publisher
         label: Publisher
         widget: string
         required: false
-        hint: "Leave blank to take the publisher listed for this ISBN."
+        hint: "Publisher of the edition read."
       - name: publishedYear
         label: Edition year
         widget: number
         required: false
         value_type: int
-        hint: "Year of this edition. Leave blank to take the year listed for this ISBN."
+        hint: "Year of the edition read."
       - name: firstPublishedYear
         label: First published
         widget: number
         required: false
         value_type: int
-        hint: "Year the text first appeared, which for a reprint is not the edition year. Leave blank to take the year listed for this ISBN."
+        hint: "Year the text first appeared, which for a reprint is not the edition year."
       - name: summary
         label: Summary
         widget: text
         required: false
-        hint: "One or two sentences in AKSC's own words, shown on the books index. The only thing the ISBN cannot supply, so leave it blank rather than pasting the publisher's blurb, and write it when you have time."
+        hint: "One or two sentences in AKSC's own words. Do not paste the publisher's blurb."
       - name: topics
         label: Topics
         widget: select
@@ -568,6 +595,8 @@ collections:
       this list, so one author carries every book of theirs and has a page of
       their own. Add the author here before adding their first book.
     folder: cms/content/authors
+    media_folder: /cms/public/media/authors
+    public_folder: /media/authors
     create: true
     slug: "{{slug}}"
     sortable_fields: [name]
@@ -595,13 +624,13 @@ collections:
         widget: object
         required: false
         collapsed: true
-        hint: "Only for a photograph AKSC holds. Several authors already show an archival portrait kept with the site; one added here replaces it, credit and all, so add one only if we may publish it."
+        hint: "The photograph the author's page opens with. An author with none opens on their name instead."
         fields:
           - {
               name: src,
-              label: R2 image URL,
-              widget: string,
-              hint: "Use the public media.akscusa.org URL after uploading the portrait to R2.",
+              label: Image,
+              widget: image,
+              hint: "Upload a portrait. Only use a photograph AKSC may publish — either one we hold, or one whose licence allows it, credited below.",
             }
           - {
               name: alt,
@@ -609,6 +638,45 @@ collections:
               widget: string,
               hint: Describe the person and setting rather than repeating their name.,
             }
+          - name: credit
+            label: Credit
+            widget: object
+            required: false
+            collapsed: true
+            hint: "Required for anyone else's photograph, including a Wikimedia Commons one. It prints under the picture. Leave the whole section empty only for a photograph AKSC itself holds."
+            fields:
+              - {
+                  name: creator,
+                  label: Photographer,
+                  widget: string,
+                  hint: "Whom the licence asks you to name — “Alex Lozupone (Tduk) / Wikimedia Commons”.",
+                }
+              - {
+                  name: sourceUrl,
+                  label: Source page,
+                  widget: string,
+                  hint: "The page the file came from, which is where its licence is stated.",
+                }
+              - {
+                  name: license,
+                  label: Licence,
+                  widget: string,
+                  hint: "As the source names it — “CC BY-SA 4.0”, or “Public domain”.",
+                }
+              - {
+                  name: licenseUrl,
+                  label: Licence deed,
+                  widget: string,
+                  required: false,
+                  hint: "A link to the licence text. Leave blank for public domain, which has none.",
+                }
+              - {
+                  name: note,
+                  label: What was done to it,
+                  widget: string,
+                  required: false,
+                  hint: "Any change you made to the file before uploading, such as “cropped”. The page already says it recoloured the picture.",
+                }
       - {
           name: sourceUrl,
           label: Where this biography came from,

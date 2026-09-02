@@ -4,6 +4,10 @@ subtitle: "Battles for Equality in Hindu India"
 authors:
   - "manoj-mitta"
 isbn: "9789357762946"
+cover: "/media/books/caste-pride.jpg"
+coverSource:
+  label: "Open Library"
+  url: "https://openlibrary.org/isbn/9789357762946"
 publisher: "Westland Context"
 publishedYear: 2023
 firstPublishedYear: 2023

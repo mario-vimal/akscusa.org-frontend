@@ -2,8 +2,15 @@
 import type { ImageMetadata } from "astro";
 import { Image } from "astro:assets";
 
+import { measurePublicImage } from "~/lib/public-image";
+
 interface Props {
-  src: ImageMetadata;
+  /**
+   * An imported image, or a path to a file already in `public/`. A CMS upload
+   * is the second kind: it is committed under `cms/public/media/` and served
+   * as it was uploaded, so Astro cannot generate a responsive set for it.
+   */
+  src: ImageMetadata | string;
   alt: string;
   sizes: string;
   class?: string;
@@ -19,17 +26,40 @@ const {
   loading = "lazy",
   widths = [320, 640, 960, 1280],
 } = Astro.props;
-const responsiveWidths = widths.filter((width) => width <= src.width);
+const responsiveWidths =
+  typeof src === "string" ? [] : widths.filter((width) => width <= src.width);
+
+/*
+ * A file in `public/` is served byte for byte, so Astro never learns its
+ * proportions and the browser reserves no room for it. Reading the header at
+ * build time is what stops the page reflowing as each picture arrives.
+ */
+const size =
+  typeof src === "string" ? await measurePublicImage(src) : undefined;
 ---
 
-<Image
-  src={src}
-  alt={alt}
-  class={className}
-  decoding="async"
-  format="webp"
-  loading={loading}
-  quality={82}
-  sizes={sizes}
-  widths={responsiveWidths}
-/>
+{
+  typeof src === "string" ? (
+    <img
+      src={src}
+      alt={alt}
+      class={className}
+      decoding="async"
+      height={size?.height}
+      loading={loading}
+      width={size?.width}
+    />
+  ) : (
+    <Image
+      src={src}
+      alt={alt}
+      class={className}
+      decoding="async"
+      format="webp"
+      loading={loading}
+      quality={82}
+      sizes={sizes}
+      widths={responsiveWidths}
+    />
+  )
+}

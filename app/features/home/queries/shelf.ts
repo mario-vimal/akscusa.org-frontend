@@ -1,6 +1,3 @@
-import type { ImageMetadata } from "astro";
-
-import { coverForIsbn } from "~/features/books/covers";
 import { bookByline } from "~/features/books/presenters";
 import {
   bookHref,
@@ -18,7 +15,7 @@ export interface ShelfBook {
   /** Absent for a book whose entry names no author. */
   authors?: string;
   href: string;
-  cover?: ImageMetadata;
+  cover?: string;
   /** AKSC's own note on the book, when the entry has one. */
   summary?: string;
   /** How many sessions the circle gave it. */
@@ -66,7 +63,7 @@ export async function loadShelf(limit = 12): Promise<Shelf> {
       title: book.book.data.title,
       authors: bookByline(book),
       href: bookHref(book.book),
-      cover: coverForIsbn(book.book.data.isbn),
+      cover: book.book.data.cover,
       summary: book.book.data.summary,
       sessions,
       lastReadOn,

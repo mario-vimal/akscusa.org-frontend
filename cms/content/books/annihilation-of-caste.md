@@ -4,6 +4,10 @@ subtitle: "The Annotated Critical Edition"
 authors:
   - "dr-b-r-ambedkar"
 isbn: "9788189059637"
+cover: "/media/books/annihilation-of-caste.jpg"
+coverSource:
+  label: "Open Library"
+  url: "https://openlibrary.org/isbn/9788189059637"
 publisher: "Navayana"
 publishedYear: 2014
 firstPublishedYear: 1936

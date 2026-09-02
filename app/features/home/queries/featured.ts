@@ -1,6 +1,3 @@
-import type { ImageMetadata } from "astro";
-
-import { coverForIsbn } from "~/features/books/covers";
 import { bookByline } from "~/features/books/presenters";
 import { bookHref, loadReadingBooks } from "~/features/books/queries/books";
 import {
@@ -166,7 +163,7 @@ export interface BookFeature {
   /** Absent for a book whose entry names no author. */
   authors?: string;
   href: string;
-  cover?: ImageMetadata;
+  cover?: string;
   /**
    * The day of the session this book is the book of: the next one when one is
    * scheduled, otherwise the last one held.
@@ -231,7 +228,7 @@ export async function loadCurrentBook(): Promise<BookFeature | undefined> {
     title: book.data.title,
     authors: bookByline(current),
     href: bookHref(book),
-    cover: coverForIsbn(book.data.isbn),
+    cover: book.data.cover,
     sessionOn: session.data.date,
     sessions: readings.filter(
       (entry) => booksByReading.get(entry.id)?.book.id === book.id,

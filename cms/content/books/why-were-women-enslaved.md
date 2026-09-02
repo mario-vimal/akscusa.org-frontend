@@ -4,6 +4,10 @@ subtitle: ""
 authors:
   - "periyar-e-v-ramasamy"
 isbn: "9788190357937"
+cover: "/media/books/why-were-women-enslaved.jpg"
+coverSource:
+  label: "Open Library"
+  url: "https://openlibrary.org/isbn/9788190357937"
 publisher: "The Periyar Self-Respect Propaganda Institution"
 publishedYear: 2007
 firstPublishedYear: 1942

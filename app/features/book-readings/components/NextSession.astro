@@ -1,6 +1,6 @@
 ---
 import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
-import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
+import { COVER_ALT, COVER_WIDTHS } from "~/features/books/covers";
 import type { NextSession } from "~/features/book-readings/presenters";
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { session } = Astro.props;
-const cover = session.book ? coverForIsbn(session.book.isbn) : undefined;
+const cover = session.book?.cover;
 ---
 
 <!--

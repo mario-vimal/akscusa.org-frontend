@@ -4,6 +4,10 @@ subtitle: "Men, Masculinity, and Love"
 authors:
   - "bell-hooks"
 isbn: "9780743456074"
+cover: "/media/books/the-will-to-change.jpg"
+coverSource:
+  label: "Open Library"
+  url: "https://openlibrary.org/isbn/9780743456074"
 publisher: "Atria Books"
 publishedYear: 2004
 firstPublishedYear: 2004
