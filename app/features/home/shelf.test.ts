@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { shelve, type HeldSession } from "./shelf";
+import { shelve as groupOntoShelf, type HeldSession } from "./shelf";
 
 interface Book {
   id: string;
@@ -12,6 +12,10 @@ const session = (book: Book, date: string): HeldSession<Book> => ({
   book,
   date: new Date(`${date}T00:00:00Z`),
 });
+
+/** The shelf is told how to read an id, so the test says it once. */
+const shelve = (sessions: readonly HeldSession<Book>[]) =>
+  groupOntoShelf(sessions, (book) => book.id);
 
 describe("shelve", () => {
   const annihilation = book("annihilation-of-caste");

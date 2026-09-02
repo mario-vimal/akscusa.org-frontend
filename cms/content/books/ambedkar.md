@@ -2,7 +2,7 @@
 title: "Ambedkar"
 subtitle: "towards an enlightened India"
 authors:
-  - "Gail Omvedt"
+  - "gail-omvedt"
 isbn: '9780670049912'
 publisher: "Penguin"
 publishedYear: 2004

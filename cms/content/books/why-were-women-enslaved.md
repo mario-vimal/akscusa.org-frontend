@@ -2,7 +2,7 @@
 title: "Why Were Women Enslaved?"
 subtitle: ""
 authors:
-  - "Periyar E. V. Ramasamy"
+  - "periyar-e-v-ramasamy"
 isbn: "9788190357937"
 publisher: "The Periyar Self-Respect Propaganda Institution"
 publishedYear: 2007

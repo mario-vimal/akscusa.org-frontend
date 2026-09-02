@@ -1,0 +1,264 @@
+---
+import BackLink from "~/components/ui/BackLink.astro";
+import Container from "~/components/ui/Container.astro";
+import PageMasthead from "~/components/ui/PageMasthead.astro";
+import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
+import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
+import { archivalPortrait } from "~/features/authors/portraits";
+import type { AuthorPage } from "~/features/authors/presenters";
+
+interface Props {
+  page: AuthorPage;
+}
+
+const { page } = Astro.props;
+
+/*
+ * An entry's own portrait is a photograph AKSC holds and has chosen, so it
+ * beats the archival one this site keeps for the figures it could find a
+ * freely licensed picture of.
+ */
+const archival = page.portrait ? undefined : archivalPortrait(page.slug);
+const hasPortrait = page.portrait !== undefined || archival !== undefined;
+const hasIntroduction = page.bio.length > 0 || hasPortrait;
+
+/*
+ * The running figures down the index are the count of this author's books, so
+ * they read 01, 02, 03 rather than restating a position in the whole library.
+ */
+const figure = (index: number) => String(index + 1).padStart(2, "0");
+---
+
+<!--
+  An author's page. It exists because the relation between a book and the
+  person who wrote it runs both ways, and the book's page can only show one
+  direction of it: three books by Ambedkar are three pages that each mention
+  him and never say that the circle has read the other two.
+
+  Every author gets one, including an author of a single book. The alternative
+  — a route that appears once a second book of theirs is read — makes an
+  address depend on how much of a person's work the circle has happened to get
+  through, so a link published today breaks when a book is drafted, and a
+  byline would have to be clickable for some names and not others with nothing
+  on the page to explain which. The page still earns its keep for one book: it
+  carries the biography and the portrait, which no book page shows, and it
+  gathers every sitting the circle held on that work in one place.
+-->
+<article>
+  <PageMasthead
+    eyebrow="Author"
+    title={page.name}
+    meta={page.shelfLine}
+    size="large"
+  >
+    <BackLink slot="above" href="/books/" tone="light">Back to Books</BackLink>
+  </PageMasthead>
+
+  {
+    hasIntroduction && (
+      <Container class="pt-12 pb-2 sm:pt-16">
+        <div class="rule-draw max-w-3xl" aria-hidden="true" />
+        <div class="mt-8 gap-10 lg:flex lg:items-start">
+          {hasPortrait && (
+            <figure class="mb-8 w-40 shrink-0 sm:w-48 lg:order-last lg:mb-0 lg:w-56">
+              {/*
+                  `duotone-light` only drains the colour out of a photograph;
+                  the layer over it puts the brand blue back, which is how the
+                  mastheads do it too. The light variant is used because this
+                  band is white and nothing is laid over the picture.
+                */}
+              <div class="relative isolate aspect-4/5 overflow-hidden rounded-xl">
+                {archival ? (
+                  <ResponsiveImage
+                    class="size-full object-cover object-top duotone-light"
+                    src={archival.image}
+                    alt={archival.alt}
+                    sizes="(min-width: 1024px) 14rem, (min-width: 640px) 12rem, 10rem"
+                    widths={[160, 224, 320, 448]}
+                    loading="eager"
+                  />
+                ) : (
+                  page.portrait && (
+                    <img
+                      class="size-full object-cover object-top duotone-light"
+                      src={page.portrait.src}
+                      alt={page.portrait.alt}
+                      loading="eager"
+                      decoding="async"
+                    />
+                  )
+                )}
+                <div
+                  class="absolute inset-0 bg-ambedkar-700 mix-blend-color"
+                  aria-hidden="true"
+                />
+              </div>
+              {archival && (
+                <figcaption class="mt-3 text-xs leading-5 text-ambedkar-900/65">
+                  Image:{" "}
+                  <a
+                    class="underline underline-offset-2 hover:text-ambedkar-900"
+                    href={archival.credit.sourceHref}
+                  >
+                    {archival.credit.creator}
+                  </a>{" "}
+                  ·{" "}
+                  {archival.credit.licenseHref ? (
+                    <a
+                      class="underline underline-offset-2 hover:text-ambedkar-900"
+                      href={archival.credit.licenseHref}
+                      rel="license"
+                    >
+                      {archival.credit.license}
+                    </a>
+                  ) : (
+                    archival.credit.license
+                  )}{" "}
+                  · cropped and recolored
+                </figcaption>
+              )}
+            </figure>
+          )}
+
+          <div class="max-w-2xl min-w-0 lg:flex-1">
+            {page.bio.map((paragraph) => (
+              <p class="mt-5 font-serif text-lg leading-[1.7] text-ambedkar-900/85 first:mt-0">
+                {paragraph}
+              </p>
+            ))}
+            {page.sourceUrl && (
+              <p class="mt-6 text-sm">
+                <a
+                  class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                  href={page.sourceUrl}
+                >
+                  Where this biography came from
+                </a>
+              </p>
+            )}
+          </div>
+        </div>
+      </Container>
+    )
+  }
+
+  <Container class="pt-12 pb-20 sm:pt-16 sm:pb-28">
+    <div class="section-head">
+      <p class="eyebrow self-start">On the reading list</p>
+      <h2
+        class="font-display text-display-sm leading-[1.06] font-bold tracking-display text-balance text-ambedkar-950"
+      >
+        What the circle has read of theirs
+      </h2>
+    </div>
+
+    <ol class="reveal-children mt-10 border-t border-rule">
+      {
+        page.books.map((entry, index) => {
+          const cover = coverForIsbn(entry.isbn);
+
+          return (
+            <li class="border-b border-rule">
+              <article class="gap-6 py-8 sm:flex sm:gap-8 sm:py-10">
+                <div class="mb-5 flex items-start gap-4 sm:mb-0 sm:block sm:w-28 sm:shrink-0">
+                  <span class="index-figure sm:mb-3">{figure(index)}</span>
+                  {cover ? (
+                    <a class="block shrink-0" href={entry.href} tabindex="-1">
+                      <ResponsiveImage
+                        class="w-20 rounded-md shadow-lift sm:w-full"
+                        src={cover}
+                        alt={COVER_ALT}
+                        sizes="(min-width: 640px) 112px, 80px"
+                        widths={COVER_WIDTHS}
+                      />
+                    </a>
+                  ) : (
+                    <div
+                      class="h-24 w-20 shrink-0 rounded-md border border-dashed border-rule-strong bg-ambedkar-50 sm:h-36 sm:w-full"
+                      aria-hidden="true"
+                    />
+                  )}
+                </div>
+
+                <div class="min-w-0 flex-1">
+                  <h3 class="font-display text-xl leading-[1.16] font-semibold tracking-title text-balance wrap-break-word text-ambedkar-950 sm:text-2xl sm:leading-[1.14]">
+                    <a class="link-underline" href={entry.href}>
+                      {entry.title}
+                    </a>
+                  </h3>
+
+                  {entry.subtitle && (
+                    <p class="mt-1.5 text-[0.9375rem] leading-6 text-ambedkar-900/65">
+                      {entry.subtitle}
+                    </p>
+                  )}
+
+                  {entry.coAuthors && (
+                    <p class="mt-2 font-serif text-[0.9375rem] leading-6 text-ambedkar-900/80 italic">
+                      With {entry.coAuthors}
+                    </p>
+                  )}
+
+                  {entry.summary && (
+                    <p class="mt-4 leading-7 text-ambedkar-900/75">
+                      {entry.summary}
+                    </p>
+                  )}
+
+                  {entry.sessions.length === 0 ? (
+                    <p class="mt-5 text-sm text-ambedkar-900/65">
+                      No session on this book has been scheduled yet.
+                    </p>
+                  ) : (
+                    <>
+                      {/*
+                        The count and the upcoming mark sit on their own line
+                        rather than inside a chip. A chip is one unwrappable
+                        row, so a badge added to a chapter range runs off a
+                        320px screen; this line wraps.
+                      */}
+                      <p class="label mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-ambedkar-900/60">
+                        <span>
+                          {entry.sessions.length === 1
+                            ? "1 session"
+                            : `${entry.sessions.length} sessions`}
+                        </span>
+                        {entry.upcoming && (
+                          <span class="rounded-sm border border-accent-600 px-1.5 py-0.5 text-accent-700">
+                            Upcoming
+                          </span>
+                        )}
+                      </p>
+                      <ul class="mt-3 flex flex-wrap gap-2">
+                        {entry.sessions.map((session) => (
+                          <li>
+                            <a class="session-chip" href={session.href}>
+                              {session.label && (
+                                <span class="session-chip__label">
+                                  {session.label}
+                                </span>
+                              )}
+                              <time
+                                class:list={[
+                                  "session-chip__date",
+                                  !session.label && "session-chip__date--lead",
+                                ]}
+                                datetime={session.dateTime}
+                              >
+                                {session.dateLabel}
+                              </time>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+              </article>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </Container>
+</article>

@@ -80,6 +80,31 @@ export const linkSchema = z.object({
   url: z.string(),
 });
 
+// A relation to another collection, stored as that collection's stable entry
+// ids. Shared because two collections now hold one: a conference names its
+// speakers and a book names its authors, and both are a list of slugs an
+// editor picks from a relation widget rather than a list of typed names.
+//
+// The shape is checked here; that a slug names an entry which exists and is
+// published is checked where the reference is resolved, because a schema
+// cannot read another collection. `noun` names what is being referenced so a
+// rejected value says which field it came from.
+export function slugReferences(noun: string, duplicateMessage: string) {
+  return optionalCmsList(
+    z
+      .array(
+        z
+          .string()
+          .regex(
+            /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+            `Must be a lowercase kebab-case ${noun} slug.`,
+          ),
+      )
+      .default([])
+      .refine((ids) => new Set(ids).size === ids.length, duplicateMessage),
+  );
+}
+
 // A poster or flyer, committed to Git rather than hosted on the media host:
 // it is AKSC's own artwork, kept in its original colours, not editorial
 // photography. Shared by every collection that offers the Sveltia `image`

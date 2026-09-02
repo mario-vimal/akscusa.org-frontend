@@ -2,7 +2,7 @@
 title: "Annihilation of Caste"
 subtitle: "The Annotated Critical Edition"
 authors:
-  - "B. R. Ambedkar"
+  - "dr-b-r-ambedkar"
 isbn: "9788189059637"
 publisher: "Navayana"
 publishedYear: 2014

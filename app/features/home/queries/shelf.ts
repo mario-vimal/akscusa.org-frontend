@@ -1,11 +1,11 @@
 import type { ImageMetadata } from "astro";
 
 import { coverForIsbn } from "~/features/books/covers";
-import { bookAuthors } from "~/features/books/presenters";
+import { bookByline } from "~/features/books/presenters";
 import {
   bookHref,
   loadReadingBooks,
-  type Book,
+  type BookWithAuthors,
 } from "~/features/books/queries/books";
 import { loadEditorialEntries } from "~/features/editorial/queries/entries";
 import { shelve, type HeldSession } from "~/features/home/shelf";
@@ -51,23 +51,23 @@ export async function loadShelf(limit = 12): Promise<Shelf> {
     loadReadingBooks(),
   ]);
 
-  const held: HeldSession<Book>[] = readings
+  const held: HeldSession<BookWithAuthors>[] = readings
     .filter((reading) => !isUpcoming(reading))
     .flatMap((reading) => {
       const book = booksByReading.get(reading.id);
       return book ? [{ book, date: reading.data.date }] : [];
     });
 
-  const entries = shelve(held);
+  const entries = shelve(held, (entry) => entry.book.id);
 
   return {
     books: entries.slice(0, limit).map(({ book, sessions, lastReadOn }) => ({
-      id: book.id,
-      title: book.data.title,
-      authors: bookAuthors(book),
-      href: bookHref(book),
-      cover: coverForIsbn(book.data.isbn),
-      summary: book.data.summary,
+      id: book.book.id,
+      title: book.book.data.title,
+      authors: bookByline(book),
+      href: bookHref(book.book),
+      cover: coverForIsbn(book.book.data.isbn),
+      summary: book.book.data.summary,
       sessions,
       lastReadOn,
     })),

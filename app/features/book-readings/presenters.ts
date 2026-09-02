@@ -18,10 +18,11 @@ import {
   formatPacificTime,
   pacificYear,
 } from "~/lib/dates";
+import type { AuthorLink } from "~/features/authors/links";
 import type { Badge, Detail } from "~/features/editorial/presenters";
 import { topicLabel } from "~/features/editorial/taxonomy";
-import { bookAuthors } from "~/features/books/presenters";
-import { bookHref, type Book } from "~/features/books/queries/books";
+import { bookAuthorLinks, bookByline } from "~/features/books/presenters";
+import { bookHref, type BookWithAuthors } from "~/features/books/queries/books";
 import { isUpcoming } from "~/lib/collections";
 import { sessionLabel } from "~/features/book-readings/titles";
 
@@ -30,10 +31,12 @@ type Reading = EditorialEntry<"bookReadings">;
 const list = (values: readonly string[]) => values.join(", ");
 
 /** The book a session worked through, named as a detail line prints it. */
-const bookTitleAndAuthors = (book: Book) => {
-  const authors = bookAuthors(book);
+const bookTitleAndAuthors = (entry: BookWithAuthors) => {
+  const byline = bookByline(entry);
 
-  return authors ? `${book.data.title} by ${authors}` : book.data.title;
+  return byline
+    ? `${entry.book.data.title} by ${byline}`
+    : entry.book.data.title;
 };
 
 export const bookReadingBadge = (reading: Reading): Badge =>
@@ -41,19 +44,22 @@ export const bookReadingBadge = (reading: Reading): Badge =>
     ? { label: "Upcoming", tone: "accent" }
     : { label: "Past reading", tone: "muted" };
 
-export function bookReadingDetails(reading: Reading, book?: Book): Detail[] {
+export function bookReadingDetails(
+  reading: Reading,
+  entry?: BookWithAuthors,
+): Detail[] {
   const details: Detail[] = [
     { term: "When", description: formatPacificTime(reading.data.date) },
     { term: "Where", description: reading.data.location },
   ];
 
-  if (book) {
+  if (entry) {
     details.push({
       term: "Book",
-      description: bookTitleAndAuthors(book),
-      href: bookHref(book),
+      description: bookTitleAndAuthors(entry),
+      href: bookHref(entry.book),
     });
-    details.push({ term: "ISBN", description: book.data.isbn });
+    details.push({ term: "ISBN", description: entry.book.data.isbn });
   }
 
   if (reading.data.participants.length > 0) {
@@ -112,13 +118,15 @@ export interface ReadingEntry {
   href: string;
   title: string;
   subtitle?: string;
-  authors?: string;
+  /** The authors on one line, which is what the entry prints. */
+  byline?: string;
   /**
-   * The authors one at a time, for the author dropdown. The joined `authors`
-   * line is what the entry prints; a filter has to match a single name, and
-   * splitting the printed line back apart would depend on how it was joined.
+   * The same authors one at a time, for the byline's links and for the author
+   * dropdown, which files an entry under each author's slug. Splitting the
+   * printed line back apart would depend on how it was joined, and would file
+   * one person under two names the moment a catalogue spells them differently.
    */
-  authorNames: string[];
+  authors: AuthorLink[];
   /** Absent for an entry with no book; the component resolves the cover. */
   isbn?: string;
   summary?: string;
@@ -194,16 +202,16 @@ const readingYears = (sessions: readonly Reading[]): number[] =>
  */
 function entrySearch(
   sessions: readonly Reading[],
-  book: Book | undefined,
+  entry: BookWithAuthors | undefined,
   topics: readonly string[],
 ): string {
   return (
     [
-      book?.data.title,
-      book?.data.subtitle,
-      book ? bookAuthors(book) : undefined,
-      book?.data.isbn,
-      book?.data.summary,
+      entry?.book.data.title,
+      entry?.book.data.subtitle,
+      entry ? bookByline(entry) : undefined,
+      entry?.book.data.isbn,
+      entry?.book.data.summary,
       ...sessions.map((reading) => reading.data.title),
       ...sessions.map((reading) => reading.data.summary),
       ...sessions.map((reading) => formatPacificDate(reading.data.date)),
@@ -219,7 +227,11 @@ function entrySearch(
   );
 }
 
-function bookEntry(book: Book, unordered: readonly Reading[]): ReadingEntry {
+function bookEntry(
+  entry: BookWithAuthors,
+  unordered: readonly Reading[],
+): ReadingEntry {
+  const { book } = entry;
   const run = chronological(unordered);
   const first = run[0];
   const last = run[run.length - 1];
@@ -247,8 +259,8 @@ function bookEntry(book: Book, unordered: readonly Reading[]): ReadingEntry {
     href: bookHref(book),
     title: book.data.title,
     subtitle: book.data.subtitle,
-    authors: bookAuthors(book),
-    authorNames: [...book.data.authors],
+    byline: bookByline(entry),
+    authors: bookAuthorLinks(entry),
     isbn: book.data.isbn,
     summary: book.data.summary,
     sessionCount: run.length,
@@ -260,7 +272,7 @@ function bookEntry(book: Book, unordered: readonly Reading[]): ReadingEntry {
     sessions: sessionLinks(sessions, book.data, spansYears),
     posters: entryPosters(sessions),
     topics,
-    search: entrySearch(run, book, topics),
+    search: entrySearch(run, entry, topics),
   };
 }
 
@@ -274,7 +286,7 @@ function articlesEntry(reading: Reading): ReadingEntry {
     href: sessionHref(reading),
     title: reading.data.title,
     // A reading list of articles has no one author to file it under.
-    authorNames: [],
+    authors: [],
     summary: reading.data.summary,
     sessionCount: 1,
     spanLabel: formatPacificMonthRange(reading.data.date, reading.data.date),
@@ -301,33 +313,34 @@ function articlesEntry(reading: Reading): ReadingEntry {
  */
 export function readingEntries(
   readings: readonly Reading[],
-  books: ReadonlyMap<string, Book>,
+  books: ReadonlyMap<string, BookWithAuthors>,
 ): ReadingEntry[] {
   const sessionsByBook = new Map<string, Reading[]>();
 
   for (const reading of readings) {
-    const book = books.get(reading.id);
-    if (!book) continue;
+    const entry = books.get(reading.id);
+    if (!entry) continue;
 
-    const sessions = sessionsByBook.get(book.id) ?? [];
+    const sessions = sessionsByBook.get(entry.book.id) ?? [];
     sessions.push(reading);
-    sessionsByBook.set(book.id, sessions);
+    sessionsByBook.set(entry.book.id, sessions);
   }
 
   const emitted = new Set<string>();
   const entries: ReadingEntry[] = [];
 
   for (const reading of readings) {
-    const book = books.get(reading.id);
+    const entry = books.get(reading.id);
 
-    if (!book) {
+    if (!entry) {
       entries.push(articlesEntry(reading));
       continue;
     }
 
-    if (emitted.has(book.id)) continue;
-    emitted.add(book.id);
-    entries.push(bookEntry(book, sessionsByBook.get(book.id) ?? [reading]));
+    const { id } = entry.book;
+    if (emitted.has(id)) continue;
+    emitted.add(id);
+    entries.push(bookEntry(entry, sessionsByBook.get(id) ?? [reading]));
   }
 
   return entries;
@@ -356,13 +369,17 @@ export interface NextSession {
   upcoming: boolean;
   book?: {
     title: string;
-    authors?: string;
+    /** The authors on one line, absent when the entry names none. */
+    byline?: string;
     href: string;
     isbn: string;
   };
 }
 
-export function nextSession(reading: Reading, book?: Book): NextSession {
+export function nextSession(
+  reading: Reading,
+  entry?: BookWithAuthors,
+): NextSession {
   return {
     href: sessionHref(reading),
     title: reading.data.title,
@@ -371,12 +388,12 @@ export function nextSession(reading: Reading, book?: Book): NextSession {
     whenLabel: formatPacificTime(reading.data.date),
     location: reading.data.location,
     upcoming: isUpcoming(reading),
-    book: book
+    book: entry
       ? {
-          title: book.data.title,
-          authors: bookAuthors(book),
-          href: bookHref(book),
-          isbn: book.data.isbn,
+          title: entry.book.data.title,
+          byline: bookByline(entry),
+          href: bookHref(entry.book),
+          isbn: entry.book.data.isbn,
         }
       : undefined,
   };

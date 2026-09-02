@@ -11,8 +11,8 @@
 import { parse } from "yaml";
 
 /**
- * Values this module can write: a scalar, or a list of strings for `authors`.
- * Books hold no field nested deeper than that worth filling.
+ * Values this module can write: a scalar, or a list of strings. Books hold no
+ * field nested deeper than that worth filling.
  */
 export type FieldValue = string | number | readonly string[];
 

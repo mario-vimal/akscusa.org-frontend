@@ -33,17 +33,23 @@ export interface ShelfEntry<B> {
  * A book read over several sessions appears once, dated by the last of them,
  * so a long book does not fill the shelf with copies of itself and does not
  * sit at the date the circle started it.
+ *
+ * How to read a book's id is asked for rather than assumed, because what a
+ * caller holds is a book together with the people who wrote it, and the id it
+ * is grouped by belongs to the entry inside that pair.
  */
-export function shelve<B extends { id: string }>(
+export function shelve<B>(
   sessions: readonly HeldSession<B>[],
+  idOf: (book: B) => string,
 ): ShelfEntry<B>[] {
   const byBook = new Map<string, ShelfEntry<B>>();
 
   for (const { book, date } of sessions) {
-    const entry = byBook.get(book.id);
+    const id = idOf(book);
+    const entry = byBook.get(id);
 
     if (!entry) {
-      byBook.set(book.id, { book, sessions: 1, lastReadOn: date });
+      byBook.set(id, { book, sessions: 1, lastReadOn: date });
       continue;
     }
 

@@ -17,9 +17,6 @@ export const getStaticPaths = (async () => {
 const { entry } = Astro.props;
 ---
 
-<SiteLayout
-  title={entry.book.data.title}
-  description={bookDescription(entry.book)}
->
+<SiteLayout title={entry.book.data.title} description={bookDescription(entry)}>
   <BookDetail entry={entry} />
 </SiteLayout>

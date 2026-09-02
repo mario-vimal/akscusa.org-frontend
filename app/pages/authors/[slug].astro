@@ -1,0 +1,23 @@
+---
+import type { GetStaticPaths } from "astro";
+
+import AuthorDetail from "~/features/authors/components/AuthorDetail.astro";
+import { authorPage } from "~/features/authors/presenters";
+import { loadAuthorShelves } from "~/features/authors/queries/shelf";
+import SiteLayout from "~/layouts/SiteLayout.astro";
+
+export const getStaticPaths = (async () => {
+  const shelves = await loadAuthorShelves();
+
+  return shelves.map((shelf) => ({
+    params: { slug: shelf.author.id },
+    props: { page: authorPage(shelf) },
+  }));
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+---
+
+<SiteLayout title={page.name} description={page.description}>
+  <AuthorDetail page={page} />
+</SiteLayout>

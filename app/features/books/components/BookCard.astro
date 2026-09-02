@@ -55,7 +55,21 @@ const sessionLabel =
     }
 
     <div class="min-w-0">
-      {authors && <p class="label text-ambedkar-700">{authors}</p>}
+      {
+        /*
+        A byline is a person's name, not a label, so the label's uppercase and
+        its letterspacing are dropped here. bell hooks set her pen name in
+        lower case deliberately; a card that prints "BELL HOOKS" has quietly
+        overruled the one thing about that name its owner chose.
+      */
+      }
+      {
+        authors && (
+          <p class="label tracking-normal text-ambedkar-700 normal-case">
+            {authors}
+          </p>
+        )
+      }
       <h2
         class="mt-2 font-display text-xl leading-[1.16] font-semibold tracking-title text-balance text-ambedkar-950"
       >

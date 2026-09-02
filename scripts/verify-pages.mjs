@@ -31,6 +31,8 @@ const routes = new Map([
   ["/interventions/kind/legislative/", "Legislative"],
   ["/actions/", "What we do"],
   ["/book-readings/", "Book Readings"],
+  ["/books/", "Every book the reading circle has worked through"],
+  ["/authors/dr-b-r-ambedkar/", "What the circle has read of theirs"],
   ["/conferences/", "Conferences"],
   ["/conferences/aksc-6th-annual-conference-2025/", "Conference speakers"],
   [

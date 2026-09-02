@@ -52,46 +52,49 @@ describe("yearFromPublishDate", () => {
 });
 
 describe("fieldsToFill", () => {
-  const record = {
+  const fetched = {
     title: "Annihilation of Caste",
     subtitle: "The Annotated Critical Edition",
-    authors: ["B. R. Ambedkar"],
     publisher: "Navayana",
     publishedYear: 2014,
     firstPublishedYear: 1936,
   };
 
+  const record = { ...fetched, authors: ["B. R. Ambedkar"] };
+
   it("fills every field the entry has left blank", () => {
-    expect(fieldsToFill({}, record)).toEqual(record);
-    expect(
-      fieldsToFill({ subtitle: "", authors: [], publishedYear: null }, record),
-    ).toEqual(record);
+    expect(fieldsToFill({}, record)).toEqual(fetched);
+    expect(fieldsToFill({ subtitle: "", publishedYear: null }, record)).toEqual(
+      fetched,
+    );
   });
 
-  it("fills the title and the authors an entry never stated", () => {
+  it("fills the title an entry never stated", () => {
     // The whole point of the ISBN: an entry that says only that can still
     // name its book.
     expect(fieldsToFill({ isbn: "9788189059637" }, record)).toMatchObject({
       title: "Annihilation of Caste",
-      authors: ["B. R. Ambedkar"],
     });
+  });
+
+  // A book names its authors by the slug of an author entry, so a name off a
+  // catalogue is not a value this field can hold. Writing one would fail the
+  // build the moment the entry was read.
+  it("never fills the authors, whatever the catalogue returns", () => {
+    expect(fieldsToFill({}, record)).not.toHaveProperty("authors");
+    expect(fieldsToFill({ authors: [] }, record)).not.toHaveProperty("authors");
   });
 
   it("never replaces a value an editor typed", () => {
     const existing = {
       title: "Annihilation of Caste (annotated)",
       subtitle: "The Annotated Critical Edition, 2nd printing",
-      authors: ["Bhimrao Ramji Ambedkar"],
       publisher: "Navayana Publishing",
       publishedYear: 2015,
       firstPublishedYear: 1936,
     };
 
     expect(fieldsToFill(existing, record)).toEqual({});
-  });
-
-  it("leaves a list alone when the record names nobody", () => {
-    expect(fieldsToFill({ authors: [] }, { authors: [] })).toEqual({});
   });
 
   it("fills only what the record supplies", () => {

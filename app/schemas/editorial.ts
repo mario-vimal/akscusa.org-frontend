@@ -26,6 +26,7 @@ import {
   optionalRemoteImage,
   optionalUrl,
   posterListSchema,
+  slugReferences,
 } from "~/schemas/shared";
 
 export const articles = defineCollection({
@@ -97,21 +98,9 @@ export const conferences = defineCollection({
     format: z.enum(conferenceFormatIds),
     theme: optionalCmsField(z.string()),
     registrationUrl: optionalUrl,
-    speakers: optionalCmsList(
-      z
-        .array(
-          z
-            .string()
-            .regex(
-              /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-              "Must be a lowercase kebab-case speaker slug.",
-            ),
-        )
-        .default([])
-        .refine(
-          (ids) => new Set(ids).size === ids.length,
-          "A conference cannot list the same speaker twice.",
-        ),
+    speakers: slugReferences(
+      "speaker",
+      "A conference cannot list the same speaker twice.",
     ),
     resources: optionalCmsList(z.array(linkSchema).default([])),
   }),

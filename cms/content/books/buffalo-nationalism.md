@@ -2,7 +2,7 @@
 title: Buffalo Nationalism
 subtitle: "A Critique of Spiritual Fascism"
 authors:
-  - Kancha Ilaiah
+  - "kancha-ilaiah"
 isbn: '9789353282561'
 publisher: "SAGE Publications, Incorporated"
 publishedYear: 2019

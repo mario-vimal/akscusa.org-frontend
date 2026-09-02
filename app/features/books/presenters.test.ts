@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { bookAuthors, bookDescription } from "./presenters";
+import { bookAuthorLinks, bookByline, bookDescription } from "./presenters";
 
-const book = (title: string, authors: readonly string[], summary?: string) => ({
-  data: { title, authors, summary },
+const book = (title: string, names: readonly string[], summary?: string) => ({
+  book: { data: { title, summary } },
+  authors: names.map((name) => ({
+    id: name.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-"),
+    data: { name },
+  })),
 });
 
 const periyar = book(
@@ -12,20 +16,32 @@ const periyar = book(
   "Periyar's case that the subjection of women is built and can be dismantled.",
 );
 
-describe("bookAuthors", () => {
-  it("joins the authors an entry names", () => {
-    expect(bookAuthors(periyar)).toBe("Periyar E. V. Ramasamy");
-    expect(bookAuthors(book("Ambedkar", ["A", "B"]))).toBe("A, B");
+describe("bookByline", () => {
+  it("joins the authors the entry's slugs resolved to", () => {
+    expect(bookByline(periyar)).toBe("Periyar E. V. Ramasamy");
+    expect(bookByline(book("Ambedkar", ["A", "B"]))).toBe("A, B");
   });
 
   it("names nobody for an entry Open Library could not fill", () => {
-    expect(bookAuthors(book("Why Were Women Enslaved?", []))).toBeUndefined();
+    expect(bookByline(book("Why Were Women Enslaved?", []))).toBeUndefined();
+  });
+});
+
+describe("bookAuthorLinks", () => {
+  it("points each name at that author's own page", () => {
+    expect(bookAuthorLinks(book("Ambedkar", ["Gail Omvedt"]))).toEqual([
+      { slug: "gail-omvedt", name: "Gail Omvedt" },
+    ]);
+  });
+
+  it("has nothing to link for an entry that names no author", () => {
+    expect(bookAuthorLinks(book("Buffalo Nationalism", []))).toEqual([]);
   });
 });
 
 describe("bookDescription", () => {
   it("uses the summary AKSC wrote", () => {
-    expect(bookDescription(periyar)).toBe(periyar.data.summary);
+    expect(bookDescription(periyar)).toBe(periyar.book.data.summary);
   });
 
   it("falls back to the book itself when there is no summary yet", () => {

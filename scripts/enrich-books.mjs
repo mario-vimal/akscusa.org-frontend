@@ -4,10 +4,12 @@
  *
  * Cover art is fetched from Open Library and stored under
  * `app/features/books/assets/covers/<isbn>.jpg`, and every bibliographic field
- * left blank — title, subtitle, authors, publisher, edition year, first
- * publication year — is written into the entry's frontmatter, so an ISBN is
- * all an entry has to state. A value an editor typed is never replaced, and
- * `summary` is never fetched: that sentence is AKSC's own.
+ * left blank — title, subtitle, publisher, edition year, first publication
+ * year — is written into the entry's frontmatter, so an ISBN is nearly all an
+ * entry has to state. A value an editor typed is never replaced, and two
+ * fields are never fetched: `summary`, because that sentence is AKSC's own,
+ * and `authors`, because a book names its authors by the slug of an author
+ * entry and a name off a catalogue is not one.
  *
  * An entry saved without a title is also renamed to the title that arrives, so
  * a book added from an ISBN alone still reaches a readable URL rather than

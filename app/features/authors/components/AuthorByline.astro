@@ -1,0 +1,41 @@
+---
+import { authorHref, type AuthorLink } from "~/features/authors/links";
+
+interface Props {
+  authors: readonly AuthorLink[];
+  /** `light` is for the dark masthead, `dark` for a light page. */
+  tone?: "light" | "dark";
+  class?: string;
+}
+
+const { authors, tone = "dark", class: className } = Astro.props;
+
+const toneClasses = {
+  light: "text-accent-300 hover:text-white decoration-accent-300/50",
+  dark: "text-ambedkar-700 hover:text-ambedkar-950 decoration-ambedkar-700/40",
+};
+---
+
+<!--
+  A byline whose names are links. The separator sits outside the anchors so a
+  reader dragging across the line does not select a comma into the link, and so
+  a name that itself contains a comma cannot be split by one.
+-->
+<span class={className}
+  >{
+    authors.map((author, index) => (
+      <>
+        {index > 0 && <span aria-hidden="true">, </span>}
+        <a
+          class:list={[
+            "underline underline-offset-4 transition-colors",
+            toneClasses[tone],
+          ]}
+          href={authorHref(author.slug)}
+        >
+          {author.name}
+        </a>
+      </>
+    ))
+  }</span
+>

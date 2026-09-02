@@ -1,7 +1,7 @@
 ---
 title: "Waiting for a Visa"
 authors:
-  - "B. R. Ambedkar"
+  - "dr-b-r-ambedkar"
 isbn: "9789354206344"
 publisher: "Lector House"
 publishedYear: 2021

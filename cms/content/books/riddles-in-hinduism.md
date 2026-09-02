@@ -2,7 +2,7 @@
 title: "Riddles in Hinduism"
 subtitle: "The Annotated Critical Selection"
 authors:
-  - "B. R. Ambedkar"
+  - "dr-b-r-ambedkar"
 isbn: "9788189059774"
 publisher: "Navayana"
 publishedYear: 2016

@@ -71,7 +71,7 @@ export interface FilterableEntry {
   key: string;
   title: string;
   readsArticles: boolean;
-  authorNames: readonly string[];
+  authors: readonly { slug: string; name: string }[];
   years: readonly number[];
 }
 
@@ -98,6 +98,12 @@ const byLabel = new Intl.Collator("en", { sensitivity: "base" });
  * order of the log itself. An entry that read articles rather than a book is
  * left out of the book list — it has no book to name — but it is still in the
  * log and still reachable by year or by the search box.
+ *
+ * An author is keyed by their slug rather than by the name printed beside it.
+ * Filtering on the name was the thing that broke the first time a catalogue
+ * returned "Kancha Ilaiah" for one book and "Kancha Ilaiah Shepherd" for
+ * another: one person became two entries in the dropdown, each hiding half of
+ * their own books.
  */
 export function logFacets(entries: readonly FilterableEntry[]): LogFacets {
   const books = entries
@@ -105,9 +111,20 @@ export function logFacets(entries: readonly FilterableEntry[]): LogFacets {
     .map((entry) => ({ value: entry.key, label: entry.title }))
     .sort((a, b) => byLabel.compare(a.label, b.label));
 
-  const authors = [...new Set(entries.flatMap((entry) => entry.authorNames))]
-    .sort(byLabel.compare)
-    .map((name) => ({ value: name, label: name }));
+  const names = new Map<string, string>();
+  for (const entry of entries) {
+    for (const author of entry.authors) {
+      // First name seen wins, which is the one nearest the top of the log.
+      // Every entry resolves its authors through the authors collection, so
+      // one slug carries one name; this only keeps the result stable if that
+      // ever stops being true.
+      if (!names.has(author.slug)) names.set(author.slug, author.name);
+    }
+  }
+
+  const authors = [...names]
+    .map(([value, label]) => ({ value, label }))
+    .sort((a, b) => byLabel.compare(a.label, b.label));
 
   const years = [...new Set(entries.flatMap((entry) => entry.years))]
     .sort((a, b) => b - a)

@@ -1,4 +1,4 @@
-import { books, bookReadings } from "~/schemas/books";
+import { authors, books, bookReadings } from "~/schemas/books";
 import { comics, toolkitScenarios } from "~/schemas/artwork";
 import {
   articles,
@@ -22,6 +22,7 @@ import { pages } from "~/schemas/pages";
 export const collections = {
   pages,
   books,
+  authors,
   bookReadings,
   articles,
   pressReleases,

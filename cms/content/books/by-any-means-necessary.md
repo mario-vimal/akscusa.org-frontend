@@ -2,7 +2,7 @@
 title: "By Any Means Necessary"
 subtitle: ""
 authors:
-  - "Malcolm X"
+  - "malcolm-x"
 isbn: "9780873487542"
 publisher: "Pathfinder Press"
 publishedYear: 1992

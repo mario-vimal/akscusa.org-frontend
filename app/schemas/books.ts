@@ -1,11 +1,12 @@
 /**
- * Books and the sessions that read them.
+ * Books, the people who wrote them, and the sessions that read them.
  *
- * The two are defined together because they are joined here: a reading names
+ * The three are defined together because they are joined here: a reading names
  * the book it worked through by the book's stable content-entry id (its
- * slug), and that is the only link between them. The id survives an editor
- * correcting the book's ISBN, which the ISBN itself cannot. Keeping them
- * apart would put the two halves of one relationship in two files.
+ * slug), a book names its authors the same way, and those ids are the only
+ * links between them. An id survives an editor correcting the book's ISBN or
+ * an author's display name, which neither of those fields can. Keeping them
+ * apart would put the halves of one relationship in three files.
  */
 
 import { defineCollection } from "astro:content";
@@ -18,10 +19,42 @@ import {
   linkSchema,
   optionalCmsField,
   optionalCmsList,
+  optionalRemoteImage,
   optionalUrl,
   posterListSchema,
+  slugReferences,
   topicsSchema,
 } from "~/schemas/shared";
+
+// An author is their own record because the relation runs both ways: one book
+// names several authors, and one author carries several books. Stored as a
+// string on a book, an author could not survive a catalogue returning two
+// spellings of one name, and there would be nothing to hang a biography, a
+// portrait, or a page on. The slug is the entry's filename, as it is for
+// speakers, so renaming an author's display name never moves their page.
+export const authors = defineCollection({
+  loader: glob({
+    base: "./cms/content/authors",
+    pattern: "**/*.md",
+  }),
+  schema: z.object({
+    /** The name as a byline prints it: "bell hooks", "B. R. Ambedkar". */
+    name: z.string().min(1),
+    /**
+     * Other spellings a catalogue returns for the same person — "Kancha
+     * Ilaiah" and "Kancha Ilaiah Shepherd" are one author with two names in
+     * print. `scripts/enrich-books.mjs` matches a fetched name against these
+     * before creating an entry, which is what stops a second spelling minting
+     * a second author and splitting their books across two pages.
+     */
+    aliases: optionalCmsList(z.array(z.string().min(1)).default([])),
+    /** Paragraphs are separated by blank lines, as they are for a speaker. */
+    bio: optionalCmsField(z.string()),
+    portrait: optionalRemoteImage,
+    sourceUrl: optionalUrl,
+    draft: z.boolean().default(false),
+  }),
+});
 
 // Books are their own records because one book carries several readings. They
 // are not editorial entries: a book has no publication date of its own on this
@@ -42,11 +75,17 @@ export const books = defineCollection({
     title: z.string().min(1),
     subtitle: optionalCmsField(z.string()),
     /**
-     * Filled from the ISBN when the entry does not state them, so a book with
-     * no authors is one Open Library had nothing for. Pages print the line
-     * only when there is one rather than an empty byline.
+     * The stable slugs of the authors' entries, not their names. Filled from
+     * the ISBN when the entry does not state them — the enrichment script
+     * matches each fetched name to an author entry, or creates one, so what
+     * lands here is always a slug. A book with no authors is one Open Library
+     * had nothing for. Pages print the byline only when there is one rather
+     * than an empty line.
      */
-    authors: optionalCmsList(z.array(z.string()).default([])),
+    authors: slugReferences(
+      "author",
+      "A book cannot list the same author twice.",
+    ),
     /**
      * Identifies the edition the circle read, for bibliographic lookup and
      * cover naming. Correcting it does not affect a reading's link to this

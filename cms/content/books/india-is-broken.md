@@ -2,7 +2,7 @@
 title: "India Is Broken"
 subtitle: "A People Betrayed, Independence to Today"
 authors:
-  - "Ashoka Mody"
+  - "ashoka-mody"
 isbn: "9781503630055"
 publisher: "Stanford University Press"
 publishedYear: 2023

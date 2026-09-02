@@ -6,9 +6,10 @@ import Poster from "~/components/ui/Poster.astro";
 import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
 import { formatPacificDate } from "~/lib/dates";
 import { topicLabel } from "~/features/editorial/taxonomy";
+import AuthorByline from "~/features/authors/components/AuthorByline.astro";
 import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
 import { openLibraryUrl } from "~/features/books/isbn";
-import { bookAuthors } from "~/features/books/presenters";
+import { bookAuthorLinks } from "~/features/books/presenters";
 import type { BookWithReadings } from "~/features/books/queries/books";
 
 interface Props {
@@ -19,16 +20,10 @@ const { entry } = Astro.props;
 const { book, readings } = entry;
 const { data } = book;
 
-const authors = bookAuthors(book);
+const authors = bookAuthorLinks(entry);
 const cover = coverForIsbn(data.isbn);
 
 const facts = [
-  authors
-    ? {
-        term: data.authors.length === 1 ? "Author" : "Authors",
-        description: authors,
-      }
-    : null,
   data.publisher ? { term: "Publisher", description: data.publisher } : null,
   data.publishedYear
     ? { term: "Edition", description: String(data.publishedYear) }
@@ -56,8 +51,10 @@ const facts = [
       )
     }
     {
-      authors && (
-        <p class="mt-5 text-lg font-semibold text-accent-300">By {authors}</p>
+      authors.length > 0 && (
+        <p class="mt-5 text-lg font-semibold text-white/80">
+          By <AuthorByline authors={authors} tone="light" />
+        </p>
       )
     }
   </PageMasthead>
@@ -68,6 +65,18 @@ const facts = [
         <dl
           class="card max-w-3xl gap-x-8 gap-y-5 p-6 sm:grid sm:grid-cols-2 sm:p-8"
         >
+          {
+            authors.length > 0 && (
+              <div>
+                <dt class="label text-ambedkar-700">
+                  {authors.length === 1 ? "Author" : "Authors"}
+                </dt>
+                <dd class="mt-1 leading-7 text-ambedkar-900/80">
+                  <AuthorByline authors={authors} />
+                </dd>
+              </div>
+            )
+          }
           {
             facts.map((fact) => (
               <div>

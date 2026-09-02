@@ -2,7 +2,7 @@
 title: "The Will to Change"
 subtitle: "Men, Masculinity, and Love"
 authors:
-  - "bell hooks"
+  - "bell-hooks"
 isbn: "9780743456074"
 publisher: "Atria Books"
 publishedYear: 2004

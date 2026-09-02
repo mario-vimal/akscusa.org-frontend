@@ -1,7 +1,7 @@
 ---
 import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
 import libraryShelves from "~/features/books/assets/library-shelves-2jivbogleho.jpg";
-import { bookAuthors } from "~/features/books/presenters";
+import { bookByline } from "~/features/books/presenters";
 import {
   bookHref,
   loadBooksWithReadings,
@@ -22,18 +22,18 @@ const entries = await loadBooksWithReadings();
   backgroundImage={libraryShelves}
 >
   {
-    entries.map(({ book, readings }) => (
+    entries.map((entry) => (
       <li>
         <BookCard
-          href={bookHref(book)}
-          title={book.data.title}
-          subtitle={book.data.subtitle}
-          authors={bookAuthors(book)}
-          summary={book.data.summary}
-          isbn={book.data.isbn}
-          publisher={book.data.publisher}
-          sessions={readings.length}
-          topics={book.data.topics}
+          href={bookHref(entry.book)}
+          title={entry.book.data.title}
+          subtitle={entry.book.data.subtitle}
+          authors={bookByline(entry)}
+          summary={entry.book.data.summary}
+          isbn={entry.book.data.isbn}
+          publisher={entry.book.data.publisher}
+          sessions={entry.readings.length}
+          topics={entry.book.data.topics}
         />
       </li>
     ))

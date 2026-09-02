@@ -184,6 +184,18 @@ describe("Sveltia CMS taxonomy options", () => {
     expect(collection("speakers").folder).toBe("cms/content/speakers");
   });
 
+  // A name typed into a book would be stored as an author slug and fail the
+  // build, so the field has to be a relation rather than a list of strings.
+  // This is also what makes one author's page gather every book of theirs.
+  it("names a book's authors by picking from the authors collection", () => {
+    const bookAuthors = collection("books").fields?.find(
+      (field) => field.name === "authors",
+    );
+
+    expect(bookAuthors?.widget).toBe("relation");
+    expect(collection("authors").folder).toBe("cms/content/authors");
+  });
+
   it("offers every program kind and status", () => {
     expectMatches("programs", "kind", programKinds);
     expectMatches("programs", "status", programStatuses);

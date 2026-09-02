@@ -226,12 +226,14 @@ the book entry's stable content id (its slug) rather than its ISBN, the CMS
 offers that as a relation to the books collection, and
 `app/features/books/queries/books.ts` resolves it at build time. Referencing
 the slug rather than the ISBN means correcting a book's ISBN afterwards cannot
-sever every reading that names it. Two checks keep the link honest and fail
-the build rather than degrading quietly:
+sever every reading that names it. A book names its authors the same way, by
+the slug of an entry in the authors collection. Three checks keep those links
+honest and fail the build rather than degrading quietly:
 
 - an ISBN-13 must pass its check digit, so a typo cannot slip through
   (`app/features/books/isbn.ts`), and no two books may claim the same ISBN;
-- a reading may not reference a book slug that no book entry claims.
+- a reading may not reference a book slug that no book entry claims;
+- a book may not reference an author slug that no author entry claims.
 
 A book page lists every session that read it, and `/book-readings/` clubs those
 sessions into one entry per book, which links back to it. A book worked through
@@ -245,10 +247,11 @@ group and registrant depends on the ISBN range tables rather than fixed offsets,
 so the site does not invent hyphenation; the reading log's search accepts an
 ISBN typed either way.
 
-A new book only needs its ISBN. The title and the rest of the edition — cover
-art, subtitle, authors, publisher, edition year, first publication year — are
-looked up from the ISBN on Open Library and committed, so Astro optimizes the
-cover at build time instead of the page depending on a third party at runtime.
+A new book needs its ISBN and its authors. The title and the rest of the
+edition — cover art, subtitle, publisher, edition year, first publication
+year — are looked up from the ISBN on Open Library and committed, so Astro
+optimizes the cover at build time instead of the page depending on a third
+party at runtime.
 An entry saved with no title is also renamed to the file that title names, so
 it reaches a readable URL rather than keeping the random id the CMS gives a
 file it has no title to name. Typing the title yourself is how you choose that
@@ -274,9 +277,12 @@ empty heading, which is the case where Open Library had no record at all.
 
 A fetched value only ever fills a blank field; nothing an editor typed is
 replaced. `isbn` is the question being asked, `topics`, `resources`, and `draft`
-are editorial judgement, and `summary` is deliberately never fetched: a
-catalogue summary is the publisher's marketing copy, which is both the wrong
-voice for this site and not ours to copy. The summary is optional for the same
+are editorial judgement, and two fields are deliberately never fetched.
+`summary`, because a catalogue summary is the publisher's marketing copy, which
+is both the wrong voice for this site and not ours to copy. `authors`, because
+a book stores author slugs and a name off a catalogue is not one: turning a
+name into a slug means deciding whether that person already has an entry, which
+is a judgement about who two spellings refer to rather than a lookup. The summary is optional for the same
 reason — an entry saved from its ISBN alone is written up in AKSC's own words
 afterwards, rather than an editor filling a required field with a blurb. A
 free-text publication date yields a year only when it names exactly one, so a
@@ -292,6 +298,48 @@ filename. A book with no cover file renders without one, so nothing breaks when
 Open Library has nothing for an ISBN; the run lists those books rather than
 failing. A cover already on disk is never refetched, so one committed by hand
 stands.
+
+### Authors, and the page each one gets
+
+Authors live in `cms/content/authors/` with a name, optional other spellings, an
+optional biography and portrait, and a `draft` flag. A book stores the slugs of
+its authors, so the byline on every page is resolved from those entries rather
+than read off the book, and an author is one record however many books they
+carry. This is what the field could not do as a list of names: a catalogue
+returning "Kancha Ilaiah" for one book and "Kancha Ilaiah Shepherd" for another
+made one person into two, split their books between them, and gave the author
+dropdown on `/book-readings/` two half-empty options. That dropdown now files an
+entry under each author's slug, and the `aliases` field records the other
+spellings so the CMS finds an existing author when a book is added.
+
+Each author has a page at `/authors/<slug>/` listing every book of theirs the
+circle has read, the sittings each book took, and their biography and portrait.
+The route is generated only for an author at least one published book names —
+an author entry nothing references has nothing to put on a page, and a byline is
+the only way in.
+
+**Every author gets a page, including an author of a single book.** The
+alternative considered was a route that appears only once a second book of
+theirs is read. It was rejected: it makes a published address depend on how much
+of a person's work the circle has happened to get through, so a link breaks when
+a book is drafted, and a byline would have to be clickable for some names and
+not others with nothing on the page to explain which. A one-book page still
+carries the biography and the portrait, which no book page shows.
+
+There is no `/authors/` index. The books index and the reading log are already
+lists of the same reading, and a second list of it ordered by author would be a
+page duplicating what those two say.
+
+Portraits come from two places, and which one is used says who owns the
+picture. An author entry's own `portrait` is an R2 URL for a photograph AKSC
+holds. Everything else is an archival portrait listed in
+`app/features/authors/portraits.ts` and committed under
+`app/features/authors/assets/portraits/`, with its photographer, licence, and
+Commons source recorded beside it in `SOURCES.md` and printed under the picture
+on the page. Those credits are why the list is in code: the CMS field holds a
+URL and an alt text, and a CC BY-SA photograph needs more than that said about
+it. An entry's own portrait wins where there is one, and an author with neither
+shows no picture — the page opens on a name rather than a face.
 
 ### Comics and toolkit scenarios, published as panels
 

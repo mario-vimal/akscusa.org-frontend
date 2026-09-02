@@ -62,7 +62,7 @@ const cover = session.book ? coverForIsbn(session.book.isbn) : undefined;
             <a class="link-underline" href={session.book.href}>
               <cite class="italic">{session.book.title}</cite>
             </a>
-            {session.book.authors && <span> by {session.book.authors}</span>}
+            {session.book.byline && <span> by {session.book.byline}</span>}
           </p>
         )
       }

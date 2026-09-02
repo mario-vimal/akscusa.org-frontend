@@ -28,11 +28,18 @@ export interface BookRecord {
  * deliberately absent: a catalogue summary is the publisher's marketing copy,
  * which is both the wrong voice for this site and not ours to copy, so the
  * one or two sentences a card prints stay AKSC's to write.
+ *
+ * `authors` is absent for a different reason. A book stores the slugs of
+ * author entries rather than the names printed on its cover, so a fetched
+ * name is not a value this field can hold: writing one would fail the build,
+ * and turning it into a slug means deciding whether the person already has an
+ * entry — which is a judgement about who two spellings refer to, not a
+ * lookup. An author is named in the CMS instead, by picking from the authors
+ * collection.
  */
 export const FILLABLE_FIELDS = [
   "title",
   "subtitle",
-  "authors",
   "publisher",
   "publishedYear",
   "firstPublishedYear",

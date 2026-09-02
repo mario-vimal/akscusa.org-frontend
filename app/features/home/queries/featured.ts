@@ -1,7 +1,7 @@
 import type { ImageMetadata } from "astro";
 
 import { coverForIsbn } from "~/features/books/covers";
-import { bookAuthors } from "~/features/books/presenters";
+import { bookByline } from "~/features/books/presenters";
 import { bookHref, loadReadingBooks } from "~/features/books/queries/books";
 import {
   loadComicsIndex,
@@ -222,17 +222,19 @@ export async function loadCurrentBook(): Promise<BookFeature | undefined> {
   const session = currentOf(
     readings.filter((entry) => booksByReading.has(entry.id)),
   );
-  const book = session && booksByReading.get(session.id);
-  if (!session || !book) return undefined;
+  const current = session && booksByReading.get(session.id);
+  if (!session || !current) return undefined;
+
+  const { book } = current;
 
   return {
     title: book.data.title,
-    authors: bookAuthors(book),
+    authors: bookByline(current),
     href: bookHref(book),
     cover: coverForIsbn(book.data.isbn),
     sessionOn: session.data.date,
     sessions: readings.filter(
-      (entry) => booksByReading.get(entry.id)?.id === book.id,
+      (entry) => booksByReading.get(entry.id)?.book.id === book.id,
     ).length,
   };
 }

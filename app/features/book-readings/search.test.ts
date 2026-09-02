@@ -10,13 +10,15 @@ import {
   type FilterableEntry,
 } from "./search";
 
+const author = (slug: string, name: string) => ({ slug, name });
+
 const entry = (
   key: string,
   title: string,
-  authorNames: string[],
+  authors: { slug: string; name: string }[],
   years: number[],
   readsArticles = false,
-): FilterableEntry => ({ key, title, authorNames, years, readsArticles });
+): FilterableEntry => ({ key, title, authors, years, readsArticles });
 
 describe("searchTerms", () => {
   it("splits on whitespace and lowercases", () => {
@@ -88,12 +90,23 @@ describe("logStatusLabel", () => {
 
 describe("logFacets", () => {
   const entries = [
-    entry("the-will-to-change", "The Will to Change", ["bell hooks"], [2025]),
+    entry(
+      "the-will-to-change",
+      "The Will to Change",
+      [author("bell-hooks", "bell hooks")],
+      [2025],
+    ),
     entry(
       "annihilation-of-caste",
       "Annihilation of Caste",
-      ["B. R. Ambedkar"],
+      [author("dr-b-r-ambedkar", "Dr. B. R. Ambedkar")],
       [2025, 2020],
+    ),
+    entry(
+      "riddles-in-hinduism",
+      "Riddles in Hinduism",
+      [author("dr-b-r-ambedkar", "Dr. B. R. Ambedkar")],
+      [2020],
     ),
     entry("palestine", "Palestine – A reading list", [], [2024], true),
   ];
@@ -101,14 +114,18 @@ describe("logFacets", () => {
   it("lists the books by title, leaving out an entry that read no book", () => {
     expect(logFacets(entries).books).toEqual([
       { value: "annihilation-of-caste", label: "Annihilation of Caste" },
+      { value: "riddles-in-hinduism", label: "Riddles in Hinduism" },
       { value: "the-will-to-change", label: "The Will to Change" },
     ]);
   });
 
+  // Two books by one author are one option. The dropdown is keyed by the
+  // author's slug rather than by the name printed on either book, which is
+  // what stops two spellings of one name becoming two half-empty filters.
   it("lists each author once, alphabetically", () => {
-    expect(logFacets(entries).authors.map((option) => option.value)).toEqual([
-      "B. R. Ambedkar",
-      "bell hooks",
+    expect(logFacets(entries).authors).toEqual([
+      { value: "bell-hooks", label: "bell hooks" },
+      { value: "dr-b-r-ambedkar", label: "Dr. B. R. Ambedkar" },
     ]);
   });
 
@@ -134,11 +151,11 @@ describe("facetSet", () => {
 
   it("is empty for a row that belongs to nothing", () => {
     expect(facetSet([])).toBe("");
-    expect(inFacetSet("bell hooks", facetSet([]))).toBe(false);
+    expect(inFacetSet("bell-hooks", facetSet([]))).toBe(false);
   });
 
   it("drops a delimiter inside a value rather than splitting on it", () => {
-    expect(facetSet(["Ambedkar | Omvedt"])).toBe("|Ambedkar  Omvedt|");
+    expect(facetSet(["ambedkar | omvedt"])).toBe("|ambedkar  omvedt|");
   });
 });
 

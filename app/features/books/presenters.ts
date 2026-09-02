@@ -7,24 +7,38 @@
  * meta description of the book's own page — are built here, once, rather than
  * each component deciding for itself what an absent field looks like.
  *
- * Both take the fields they read rather than a `CollectionEntry`, so they can
- * be tested without `astro:content`, which only exists inside an Astro build.
+ * Both take a book with its authors already resolved rather than a
+ * `CollectionEntry`, so they can be tested without `astro:content`, which only
+ * exists inside an Astro build. An entry stores author slugs, so no byline is
+ * ever built from what is written on the book itself.
  */
 
-/** Enough of a book entry to build the strings a page prints about it. */
+import type { AuthorLink } from "~/features/authors/links";
+
+/** Enough of a book and its authors to build the strings a page prints. */
 export interface PresentableBook {
-  data: {
-    title: string;
-    authors: readonly string[];
-    summary?: string;
-  };
+  book: { data: { title: string; summary?: string } };
+  authors: readonly { id: string; data: { name: string } }[];
 }
 
 /** The authors on one line, or nothing when the entry names none. */
-export function bookAuthors(book: PresentableBook): string | undefined {
-  const { authors } = book.data;
+export function bookByline(entry: PresentableBook): string | undefined {
+  return entry.authors.length > 0
+    ? entry.authors.map((author) => author.data.name).join(", ")
+    : undefined;
+}
 
-  return authors.length > 0 ? authors.join(", ") : undefined;
+/**
+ * The same names, each pointing at the author's own page. Kept apart from the
+ * joined line because a byline set in one string cannot be split back into
+ * links without depending on how it was joined, and a name containing a comma
+ * would be split in two.
+ */
+export function bookAuthorLinks(entry: PresentableBook): AuthorLink[] {
+  return entry.authors.map((author) => ({
+    slug: author.id,
+    name: author.data.name,
+  }));
 }
 
 /**
@@ -32,15 +46,15 @@ export function bookAuthors(book: PresentableBook): string | undefined {
  * summary when there is one; otherwise the book itself, which is a plain fact
  * rather than an invented description.
  */
-export function bookDescription(book: PresentableBook): string {
-  const { summary, title } = book.data;
+export function bookDescription(entry: PresentableBook): string {
+  const { summary, title } = entry.book.data;
 
   if (summary) {
     return summary;
   }
 
-  const authors = bookAuthors(book);
-  const named = authors ? `${title} by ${authors}` : title;
+  const byline = bookByline(entry);
+  const named = byline ? `${title} by ${byline}` : title;
 
   return `${named}, on the Ambedkar King Study Circle's reading list.`;
 }

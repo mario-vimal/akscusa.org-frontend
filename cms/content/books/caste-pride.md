@@ -2,7 +2,7 @@
 title: "Caste Pride"
 subtitle: "Battles for Equality in Hindu India"
 authors:
-  - "Manoj Mitta"
+  - "manoj-mitta"
 isbn: "9789357762946"
 publisher: "Westland Context"
 publishedYear: 2023
