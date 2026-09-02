@@ -85,7 +85,13 @@ export function yearFromPublishDate(
 
   // A catalogue occasionally holds a typo far in the future. Next year is
   // allowed, because a book announced for it is real.
-  return unique[0] <= now.getFullYear() + 1 ? unique[0] : undefined;
+  //
+  // The cutoff is read in UTC. A publication year is a calendar year with no
+  // zone attached, so comparing it against the year in whatever zone the
+  // script happens to run in makes the result depend on the machine: at UTC
+  // midnight on 1 January, a run in California is still in the previous year
+  // and would reject a year it accepts everywhere else.
+  return unique[0] <= now.getUTCFullYear() + 1 ? unique[0] : undefined;
 }
 
 /**
