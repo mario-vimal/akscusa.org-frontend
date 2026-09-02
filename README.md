@@ -195,8 +195,9 @@ TypeScript, so `cms/public/admin/config.yml` repeats the options in YAML and
 a campaign about the same subject stay relatable without duplicating an entry.
 
 Each section has an index at its route and an entry page at
-`<route>/<slug>/`. Book readings are listed as a sortable table rather than
-cards, since the archive grows steadily. Articles are also browsable by category at
+`<route>/<slug>/`. Book readings are listed as a record rather than as cards:
+one entry per book, carrying the run of sittings it took and the flyers those
+sittings were announced with. Articles are also browsable by category at
 `/blog/category/<category>/` and interventions by kind at
 `/interventions/kind/<kind>/`; only terms that have entries get a page.
 `app/features/editorial/` holds the shared list, card, and entry components, so
@@ -232,15 +233,17 @@ the build rather than degrading quietly:
   (`app/features/books/isbn.ts`), and no two books may claim the same ISBN;
 - a reading may not reference a book slug that no book entry claims.
 
-A book page lists every session that read it, and `/book-readings/` renders a
-sortable, searchable table whose Book column links back to the book. A reading
-whose book is only a draft renders without the book rather than failing the
-build, so drafting a book cannot take the site down.
+A book page lists every session that read it, and `/book-readings/` clubs those
+sessions into one entry per book, which links back to it. A book worked through
+over four Sundays is one entry naming its four sittings rather than four
+entries, because a visitor scanning the page is asking what has been read. A
+reading whose book is only a draft renders without the book rather than failing
+the build, so drafting a book cannot take the site down.
 
 ISBNs are printed as bare digits. Where an ISBN-13 breaks into its registration
 group and registrant depends on the ISBN range tables rather than fixed offsets,
-so the site does not invent hyphenation; the table search accepts an ISBN typed
-either way.
+so the site does not invent hyphenation; the reading log's search accepts an
+ISBN typed either way.
 
 A new book only needs its ISBN. The title and the rest of the edition — cover
 art, subtitle, authors, publisher, edition year, first publication year — are

@@ -30,10 +30,6 @@ export interface ShelfBook {
 export interface Shelf {
   /** The books shown, most recently read first. */
   books: ShelfBook[];
-  /** How many books the circle has read, including any beyond the shown ones. */
-  read: number;
-  /** How many sessions those books took, in total. */
-  sessions: number;
 }
 
 /**
@@ -44,8 +40,10 @@ export interface Shelf {
  * sessions at all is a reading list rather than a record — both are on
  * `/books/`, which is the page that lists everything.
  *
- * The counts describe the whole shelf even when the band shows part of it, so
- * shortening the row cannot quietly change what the page claims.
+ * No totals come back with the row. Not every session the circle has held has
+ * been written up, so a count taken from this collection describes the archive
+ * and not the reading, and the homepage has no way to say which of the two a
+ * figure refers to.
  */
 export async function loadShelf(limit = 12): Promise<Shelf> {
   const [readings, booksByReading] = await Promise.all([
@@ -73,7 +71,5 @@ export async function loadShelf(limit = 12): Promise<Shelf> {
       sessions,
       lastReadOn,
     })),
-    read: entries.length,
-    sessions: entries.reduce((total, entry) => total + entry.sessions, 0),
   };
 }

@@ -19,6 +19,7 @@ import {
   optionalCmsField,
   optionalCmsList,
   optionalUrl,
+  posterListSchema,
   topicsSchema,
 } from "~/schemas/shared";
 
@@ -93,5 +94,12 @@ export const bookReadings = defineCollection({
     registrationUrl: optionalUrl,
     /** Anything else read for the session, such as a linked PDF. */
     resources: optionalCmsList(z.array(linkSchema).default([])),
+    /**
+     * AKSC's own flyers announcing the session, committed to Git in their
+     * original colours rather than hosted on the media host. Left empty for
+     * a session no flyer survives for, which shows no image rather than a
+     * broken one.
+     */
+    posters: posterListSchema("book-readings"),
   }),
 });

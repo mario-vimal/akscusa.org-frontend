@@ -25,6 +25,7 @@ import {
   optionalCmsList,
   optionalRemoteImage,
   optionalUrl,
+  posterListSchema,
 } from "~/schemas/shared";
 
 export const articles = defineCollection({
@@ -151,22 +152,7 @@ export const programs = defineCollection({
     schedule: optionalCmsField(z.string()),
     location: optionalCmsField(z.string()),
     registrationUrl: optionalUrl,
-    posters: optionalCmsList(
-      z
-        .array(
-          z.object({
-            src: z
-              .string()
-              .regex(
-                /^\/media\/programs\/[a-z0-9-]+\.jpg$/,
-                "Must be a lowercase kebab-case JPG under /media/programs/.",
-              ),
-            alt: z.string().min(1),
-            caption: optionalCmsField(z.string()),
-          }),
-        )
-        .default([]),
-    ),
+    posters: posterListSchema("programs"),
     resources: optionalCmsList(z.array(linkSchema).default([])),
   }),
 });

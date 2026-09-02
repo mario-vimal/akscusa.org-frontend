@@ -1,0 +1,303 @@
+---
+import Container from "~/components/ui/Container.astro";
+import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
+import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
+import type { ReadingEntry } from "~/features/book-readings/presenters";
+import {
+  facetSet,
+  logFacets,
+  logStatusLabel,
+} from "~/features/book-readings/search";
+import PosterStack from "./PosterStack.astro";
+
+interface Props {
+  entries: readonly ReadingEntry[];
+  /** Shown in place of the log before anything has been published. */
+  empty: string;
+}
+
+const { entries, empty } = Astro.props;
+
+const count = (value: number, noun: string) =>
+  `${value} ${value === 1 ? noun : `${noun}s`}`;
+
+// Built from the entries on the page, so a dropdown can never offer a choice
+// that would empty the list.
+const facets = logFacets(entries);
+
+const filters = [
+  { id: "log-book", label: "Book", key: "book", options: facets.books },
+  { id: "log-author", label: "Author", key: "author", options: facets.authors },
+  { id: "log-year", label: "Year read", key: "year", options: facets.years },
+].filter((filter) => filter.options.length > 1);
+---
+
+<!--
+  The record: one entry per book, newest reading first.
+
+  This was a sortable, searchable, paginated table with a row per session,
+  which is a console for an administrator rather than a reading list for a
+  visitor. A book worked through over four Sundays appeared four times, three
+  quarters of the log sat behind a Next button, and the flyers were 36px
+  slivers in a column too narrow to show anything of them.
+
+  Each book is now one entry that states its own run of sittings, and the
+  flyers those sittings were announced with are stacked beside it at a size
+  where their design can actually be seen. The only control left is a filter,
+  because a record already has an order — the order it happened in.
+-->
+<section aria-labelledby="reading-log">
+  <Container class="py-16 sm:py-20">
+    <div class="reveal max-w-xl">
+      <p class="eyebrow">The record</p>
+      <h2
+        id="reading-log"
+        class="mt-5 font-display text-display-sm leading-[1.06] font-bold tracking-display text-balance text-ambedkar-950"
+      >
+        What the circle has read
+      </h2>
+    </div>
+
+    {
+      entries.length > 0 && (
+        <div
+          class="mt-10 rounded-xl border border-rule bg-paper p-5 sm:p-6"
+          role="search"
+          data-log-controls
+          hidden
+        >
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))]">
+            <div>
+              <label class="label block text-ambedkar-900/60" for="log-search">
+                Find a reading
+              </label>
+              <input
+                class="field mt-2"
+                id="log-search"
+                type="search"
+                autocomplete="off"
+                aria-describedby="log-search-hint"
+                placeholder="A book, an author, a topic"
+                data-log-search
+              />
+            </div>
+
+            {filters.map((filter) => (
+              <div>
+                <label class="label block text-ambedkar-900/60" for={filter.id}>
+                  {filter.label}
+                </label>
+                <select
+                  class="field mt-2"
+                  id={filter.id}
+                  data-log-facet={filter.key}
+                >
+                  <option value="">All</option>
+                  {filter.options.map((option) => (
+                    <option value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+
+          <div class="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+            <p class="text-sm text-ambedkar-900/65" id="log-search-hint">
+              The search box also matches the chapters read, the topics, and the
+              ISBN of the edition.
+            </p>
+            <button
+              class="btn btn-outline btn-sm"
+              type="button"
+              data-log-clear
+              hidden
+            >
+              Clear filters
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    {
+      entries.length === 0 ? (
+        <p class="card mt-10 max-w-2xl px-6 py-8 leading-7 text-ambedkar-900/75">
+          {empty}
+        </p>
+      ) : (
+        <>
+          {/*
+            Rendered with the unfiltered line already in it, so a reader with
+            no JavaScript is not left with a blank rule where a line should be.
+            It states the order rather than a count: the readings here are the
+            ones that have been written up, not every session the circle has
+            held, so a total would claim a completeness the record lacks.
+          */}
+          <p
+            class="label mt-10 text-ambedkar-900/60"
+            data-log-status
+            role="status"
+            aria-live="polite"
+          >
+            {logStatusLabel(entries.length, entries.length)}
+          </p>
+
+          <ol class="reveal-children mt-4 border-t border-rule">
+            {entries.map((entry) => {
+              const cover = entry.isbn ? coverForIsbn(entry.isbn) : undefined;
+
+              return (
+                <li
+                  class="border-b border-rule"
+                  data-log-entry
+                  data-search={entry.search}
+                  data-book={facetSet([entry.key])}
+                  data-author={facetSet(entry.authorNames)}
+                  data-year={facetSet(entry.years)}
+                >
+                  <article class="grid gap-8 py-8 sm:py-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-12">
+                    <div class="flex gap-4 sm:gap-8">
+                      {cover ? (
+                        <a
+                          class="shrink-0 self-start"
+                          href={entry.href}
+                          tabindex="-1"
+                        >
+                          <ResponsiveImage
+                            class="w-16 rounded-md shadow-lift sm:w-28"
+                            src={cover}
+                            alt={COVER_ALT}
+                            sizes="(min-width: 640px) 112px, 64px"
+                            widths={COVER_WIDTHS}
+                          />
+                        </a>
+                      ) : (
+                        /*
+                          Keeps the text column in line down the whole log.
+                          An entry that read articles says so, because that is
+                          a fact about the reading; one whose cover is simply
+                          not on disk says nothing, because a box reading "no
+                          cover" reports on the site's own housekeeping and
+                          tells a visitor nothing they came for.
+                        */
+                        <div
+                          class="flex w-16 shrink-0 items-center justify-center self-start rounded-md border border-dashed border-rule-strong bg-ambedkar-50 px-2 py-8 sm:w-28 sm:py-10"
+                          aria-hidden={entry.readsArticles ? undefined : "true"}
+                        >
+                          {entry.readsArticles && (
+                            <span class="label text-center text-ambedkar-900/60">
+                              Articles &amp; papers
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      <div class="min-w-0">
+                        <p class="label flex flex-wrap items-center gap-x-2 gap-y-1 text-ambedkar-900/60">
+                          <span>{count(entry.sessionCount, "session")}</span>
+                          <span aria-hidden="true">·</span>
+                          <time datetime={entry.dateTime}>
+                            {entry.spanLabel}
+                          </time>
+                          {entry.upcoming && (
+                            <span class="rounded-sm border border-accent-600 px-1.5 py-0.5 text-accent-700">
+                              Upcoming
+                            </span>
+                          )}
+                        </p>
+
+                        {/*
+                          `wrap-break-word` is a last resort rather than a
+                          style: a single long title — "Buffalo Nationalism"
+                          beside a cover at 320px — has nowhere to wrap and
+                          otherwise runs off the side of the phone.
+                        */}
+                        <h3 class="mt-3 font-display text-lg leading-[1.16] font-semibold tracking-title text-balance wrap-break-word text-ambedkar-950 sm:text-2xl sm:leading-[1.14]">
+                          <a class="link-underline" href={entry.href}>
+                            {entry.title}
+                          </a>
+                        </h3>
+
+                        {entry.subtitle && (
+                          <p class="mt-1.5 text-[0.9375rem] leading-6 text-ambedkar-900/65">
+                            {entry.subtitle}
+                          </p>
+                        )}
+
+                        {entry.authors && (
+                          <p class="mt-2 font-serif text-[0.9375rem] leading-6 text-ambedkar-900/80 italic">
+                            {entry.authors}
+                          </p>
+                        )}
+
+                        {entry.summary && (
+                          <p class="mt-4 line-clamp-3 leading-7 text-ambedkar-900/75">
+                            {entry.summary}
+                          </p>
+                        )}
+
+                        {/*
+                          The sittings, in the order they were read, so the
+                          chapter ranges count upwards. This is what the clubbed
+                          entry would otherwise lose: one line per evening, each
+                          still its own page.
+                        */}
+                        <ul class="mt-5 flex flex-wrap gap-2">
+                          {entry.sessions.map((session) => (
+                            <li>
+                              <a class="session-chip" href={session.href}>
+                                {session.label && (
+                                  <span class="session-chip__label">
+                                    {session.label}
+                                  </span>
+                                )}
+                                <time
+                                  class:list={[
+                                    "session-chip__date",
+                                    !session.label &&
+                                      "session-chip__date--lead",
+                                  ]}
+                                  datetime={session.dateTime}
+                                >
+                                  {session.dateLabel}
+                                </time>
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {entry.posters.length > 0 && (
+                      <div class="lg:pt-1">
+                        <p class="label label-sm text-ambedkar-900/55">
+                          {count(entry.posters.length, "flyer")}
+                        </p>
+                        <div class="mt-3">
+                          <PosterStack
+                            posters={entry.posters}
+                            label={`Flyers for ${entry.title}`}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </article>
+                </li>
+              );
+            })}
+          </ol>
+
+          <p class="mt-8 leading-7 text-ambedkar-900/75" data-log-empty hidden>
+            No readings match those filters.
+          </p>
+        </>
+      )
+    }
+  </Container>
+</section>
+
+<script>
+  import { mountReadingLog } from "~/features/book-readings/log";
+
+  mountReadingLog();
+</script>

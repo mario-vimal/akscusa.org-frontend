@@ -1,0 +1,67 @@
+---
+import type { EntryPoster } from "~/features/book-readings/presenters";
+
+interface Props {
+  posters: readonly EntryPoster[];
+  /** Names the stack for a reader who reaches it by keyboard or screen reader. */
+  label: string;
+}
+
+const { posters, label } = Astro.props;
+
+// Beyond four the sheets behind are too narrow to read as separate flyers, so
+// the rest are counted rather than drawn. No book has been read more than four
+// times yet, but a fifth sitting must not quietly break the column's width.
+const VISIBLE = 4;
+const shown = posters.slice(0, VISIBLE);
+const hidden = posters.length - shown.length;
+---
+
+<!--
+  The flyers a book's sittings were announced with, drawn as a fanned deck.
+
+  An entry stands for several evenings, so the flyers come as a set. Fanning
+  them rather than stacking them in a column keeps the entry one entry high and
+  shows at a glance that it covers more than one sitting, and it leaves each
+  sheet's own edge exposed — which matters here, because these are AKSC's own
+  artwork and each one is drawn differently.
+
+  They are left in their original colours: unlike the photography on this site,
+  a flyer's colour is part of what it says. Each sheet keeps its own link, so
+  the ones behind are reachable by pointer on their exposed edge and by
+  keyboard in order.
+-->{
+  posters.length > 0 && (
+    <ul class="poster-stack" aria-label={label} data-count={posters.length}>
+      {shown.map((poster) => (
+        <li class="poster-stack__tile">
+          <a
+            class="poster-stack__open"
+            href={poster.src}
+            data-poster-open
+            data-poster-caption={poster.caption}
+          >
+            <img
+              class="poster__image"
+              src={poster.src}
+              alt={poster.alt}
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
+        </li>
+      ))}
+      {hidden > 0 && (
+        <li class="poster-stack__tile poster-stack__more" aria-hidden="true">
+          +{hidden}
+        </li>
+      )}
+    </ul>
+  )
+}
+
+<script>
+  import { mountPosterViewer } from "~/components/ui/poster-viewer";
+
+  mountPosterViewer();
+</script>

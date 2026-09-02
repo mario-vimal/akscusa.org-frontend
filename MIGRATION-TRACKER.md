@@ -278,8 +278,10 @@ extending to the editorial collections when their images are brought over.
   annual conference, which is already an entry with a `resources` field. It was
   filed there rather than kept as a loose document.
 - **Speaker biographies.** Added as a reusable `speakers` collection because several records share one shape, more will arrive with future conferences, and editors need to maintain them. Conferences store ordered slug references and present each biography in its programme context; there are no standalone public speaker routes. The four 2025 biographies are migrated. Portraits remain optional until the documented R2 media setup is available; the new site does not depend on Squarespace CDN assets.
-- **Book readings.** Migrated. `/book-readings/` now renders the six sessions in
-  the `bookReadings` collection as a sortable, searchable table. The
+- **Book readings.** Migrated. `/book-readings/` opens on the next sitting, states
+  the standing arrangement, and then renders the `bookReadings` collection as a
+  record clubbed by book: one entry per book with the sittings it took and the
+  flyers they were announced with. The
   CMS-or-static split was: the schedule and the two reading strands are one-off
   copy in `app/content/pages/book-readings/index.md`, while each session is a
   repeating record in `cms/content/book-readings/`, because organisers add

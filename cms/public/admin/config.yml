@@ -453,7 +453,7 @@ collections:
         widget: list
         required: false
         summary: "{{fields.caption}}"
-        fields:
+        fields: &poster_fields
           - {
               name: src,
               label: Image,
@@ -562,6 +562,12 @@ collections:
     folder: cms/content/book-readings
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    # The flyer widget below needs its uploads to land beside the other
+    # book-readings media: the schema requires `/media/book-readings/...`, and
+    # without these the global folder would put a flyer at `/media/...` and
+    # fail the build the moment an editor saved it.
+    media_folder: /cms/public/media/book-readings
+    public_folder: /media/book-readings
     sortable_fields: [date, title]
     fields:
       - { name: title, label: Title, widget: string }
@@ -613,6 +619,13 @@ collections:
         required: false
         collapsed: true
         fields: *hero_image_fields
+      - name: posters
+        label: Posters and flyers
+        label_singular: Poster or flyer
+        widget: list
+        required: false
+        summary: "{{fields.caption}}"
+        fields: *poster_fields
       - name: sourceUrl
         label: Original URL
         widget: string

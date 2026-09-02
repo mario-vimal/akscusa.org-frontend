@@ -1,0 +1,90 @@
+---
+import Container from "~/components/ui/Container.astro";
+
+interface Props {
+  heading: string;
+  terms: readonly { term: string; description: string }[];
+  strandsHeading: string;
+  strands: readonly {
+    title: string;
+    description: string;
+    note?: string;
+  }[];
+}
+
+const { heading, terms, strandsHeading, strands } = Astro.props;
+---
+
+<!--
+  The standing arrangement: when the circle meets, and what it reads.
+
+  It used to be two equal cards side by side, which is the shape every template
+  arrives in and which said nothing about the difference between the two. They
+  are different kinds of thing, so they are set differently: the arrangement is
+  a timetable of term and value, and the strands are a numbered list of the
+  things the circle does.
+-->
+<section class="border-b border-rule bg-paper" aria-labelledby="meeting-terms">
+  <Container class="py-16 sm:py-20">
+    <div class="reveal section-head">
+      <p class="eyebrow">How we meet</p>
+      <h2
+        id="meeting-terms"
+        class="max-w-2xl font-display text-display-sm leading-[1.06] font-bold tracking-display text-balance text-ambedkar-950"
+      >
+        {heading}
+      </h2>
+    </div>
+
+    <div
+      class="reveal mt-12 grid gap-12 sm:mt-14 lg:grid-cols-2 lg:gap-16 xl:gap-24"
+    >
+      <dl class="self-start border-y border-rule">
+        {
+          terms.map((item) => (
+            <div class="border-b border-rule py-4 last:border-b-0 sm:flex sm:items-baseline sm:justify-between sm:gap-8">
+              <dt class="label text-ambedkar-900/60">{item.term}</dt>
+              <dd class="mt-1.5 font-display text-lg leading-tight font-semibold tracking-title text-ambedkar-950 sm:mt-0 sm:text-right sm:text-xl">
+                {item.description}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <div>
+        <h3 class="label text-ambedkar-900/60">{strandsHeading}</h3>
+
+        <ol class="mt-7 space-y-9">
+          {
+            strands.map((strand, index) => (
+              <li class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-5">
+                <span class="index-figure pt-1.5">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+
+                <div>
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                    <h4 class="font-display text-lg leading-snug font-semibold tracking-title text-ambedkar-950">
+                      {strand.title}
+                    </h4>
+                    {strand.note && <span class="tag">{strand.note}</span>}
+                  </div>
+                  <p class="mt-2 leading-7 text-ambedkar-900/75">
+                    {strand.description}
+                  </p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+
+        <p class="mt-9">
+          <a class="btn btn-outline btn-sm" href="/books/">
+            Every book, with its sessions
+          </a>
+        </p>
+      </div>
+    </div>
+  </Container>
+</section>

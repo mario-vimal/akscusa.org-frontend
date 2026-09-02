@@ -20,6 +20,34 @@ a page that does not look like AKSC and offers them nowhere to go.
       path needs a redirect in a Cloudflare Pages `_redirects` file rather than
       a 404, because those URLs are still linked from elsewhere on the web.
 
+## Author pages
+
+- [ ] **An author has a page of their own.** `/authors/<slug>/`, listing every
+      book of theirs the circle has read and the sessions that covered it. The
+      relation is many-to-many in both directions: B. R. Ambedkar carries
+      _Annihilation of Caste_, _Riddles in Hinduism_, and _Waiting for a Visa_,
+      and an edited or co-written volume names more than one author. So an
+      author cannot be a string on a book — it has to become its own collection
+      that books reference by stable slug, the way a conference already
+      references `speakers`. `app/schemas/books.ts` currently stores
+      `authors: string[]`, which cannot survive two spellings of the same name
+      and gives nothing to hang a biography, a portrait, or a byline link on.
+      Until this ships, the author dropdown on `/book-readings/` filters on the
+      exact stored string, which is the thing that breaks the first time a
+      catalogue returns "Kancha Ilaiah" for one book and "Kancha Ilaiah
+      Shepherd" for another.
+- [ ] **Model authors as a collection** with a slug, a display name, and
+      optional biography and portrait; migrate `books.authors` to slug
+      references and fail the build on a reference no author claims, as
+      conferences already do for speakers.
+- [ ] **Teach the enrichment script to reuse an author.**
+      `scripts/enrich-books.mjs` fills `authors` from Open Library, so it has to
+      match an existing author entry before creating one, or every new book will
+      mint a duplicate.
+- [ ] **Decide whether an author with a single book gets a page at all**, and
+      whether the byline on a book links to it. A page per author only earns its
+      route once it lists more than the book you arrived from.
+
 ## Machine-readable routes
 
 - [ ] **`robots.txt`** and **`sitemap.xml`**. `@astrojs/sitemap` is not

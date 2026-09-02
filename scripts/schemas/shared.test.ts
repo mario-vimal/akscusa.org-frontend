@@ -1,6 +1,3 @@
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-
 import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 import { z } from "astro/zod";
@@ -153,17 +150,33 @@ describe("editorialBase.heroImage", () => {
 });
 
 describe("the fixed book-readings regression entry", () => {
-  // Reads the actual frontmatter that broke the build (df7f56e, run
-  // 33434271406) and checks each optional field against the schema piece
-  // that now handles it, so this file fails again if the fix regresses.
-  const path = fileURLToPath(
-    new URL(
-      "../../cms/content/book-readings/2026-08-31-buffalo-nationalism-chapters-34-42.md",
-      import.meta.url,
-    ),
-  );
-  const source = readFileSync(path, "utf8");
-  const frontmatter = parse(/^---\n([\s\S]*?)\n---/.exec(source)![1]) as {
+  /*
+   * The frontmatter that broke the build (df7f56e, run 33434271406), checked
+   * field by field against the schema piece that now handles it, so this file
+   * fails again if the fix regresses.
+   *
+   * It is pinned here rather than read back out of the entry it came from.
+   * That entry is editorial content: an editor filling in its registration
+   * link is the CMS working as intended, and it should not turn into a
+   * failing schema test. What is being guarded is the shape Sveltia writes
+   * for a blank field, and that shape is fixed even when the entry is not.
+   */
+  const frontmatter = parse(`
+title: 'Buffalo Nationalism: Chapters 34 - 42'
+date: 2026-08-29T15:00:00
+location: Human Agenda, San Jose
+book: 'buffalo-nationalism'
+participants: []
+registrationUrl: ''
+topics:
+  - religion-and-culture
+  - hindutva
+resources: []
+heroImage: null
+sourceUrl: ''
+featured: true
+draft: false
+`) as {
     heroImage: unknown;
     sourceUrl: unknown;
     registrationUrl: unknown;

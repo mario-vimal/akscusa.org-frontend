@@ -84,7 +84,9 @@ export function mountPosterViewer(): void {
   function open(trigger: HTMLAnchorElement) {
     viewer ??= buildViewer();
     const figure = trigger.closest("figure");
-    const source = figure?.querySelector<HTMLImageElement>(".poster__image");
+    const source =
+      trigger.querySelector<HTMLImageElement>(".poster__image") ??
+      figure?.querySelector<HTMLImageElement>(".poster__image");
 
     viewer.image.src = trigger.href;
     viewer.image.alt = source?.alt ?? "";

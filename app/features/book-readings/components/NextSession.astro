@@ -1,0 +1,71 @@
+---
+import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
+import { COVER_ALT, COVER_WIDTHS, coverForIsbn } from "~/features/books/covers";
+import type { NextSession } from "~/features/book-readings/presenters";
+
+interface Props {
+  session: NextSession;
+}
+
+const { session } = Astro.props;
+const cover = session.book ? coverForIsbn(session.book.isbn) : undefined;
+---
+
+<!--
+  The sitting the page opens on, printed on the masthead's ink.
+
+  A visitor arriving here is usually deciding whether to come, and the answer
+  used to be a small "Upcoming" tag inside a table row two screens down. It is
+  now the first thing under the title: what is being read, when, and where.
+
+  The session's own title is the link to it, so there is no button beneath
+  repeating that link in other words. When nothing is scheduled the same panel
+  states when the circle last met instead of disappearing, because an empty
+  space answers nothing.
+-->
+<div class="mt-12 border-t border-white/15 pt-9 sm:mt-14">
+  <div class="flex gap-6 sm:gap-8">
+    {
+      cover && (
+        <a class="shrink-0 self-start" href={session.book?.href} tabindex="-1">
+          <ResponsiveImage
+            class="w-20 rounded-md shadow-lift sm:w-24"
+            src={cover}
+            alt={COVER_ALT}
+            sizes="(min-width: 640px) 96px, 80px"
+            widths={COVER_WIDTHS}
+          />
+        </a>
+      )
+    }
+
+    <div class="min-w-0">
+      <p class="label text-accent-300">
+        {session.upcoming ? "Next session" : "Last met"}
+      </p>
+
+      <h2
+        class="mt-4 font-display text-2xl leading-[1.12] font-bold tracking-title text-balance wrap-break-word sm:text-3xl"
+      >
+        <a class="link-underline" href={session.href}>{session.title}</a>
+      </h2>
+
+      <p class="mt-4 text-[0.9375rem] leading-6 text-white/75">
+        <time datetime={session.dateTime}>{session.whenLabel}</time>
+        <span class="block">{session.location}</span>
+      </p>
+
+      {
+        session.book && (
+          <p class="mt-3 font-serif text-[0.9375rem] leading-6 text-white/70">
+            Reading{" "}
+            <a class="link-underline" href={session.book.href}>
+              <cite class="italic">{session.book.title}</cite>
+            </a>
+            {session.book.authors && <span> by {session.book.authors}</span>}
+          </p>
+        )
+      }
+    </div>
+  </div>
+</div>

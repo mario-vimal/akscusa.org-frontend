@@ -1,11 +1,11 @@
 ---
-import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
-import { editorialSections } from "~/features/editorial/sections";
-import { loadEditorialEntries } from "~/features/editorial/queries/entries";
-import { loadReadingBooks } from "~/features/books/queries/books";
+import PageMasthead from "~/components/ui/PageMasthead.astro";
 import readingGathering from "~/features/book-readings/assets/reading-gathering-dgxogexaxm8.jpg";
-import { bookReadingRows } from "~/features/book-readings/presenters";
-import BookReadingsTable from "./BookReadingsTable.astro";
+import { loadReadingCircle } from "~/features/book-readings/queries/circle";
+import { editorialSections } from "~/features/editorial/sections";
+import MeetingTerms from "./MeetingTerms.astro";
+import NextSession from "./NextSession.astro";
+import ReadingLog from "./ReadingLog.astro";
 
 interface Props {
   practicalitiesHeading: string;
@@ -22,76 +22,40 @@ const { practicalitiesHeading, practicalities, strandsHeading, strands } =
   Astro.props;
 
 const section = editorialSections.bookReadings;
-const readings = await loadEditorialEntries("bookReadings");
-const rows = bookReadingRows(readings, await loadReadingBooks());
+const { entries, opener } = await loadReadingCircle();
 ---
 
-<EditorialIndex
-  eyebrow={section.eyebrow}
-  title={section.title}
-  description={section.description}
-  count={`${readings.length} ${readings.length === 1 ? "reading" : "readings"}`}
-  empty={section.empty}
-  isEmpty={readings.length === 0}
-  list={false}
-  backgroundImage={readingGathering}
->
-  <div slot="intro" class="grid gap-6 lg:grid-cols-2">
-    <section class="card p-6 sm:p-8">
-      <h2
-        class="font-display text-xl font-semibold tracking-title text-ambedkar-950"
-      >
-        {practicalitiesHeading}
-      </h2>
-      <dl class="mt-5 space-y-4">
-        {
-          practicalities.map((item) => (
-            <div>
-              <dt class="label text-ambedkar-700">{item.term}</dt>
-              <dd class="mt-1 leading-7 text-ambedkar-900/80">
-                {item.description}
-              </dd>
-            </div>
-          ))
-        }
-      </dl>
-    </section>
+<!--
+  The reading circle, in the order a visitor asks about it: when can I come,
+  how does this work, and what have you read?
 
-    <section class="card border-rule bg-mist p-6 sm:p-8">
-      <h2
-        class="font-display text-xl font-semibold tracking-title text-ambedkar-950"
-      >
-        {strandsHeading}
-      </h2>
-      <ul class="mt-5 space-y-5">
-        {
-          strands.map((strand) => (
-            <li>
-              <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-                <h3 class="font-semibold text-ambedkar-950">{strand.title}</h3>
-                {strand.note && (
-                  <span class="rounded-sm border border-rule-strong px-1.5 py-0.5 font-display text-[0.625rem] font-semibold tracking-[0.1em] text-ambedkar-900/70 uppercase">
-                    {strand.note}
-                  </span>
-                )}
-              </div>
-              <p class="mt-2 leading-7 text-ambedkar-900/75">
-                {strand.description}
-              </p>
-            </li>
-          ))
-        }
-      </ul>
-      <p class="mt-6 text-sm">
-        <a
-          class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
-          href="/books/"
-        >
-          Browse every book the circle has read &rarr;
-        </a>
-      </p>
-    </section>
-  </div>
+  The page is composed here rather than through `EditorialIndex`, which puts
+  everything in one container because it is drawing a grid of equal cards. This
+  page is not an index of cards: it is an ink masthead carrying the next
+  sitting, a band of paper stating the arrangement, and the record on the
+  page's own ground beneath them.
 
-  <BookReadingsTable rows={rows} />
-</EditorialIndex>
+  The masthead states no totals. Not every session the circle has held has been
+  written up yet, so "10 books · 22 sessions · since 2020" would put a precise
+  figure on an imprecise record, and a visitor has no way to tell that the
+  number is of the archive rather than of the reading.
+-->
+<section>
+  <PageMasthead
+    eyebrow={section.eyebrow}
+    title={section.title}
+    description={section.description}
+    backgroundImage={readingGathering}
+  >
+    {opener && <NextSession session={opener} />}
+  </PageMasthead>
+
+  <MeetingTerms
+    heading={practicalitiesHeading}
+    terms={practicalities}
+    strandsHeading={strandsHeading}
+    strands={strands}
+  />
+
+  <ReadingLog entries={entries} empty={section.empty} />
+</section>

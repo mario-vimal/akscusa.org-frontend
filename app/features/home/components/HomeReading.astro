@@ -17,11 +17,7 @@ interface Props {
 }
 
 const { book, reading, previous, shelf } = Astro.props;
-const { books, read, sessions } = shelf;
-
-const record = `${read} ${read === 1 ? "book" : "books"} read over ${sessions} ${
-  sessions === 1 ? "session" : "sessions"
-}.`;
+const { books } = shelf;
 ---
 
 <!--
@@ -207,8 +203,14 @@ const record = `${read} ${read === 1 ? "book" : "books"} read over ${sessions} $
         <div class="reveal mt-16 flex flex-wrap items-end justify-between gap-6 sm:mt-20">
           <div>
             <p class="eyebrow">The shelf</p>
+            {/*
+              Stated without a total. Not every session the circle has held has
+              been written up, so "10 books read over 22 sessions" counts the
+              record rather than the reading, and a visitor cannot tell which
+              of the two the figure refers to.
+            */}
             <p class="mt-4 font-display text-xl leading-tight font-semibold tracking-title text-ambedkar-950">
-              {record}
+              Books the circle has worked through.
             </p>
           </div>
 
@@ -332,11 +334,9 @@ const record = `${read} ${read === 1 ? "book" : "books"} read over ${sessions} $
                     </a>
                   ) : (
                     <div
-                      class="flex w-24 shrink-0 items-center justify-center self-start rounded-md border border-dashed border-rule-strong bg-ambedkar-50 px-2 py-10 text-center text-xs font-semibold text-ambedkar-800/70 sm:w-28 lg:w-32"
+                      class="w-24 shrink-0 self-start rounded-md border border-dashed border-rule-strong bg-ambedkar-50 py-10 sm:w-28 lg:w-32"
                       aria-hidden="true"
-                    >
-                      No cover
-                    </div>
+                    />
                   )}
 
                   <div class="min-w-0">

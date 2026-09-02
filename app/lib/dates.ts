@@ -39,10 +39,74 @@ const pacificTimeFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Los_Angeles",
 });
 
+// A book the circle read over several sittings is listed once, so its entry
+// states the run rather than a date: "June – October 2025". The month alone is
+// formatted separately from the month and year, because a run inside one year
+// should not print that year twice.
+const pacificMonthDayFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  timeZone: "America/Los_Angeles",
+});
+
+// The same date with its year, for a book the circle came back to years later:
+// under one entry spanning 2020 and 2025, "Apr 5" does not say which.
+const pacificShortDateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "America/Los_Angeles",
+});
+
+const pacificMonthOnlyFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  timeZone: "America/Los_Angeles",
+});
+
+const pacificYearFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  timeZone: "America/Los_Angeles",
+});
+
 export const formatPacificDate = (date: Date): string =>
   pacificDayFormatter.format(date);
 export const formatPacificTime = (date: Date): string =>
   pacificTimeFormatter.format(date);
+export const formatPacificMonthDay = (date: Date): string =>
+  pacificMonthDayFormatter.format(date);
+export const formatPacificShortDate = (date: Date): string =>
+  pacificShortDateFormatter.format(date);
+
+/**
+ * The calendar year a session fell in where the circle meets. Taken from the
+ * Pacific zone rather than from `getFullYear`, which answers in whatever zone
+ * the build happened to run in: a session at 3 PM on 31 December in California
+ * is already the next year in UTC, and the entry would be filed under a year
+ * the circle never met in.
+ */
+export const pacificYear = (date: Date): number =>
+  Number(pacificYearFormatter.format(date));
+
+/**
+ * The run of months a book was read over: "March 2025", "June – October 2025",
+ * or "December 2019 – April 2020". A year is printed once when the run stays
+ * inside it, because "June 2025 – October 2025" makes a reader compare two
+ * numbers to learn they are the same.
+ */
+export function formatPacificMonthRange(start: Date, end: Date): string {
+  const startYear = pacificYear(start);
+  const endYear = pacificYear(end);
+  const startMonth = pacificMonthOnlyFormatter.format(start);
+  const endMonth = pacificMonthOnlyFormatter.format(end);
+
+  if (startYear !== endYear) {
+    return `${startMonth} ${startYear} \u2013 ${endMonth} ${endYear}`;
+  }
+
+  return startMonth === endMonth
+    ? `${startMonth} ${endYear}`
+    : `${startMonth} \u2013 ${endMonth} ${endYear}`;
+}
 
 /** ISO date without the time part, for a `<time datetime>` attribute. */
 export const isoDate = (date: Date): string => date.toISOString().slice(0, 10);

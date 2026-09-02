@@ -2,6 +2,7 @@
 import BackLink from "~/components/ui/BackLink.astro";
 import Container from "~/components/ui/Container.astro";
 import PageMasthead from "~/components/ui/PageMasthead.astro";
+import Poster from "~/components/ui/Poster.astro";
 import {
   editorialSections,
   type EditorialCollection,
@@ -9,6 +10,12 @@ import {
 import type { Badge, Detail, LinkItem } from "~/features/editorial/presenters";
 import { topicLabel, type EditorialTopic } from "~/features/editorial/taxonomy";
 import ProseContent from "./ProseContent.astro";
+
+interface EntryPoster {
+  src: string;
+  alt: string;
+  caption?: string;
+}
 
 interface Props {
   section: EditorialCollection;
@@ -21,6 +28,8 @@ interface Props {
   links?: { heading: string; items: readonly LinkItem[] };
   topics?: readonly EditorialTopic[];
   heroImage?: { src: string; alt: string };
+  /** AKSC's own flyers for the entry, shown in an aside beside its details. */
+  posters?: readonly EntryPoster[];
   sourceUrl?: string;
 }
 
@@ -34,6 +43,7 @@ const {
   links,
   topics = [],
   heroImage,
+  posters = [],
   sourceUrl,
 } = Astro.props;
 
@@ -43,6 +53,9 @@ const badgeClasses =
   badge?.tone === "muted"
     ? "border-white/40 text-white/85"
     : "border-accent-400/70 text-accent-300";
+
+const hasPosters = posters.length > 0;
+const hasMultiplePosters = posters.length > 1;
 ---
 
 <article>
@@ -73,116 +86,146 @@ const badgeClasses =
   </PageMasthead>
 
   <Container class="pt-12 pb-20 sm:pt-14 sm:pb-28">
-    {
-      details.length > 0 && (
-        <dl class="max-w-3xl border-t border-ambedkar-950 sm:grid sm:grid-cols-2 sm:gap-x-10">
-          {details.map((detail) => (
-            <div class="border-b border-rule py-4">
-              <dt class="label text-ambedkar-700">{detail.term}</dt>
-              <dd class="mt-1.5 leading-7 text-ambedkar-900/80">
-                {detail.href ? (
-                  <a
-                    class="link-underline font-medium text-ambedkar-800"
-                    href={detail.href}
-                  >
-                    {detail.description}
-                  </a>
-                ) : (
-                  detail.description
-                )}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      )
-    }
-
-    {
-      callout && (
-        <div
-          class:list={[
-            "on-dark relative isolate max-w-3xl overflow-hidden rounded-xl bg-ambedkar-950 px-6 py-7 text-mist sm:px-8",
-            details.length > 0 ? "mt-8" : "",
-          ]}
-        >
-          <div
-            class="absolute inset-0 -z-10 bg-linear-to-br from-ambedkar-900 to-ambedkar-1000"
-            aria-hidden="true"
-          />
-          <p class="eyebrow eyebrow-light">{callout.heading}</p>
-          <p class="mt-4 leading-7">{callout.text}</p>
-        </div>
-      )
-    }
-
-    {
-      heroImage && (
-        <img
-          class="mt-10 w-full max-w-3xl rounded-xl border border-rule shadow-card"
-          src={heroImage.src}
-          alt={heroImage.alt}
-          loading="eager"
-          decoding="async"
-        />
-      )
-    }
-
-    <slot name="before-body" />
-
-    <div class="mt-12">
-      <ProseContent>
-        <slot />
-      </ProseContent>
-    </div>
-
-    {
-      links && links.items.length > 0 && (
-        <section class="card mt-12 max-w-3xl p-6 sm:p-8">
-          <h2 class="font-display text-xl font-semibold tracking-title text-ambedkar-950">
-            {links.heading}
-          </h2>
-          <ul class="mt-4 space-y-3">
-            {links.items.map((item) => (
-              <li>
-                <a
-                  class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
-                  href={item.url}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )
-    }
-
-    {
-      topics.length > 0 && (
-        <section class="mt-12 max-w-3xl">
-          <h2 class="eyebrow">Topics</h2>
-          <ul class="mt-4 flex flex-wrap gap-2">
-            {topics.map((topic) => (
-              <li class="tag px-3 py-1.5 text-sm">{topicLabel(topic)}</li>
-            ))}
-          </ul>
-        </section>
-      )
-    }
-
-    {
-      sourceUrl && (
-        <p class="mt-10 max-w-3xl text-sm wrap-break-word text-ambedkar-900/70">
-          Originally published at{" "}
-          <a
-            class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
-            href={sourceUrl}
+    <div
+      class:list={[
+        "items-start gap-10 lg:gap-14",
+        hasPosters && "grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)]",
+      ]}
+    >
+      {
+        hasPosters && (
+          <aside
+            class:list={[
+              "grid auto-rows-max content-start items-start gap-5 lg:order-2 lg:grid-cols-1",
+              hasMultiplePosters && "sm:grid-cols-2",
+            ]}
+            aria-label={`Original ${label.toLowerCase()} posters`}
           >
-            {sourceUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-          </a>
-          .
-        </p>
-      )
-    }
+            {posters.map((poster, index) => (
+              <Poster
+                src={poster.src}
+                alt={poster.alt}
+                caption={poster.caption}
+                loading={index === 0 ? "eager" : "lazy"}
+              />
+            ))}
+          </aside>
+        )
+      }
+
+      <div class:list={["min-w-0", hasPosters && "lg:order-1"]}>
+        {
+          details.length > 0 && (
+            <dl class="max-w-3xl border-t border-ambedkar-950 sm:grid sm:grid-cols-2 sm:gap-x-10">
+              {details.map((detail) => (
+                <div class="border-b border-rule py-4">
+                  <dt class="label text-ambedkar-700">{detail.term}</dt>
+                  <dd class="mt-1.5 leading-7 text-ambedkar-900/80">
+                    {detail.href ? (
+                      <a
+                        class="link-underline font-medium text-ambedkar-800"
+                        href={detail.href}
+                      >
+                        {detail.description}
+                      </a>
+                    ) : (
+                      detail.description
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+
+        {
+          callout && (
+            <div
+              class:list={[
+                "on-dark relative isolate max-w-3xl overflow-hidden rounded-xl bg-ambedkar-950 px-6 py-7 text-mist sm:px-8",
+                details.length > 0 ? "mt-8" : "",
+              ]}
+            >
+              <div
+                class="absolute inset-0 -z-10 bg-linear-to-br from-ambedkar-900 to-ambedkar-1000"
+                aria-hidden="true"
+              />
+              <p class="eyebrow eyebrow-light">{callout.heading}</p>
+              <p class="mt-4 leading-7">{callout.text}</p>
+            </div>
+          )
+        }
+
+        {
+          heroImage && (
+            <img
+              class="mt-10 w-full max-w-3xl rounded-xl border border-rule shadow-card"
+              src={heroImage.src}
+              alt={heroImage.alt}
+              loading="eager"
+              decoding="async"
+            />
+          )
+        }
+
+        <slot name="before-body" />
+
+        <div class="mt-12">
+          <ProseContent>
+            <slot />
+          </ProseContent>
+        </div>
+
+        {
+          links && links.items.length > 0 && (
+            <section class="card mt-12 max-w-3xl p-6 sm:p-8">
+              <h2 class="font-display text-xl font-semibold tracking-title text-ambedkar-950">
+                {links.heading}
+              </h2>
+              <ul class="mt-4 space-y-3">
+                {links.items.map((item) => (
+                  <li>
+                    <a
+                      class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                      href={item.url}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        {
+          topics.length > 0 && (
+            <section class="mt-12 max-w-3xl">
+              <h2 class="eyebrow">Topics</h2>
+              <ul class="mt-4 flex flex-wrap gap-2">
+                {topics.map((topic) => (
+                  <li class="tag px-3 py-1.5 text-sm">{topicLabel(topic)}</li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        {
+          sourceUrl && (
+            <p class="mt-10 max-w-3xl text-sm wrap-break-word text-ambedkar-900/70">
+              Originally published at{" "}
+              <a
+                class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                href={sourceUrl}
+              >
+                {sourceUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+              </a>
+              .
+            </p>
+          )
+        }
+      </div>
+    </div>
   </Container>
 </article>

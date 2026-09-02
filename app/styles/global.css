@@ -628,6 +628,48 @@
   }
 
   /*
+   * The filter controls. A native `<select>` is kept — its keyboard behaviour
+   * and its phone picker are things no scripted listbox reproduces for free —
+   * and only its chrome is replaced, so it sits beside the text field as one
+   * row of controls rather than as an operating system's idea of a menu.
+   */
+  .field {
+    width: 100%;
+    min-height: 2.875rem;
+    border: 1px solid var(--color-rule-strong);
+    border-radius: 0.5rem;
+    background-color: var(--color-paper);
+    padding: 0.625rem 0.875rem;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--color-ambedkar-950);
+    transition: border-color 180ms var(--ease-out-firm);
+  }
+
+  .field:hover {
+    border-color: var(--color-ambedkar-950);
+  }
+
+  .field::placeholder {
+    color: color-mix(in srgb, var(--color-ambedkar-900) 55%, transparent);
+  }
+
+  /*
+   * The chevron is drawn rather than shipped, so it takes the ink colour of
+   * the rest of the control and costs no request. `appearance: none` removes
+   * the platform arrow that would otherwise sit beside it.
+   */
+  select.field {
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230c1e36' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    background-size: 0.875rem;
+  }
+
+  /*
    * A poster sheet: the artwork at its own size with a hairline around it and
    * the caption beneath. `.card` stretches to fill its grid row so a row of
    * cards squares off; a poster must not, or it floats in a tall empty box
@@ -710,6 +752,191 @@
     font-size: 0.875rem;
     line-height: 1.5rem;
     color: color-mix(in srgb, var(--color-ambedkar-900) 70%, transparent);
+  }
+
+  /*
+   * A fanned deck of flyers, for a log entry that stands for several sittings.
+   * The entry has to stay one entry high, so the sheets overlap and each shows
+   * an edge instead of sitting in a column. The edges are the hairline the rest
+   * of the site separates things with: on a light ground a drop shadow would be
+   * the only thing holding the deck together, and it would be the one place on
+   * the page where a shadow means "behind".
+   *
+   * The sheets are drawn large enough to be looked at. At 36px, which is where
+   * this started, a flyer showed a smear of colour and nothing of the design;
+   * AKSC draws these itself and they are the one part of the record worth
+   * seeing rather than reading.
+   */
+  .poster-stack {
+    display: flex;
+    align-items: flex-start;
+    width: fit-content;
+  }
+
+  .poster-stack__tile {
+    position: relative;
+    width: 4.5rem;
+    flex: none;
+    border: 1px solid var(--color-rule-strong);
+    border-radius: 0.25rem;
+    background: var(--color-paper);
+    overflow: clip;
+    transition: translate 180ms var(--ease-out-firm);
+  }
+
+  .poster-stack__tile + .poster-stack__tile {
+    margin-left: -1.75rem;
+  }
+
+  @media (width >= 40rem) {
+    .poster-stack__tile {
+      width: 5.5rem;
+    }
+
+    .poster-stack__tile + .poster-stack__tile {
+      margin-left: -2rem;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .poster-stack__tile {
+      width: 6.5rem;
+    }
+
+    .poster-stack__tile + .poster-stack__tile {
+      margin-left: -2.25rem;
+    }
+  }
+
+  /*
+   * The first sheet is the one on top, so the stack reads front to back in
+   * the order the sessions ran. Four is the most the column draws; a fifth
+   * would leave a sliver too narrow to recognise.
+   */
+  .poster-stack__tile:nth-child(1) {
+    z-index: 5;
+  }
+  .poster-stack__tile:nth-child(2) {
+    z-index: 4;
+  }
+  .poster-stack__tile:nth-child(3) {
+    z-index: 3;
+  }
+  .poster-stack__tile:nth-child(4) {
+    z-index: 2;
+  }
+  .poster-stack__tile:nth-child(5) {
+    z-index: 1;
+  }
+
+  /* Bring the sheet under the pointer or the keyboard out of the stack. */
+  .poster-stack__tile:hover,
+  .poster-stack__tile:focus-within {
+    z-index: 6;
+    translate: 0 -0.25rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .poster-stack__tile {
+      transition: none;
+    }
+
+    .poster-stack__tile:hover,
+    .poster-stack__tile:focus-within {
+      translate: none;
+    }
+  }
+
+  .poster-stack__open {
+    display: block;
+  }
+
+  .poster-stack__open[data-poster-ready] {
+    cursor: zoom-in;
+  }
+
+  /*
+   * The tiles are one portrait ratio and the artwork is fitted inside it
+   * rather than filled into it. Flyers are drawn to whatever proportion their
+   * designer chose, and a deck of ragged heights reads as a rendering fault
+   * rather than as a set — but cropping to force the ratio throws away part of
+   * a drawing AKSC made, and on a square flyer that is a quarter of it.
+   *
+   * `contain` keeps every sheet whole: the portrait flyers, which cluster
+   * around this ratio, fill the tile almost exactly, and a square one is
+   * centred on the sheet with a margin above and below it, the way a square
+   * picture sits on a portrait page.
+   */
+  .poster-stack__open .poster__image {
+    aspect-ratio: 3 / 4;
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .poster-stack__more {
+    display: grid;
+    aspect-ratio: 3 / 4;
+    place-items: center;
+    background: var(--color-ambedkar-50);
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-ambedkar-700);
+  }
+
+  /*
+   * One sitting inside a book's entry: the chapters read that evening and the
+   * date they were read on. A book listed once still has to account for the
+   * four Sundays it took, and these are what carries that — each one its own
+   * page, so nothing is lost by not giving every sitting an entry of its own.
+   *
+   * Squared and hairlined like `.tag`, because they belong to the same family
+   * of small marks, but they are links and so they answer to the pointer.
+   */
+  .session-chip {
+    display: inline-flex;
+    min-height: 2.25rem;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--color-rule);
+    border-radius: 0.25rem;
+    background: var(--color-paper);
+    padding: 0.25rem 0.6875rem;
+    transition:
+      border-color 180ms var(--ease-out-firm),
+      color 180ms var(--ease-out-firm);
+  }
+
+  .session-chip:hover {
+    border-color: var(--color-ambedkar-950);
+  }
+
+  .session-chip__label {
+    font-family: var(--font-display);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+    color: var(--color-ambedkar-950);
+  }
+
+  .session-chip__date {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
+    color: color-mix(in srgb, var(--color-ambedkar-900) 62%, transparent);
+  }
+
+  /*
+   * A book titled the same as its one sitting has no chapter range to print,
+   * so the date is all the chip carries and it has to lead rather than sit
+   * back as a secondary mark.
+   */
+  .session-chip__date--lead {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--color-ambedkar-950);
   }
 
   /*

@@ -80,6 +80,30 @@ export const linkSchema = z.object({
   url: z.string(),
 });
 
+// A poster or flyer, committed to Git rather than hosted on the media host:
+// it is AKSC's own artwork, kept in its original colours, not editorial
+// photography. Shared by every collection that offers the Sveltia `image`
+// widget for posters, so the committed path and the shape a page reads are
+// the same wherever a poster appears.
+export function posterListSchema(collection: string) {
+  return optionalCmsList(
+    z
+      .array(
+        z.object({
+          src: z
+            .string()
+            .regex(
+              new RegExp(`^/media/${collection}/[a-z0-9-]+\\.jpg$`),
+              `Must be a lowercase kebab-case JPG under /media/${collection}/.`,
+            ),
+          alt: z.string().min(1),
+          caption: optionalCmsField(z.string()),
+        }),
+      )
+      .default([]),
+  );
+}
+
 // ISBN-13 identifies the edition a book entry names, so it is normalized and
 // checked here rather than trusted. An invalid ISBN fails the build. It is
 // bibliographic metadata rather than a relationship key: a reading names its

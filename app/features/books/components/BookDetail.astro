@@ -2,6 +2,7 @@
 import BackLink from "~/components/ui/BackLink.astro";
 import Container from "~/components/ui/Container.astro";
 import PageMasthead from "~/components/ui/PageMasthead.astro";
+import Poster from "~/components/ui/Poster.astro";
 import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
 import { formatPacificDate } from "~/lib/dates";
 import { topicLabel } from "~/features/editorial/taxonomy";
@@ -138,25 +139,40 @@ const facts = [
             The circle has not scheduled a session on this book yet.
           </p>
         ) : (
-          <ul class="mt-6 space-y-4">
+          <ul class="mt-6 divide-y divide-rule border-t border-rule">
             {readings.map((reading) => (
-              <li class="card p-6">
-                <p class="label text-ambedkar-700">
-                  <time datetime={reading.data.date.toISOString()}>
-                    {formatPacificDate(reading.data.date)}
-                  </time>
-                </p>
-                <h3 class="mt-2 font-display text-xl leading-[1.18] font-semibold tracking-title text-ambedkar-950">
-                  <a
-                    class="after:absolute after:inset-0"
-                    href={`/book-readings/${reading.id}/`}
-                  >
-                    {reading.data.title}
-                  </a>
-                </h3>
-                <p class="mt-2 leading-7 text-ambedkar-900/75">
-                  {reading.data.summary}
-                </p>
+              <li class="gap-6 py-6 sm:flex sm:items-start">
+                {reading.data.posters.length > 0 && (
+                  <div class="mb-4 flex gap-3 sm:mb-0 sm:w-36 sm:shrink-0 sm:flex-col">
+                    {reading.data.posters.map((poster, index) => (
+                      <Poster
+                        class="w-28 sm:w-full"
+                        src={poster.src}
+                        alt={poster.alt}
+                        caption={poster.caption}
+                        loading={index === 0 ? "eager" : "lazy"}
+                      />
+                    ))}
+                  </div>
+                )}
+                <div class="relative min-w-0 flex-1">
+                  <p class="label text-ambedkar-700">
+                    <time datetime={reading.data.date.toISOString()}>
+                      {formatPacificDate(reading.data.date)}
+                    </time>
+                  </p>
+                  <h3 class="mt-2 font-display text-xl leading-[1.18] font-semibold tracking-title text-ambedkar-950">
+                    <a
+                      class="after:absolute after:inset-0"
+                      href={`/book-readings/${reading.id}/`}
+                    >
+                      {reading.data.title}
+                    </a>
+                  </h3>
+                  <p class="mt-2 leading-7 text-ambedkar-900/75">
+                    {reading.data.summary}
+                  </p>
+                </div>
               </li>
             ))}
           </ul>
