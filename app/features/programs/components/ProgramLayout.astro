@@ -1,7 +1,7 @@
 ---
-import BackLink from "~/components/ui/BackLink.astro";
 import Container from "~/components/ui/Container.astro";
-import PageMasthead from "~/components/ui/PageMasthead.astro";
+import EntryHeader from "~/components/ui/EntryHeader.astro";
+import OrganiserList from "~/components/ui/OrganiserList.astro";
 import Poster from "~/components/ui/Poster.astro";
 import ProseContent from "~/features/editorial/components/ProseContent.astro";
 import type {
@@ -21,6 +21,7 @@ interface Props {
   summary: string;
   badge: Badge;
   details: readonly Detail[];
+  organisers?: readonly string[];
   posters?: readonly ProgramPoster[];
   links?: readonly LinkItem[];
   topics?: readonly string[];
@@ -32,6 +33,7 @@ const {
   summary,
   badge,
   details,
+  organisers = [],
   posters = [],
   links = [],
   topics = [],
@@ -40,49 +42,76 @@ const {
 
 const hasPosters = posters.length > 0;
 const hasMultiplePosters = posters.length > 1;
+
+/*
+ * The badge sits on the page's own white now that the blue band is gone, so
+ * both tones are the dark end of their scale. The light-on-dark pair this
+ * replaced — white/40 borders and accent-300 text — would be invisible here.
+ */
 const badgeClasses =
   badge.tone === "muted"
-    ? "border-white/40 text-white/85"
-    : "border-accent-400/70 text-accent-300";
+    ? "border-ambedkar-900/25 text-ambedkar-900/70"
+    : "border-accent-600/50 text-accent-700";
 
 const topicLabel = await loadTermLabels("topics");
 ---
 
+<!--
+  A program opens on the program, not on a blue band.
+
+  This page used `PageMasthead`, whose job is to say which section of the site
+  you are in. On the Programs index that is the most useful thing the top of
+  the page can do; on one program it is the least, because the visitor clicked
+  a card to get here and already knows. The band spent a screen restating the
+  title and summary before the flyer — the thing that carries what actually
+  happened — could begin. `EntryHeader` is what every other entry page uses,
+  so a program now matches a press release, a book, and a reading.
+-->
 <article>
-  <PageMasthead
-    eyebrow="Programs"
-    title={title}
-    description={summary}
-    size="large"
-  >
-    <BackLink slot="above" href="/programs/" tone="light">
-      Back to Programs
-    </BackLink>
-
-    <p class="mt-8">
-      <span
-        class:list={[
-          "inline-block rounded-sm border px-1.5 py-0.5 font-display text-[0.625rem] font-semibold tracking-[0.1em] uppercase",
-          badgeClasses,
-        ]}
-      >
-        {badge.label}
-      </span>
-    </p>
-  </PageMasthead>
-
-  <Container class="pt-10 pb-20 sm:pt-14 sm:pb-28">
+  <Container class="pt-10 pb-20 sm:pt-12 sm:pb-28">
     <div
       class:list={[
-        "items-start gap-10 lg:gap-14",
-        hasPosters && "grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)]",
+        "items-start",
+        hasPosters &&
+          "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)] lg:gap-x-14",
       ]}
     >
+      {
+        /*
+        Three grid items rather than two, so the flyer can sit between the
+        header and the details on a phone and still hold the right-hand column
+        on a wide screen. Reading a poster before the title tells you nothing;
+        reading it straight after tells you what the entry is about.
+      */
+      }
+      <div
+        class:list={["min-w-0", hasPosters && "lg:col-start-1 lg:row-start-1"]}
+      >
+        <EntryHeader
+          eyebrow="Program"
+          title={title}
+          lede={summary}
+          backHref="/programs/"
+          backLabel="Programs"
+        >
+          <p class="mt-5">
+            <span
+              class:list={[
+                "inline-block rounded-sm border px-1.5 py-0.5 font-display text-[0.625rem] font-semibold tracking-[0.1em] uppercase",
+                badgeClasses,
+              ]}
+            >
+              {badge.label}
+            </span>
+          </p>
+        </EntryHeader>
+      </div>
+
       {
         hasPosters && (
           <aside
             class:list={[
-              "grid auto-rows-max content-start items-start gap-5 lg:order-2 lg:grid-cols-1",
+              "mt-10 grid auto-rows-max content-start items-start gap-5 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:grid-cols-1",
               hasMultiplePosters && "sm:grid-cols-2",
             ]}
             aria-label="Original program posters"
@@ -99,28 +128,34 @@ const topicLabel = await loadTermLabels("topics");
         )
       }
 
-      <div class:list={["min-w-0", hasPosters && "mt-10 lg:order-1 lg:mt-0"]}>
-        <dl class="card gap-x-8 gap-y-5 p-6 sm:grid sm:grid-cols-2 sm:p-8">
-          {
-            details.map((detail) => (
-              <div>
-                <dt class="label text-ambedkar-700">{detail.term}</dt>
-                <dd class="mt-1 leading-7 text-ambedkar-900/80">
-                  {detail.href ? (
-                    <a
-                      class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
-                      href={detail.href}
-                    >
-                      {detail.description}
-                    </a>
-                  ) : (
-                    detail.description
-                  )}
-                </dd>
-              </div>
-            ))
-          }
-        </dl>
+      <div
+        class:list={["min-w-0", hasPosters && "lg:col-start-1 lg:row-start-2"]}
+      >
+        {
+          details.length > 0 && (
+            <dl class="mt-10 max-w-3xl border-t border-ambedkar-950 sm:grid sm:grid-cols-2 sm:gap-x-10">
+              {details.map((detail) => (
+                <div class="border-b border-rule py-4">
+                  <dt class="label text-ambedkar-700">{detail.term}</dt>
+                  <dd class="mt-1.5 leading-7 text-ambedkar-900/80">
+                    {detail.href ? (
+                      <a
+                        class="link-underline font-medium text-ambedkar-800"
+                        href={detail.href}
+                      >
+                        {detail.description}
+                      </a>
+                    ) : (
+                      detail.description
+                    )}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+
+        <OrganiserList names={organisers} class="mt-10 max-w-3xl" />
 
         <div class="mt-10 sm:mt-12">
           <ProseContent>

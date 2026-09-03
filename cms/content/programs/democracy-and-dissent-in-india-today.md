@@ -20,6 +20,6 @@ draft: false
 
 Ambedkar King Study Circle, India Civil Watch, and Alliance of South Asians Taking Action presented a conversation with investigative journalist **Niranjan Takle**.
 
-Niranjan Takle spoke about the rise of Hindu nationalism (Hindutva) in India and the ongoing attacks on journalists, human rights defenders and minority communities. Mr. Takle also broke the Judge Loya story, where the suspicious circumstances of the death of Judge Loya, who was hearing the Sohrabuddin Shah case which implicated several members of the ruling party.
+Niranjan Takle, an award-winning Indian investigative journalist, spoke about the rise of Hindu nationalism (Hindutva) in India and the ongoing attacks on journalists, human rights defenders and minority communities. Mr. Takle also broke the Judge Loya story, where the suspicious circumstances of the death of Judge Loya, who was hearing the Sohrabuddin Shaikh case which implicated several members of the ruling party.
 
 Mr. Takle is the two-time recipient of The Mumbai Press Club's National Red Ink Awards for Excellence in Journalism in 2013 and 2015. He has worked for CNN-News18, an India English-language news television channel, _The Caravan_, an Indian English-language magazine that covers politics and culture, and _The Week_, an Indian news magazine.

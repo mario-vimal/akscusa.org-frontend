@@ -1,7 +1,6 @@
 ---
-import BackLink from "~/components/ui/BackLink.astro";
 import Container from "~/components/ui/Container.astro";
-import PageMasthead from "~/components/ui/PageMasthead.astro";
+import EntryHeader from "~/components/ui/EntryHeader.astro";
 import ContributeCallout from "~/features/artwork/components/ContributeCallout.astro";
 import PanelSequence from "~/features/artwork/components/PanelSequence.astro";
 import type { SizedPanel } from "~/features/artwork/panels";
@@ -71,31 +70,37 @@ const topicLabel = await loadTermLabels("topics");
   gives every panel an edge of its own and stops a column of squares reading as
   one long sheet. It also marks the reader out from the rest of the site: a
   comic is read, not skimmed.
+
+  The header above that reader is `EntryHeader`, not `PageMasthead`, for the
+  reason every other entry page uses it: a visitor who clicked a comic already
+  knows they are in Comics, and a blue band spent a screen restating the title
+  before the first panel. Losing it also removes a three-band opening — blue,
+  then ink, then artwork — so the page now goes straight from the credits into
+  the reader.
 -->
 <article>
-  <PageMasthead
-    eyebrow="Comic"
-    title={title}
-    description={summary}
-    size="large"
-  >
-    <BackLink slot="above" href="/comics/" tone="light">
-      Back to Comics
-    </BackLink>
+  <Container class="pt-10 pb-12 sm:pt-12 sm:pb-14">
+    <EntryHeader
+      eyebrow="Comic"
+      title={title}
+      lede={summary}
+      backHref="/comics/"
+      backLabel="Comics"
+    />
 
     <dl class="mt-9 flex flex-wrap gap-x-10 gap-y-5 text-sm">
       <div>
-        <dt class="label text-accent-300">
+        <dt class="label text-ambedkar-700">
           {credits.length === 1 ? "Credit" : "Credits"}
         </dt>
-        <dd class="mt-1.5 leading-6 text-white/85">
+        <dd class="mt-1.5 leading-6 text-ambedkar-900/80">
           {
             credits.map((credit, index) => (
               <>
                 {index > 0 && <span aria-hidden="true"> · </span>}
                 {credit.url ? (
                   <a
-                    class="link-underline font-semibold"
+                    class="link-underline font-semibold text-ambedkar-800"
                     href={credit.url}
                     rel="noopener"
                   >
@@ -105,7 +110,7 @@ const topicLabel = await loadTermLabels("topics");
                   <span class="font-semibold">{credit.name}</span>
                 )}
                 {credit.role && (
-                  <span class="text-white/70"> — {credit.role}</span>
+                  <span class="text-ambedkar-900/65"> — {credit.role}</span>
                 )}
               </>
             ))
@@ -114,16 +119,16 @@ const topicLabel = await loadTermLabels("topics");
       </div>
 
       <div>
-        <dt class="label text-accent-300">Length</dt>
-        <dd class="mt-1.5 leading-6 text-white/85">
+        <dt class="label text-ambedkar-700">Length</dt>
+        <dd class="mt-1.5 leading-6 text-ambedkar-900/80">
           {total}
           {total === 1 ? "panel" : "panels"}
         </dd>
       </div>
 
       <div>
-        <dt class="label text-accent-300">Published</dt>
-        <dd class="mt-1.5 leading-6 text-white/85">{published}</dd>
+        <dt class="label text-ambedkar-700">Published</dt>
+        <dd class="mt-1.5 leading-6 text-ambedkar-900/80">{published}</dd>
       </div>
     </dl>
 
@@ -131,14 +136,12 @@ const topicLabel = await loadTermLabels("topics");
       topics.length > 0 && (
         <ul class="mt-7 flex flex-wrap gap-2">
           {topics.map((topic) => (
-            <li class="rounded-sm border border-white/25 px-2 py-0.5 font-display text-[0.6875rem] font-medium text-white/80">
-              {topicLabel(topic)}
-            </li>
+            <li class="tag px-2 py-0.5">{topicLabel(topic)}</li>
           ))}
         </ul>
       )
     }
-  </PageMasthead>
+  </Container>
 
   <div class="on-dark relative isolate bg-ambedkar-1000 text-white">
     <div class="absolute inset-0 -z-10 grain opacity-[0.05]" aria-hidden="true">

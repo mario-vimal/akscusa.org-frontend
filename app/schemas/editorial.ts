@@ -149,6 +149,13 @@ export const programs = defineCollection({
     /** Time or range as published, retained separately from the calendar day. */
     schedule: optionalCmsField(z.string()),
     location: optionalCmsField(z.string()),
+    /**
+     * Every organisation that convened the program, as its flyer credits them.
+     * AKSC organises in coalition and the original flyers name their partners,
+     * so dropping them loses who actually did the work. Optional because the
+     * WordPress programs index recorded no organisers at all.
+     */
+    organisers: optionalCmsList(z.array(z.string()).default([])),
     registrationUrl: optionalUrl,
     posters: posterListSchema("programs"),
     resources: optionalCmsList(z.array(linkSchema).default([])),

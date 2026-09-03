@@ -4,7 +4,12 @@ date: "2017-09-16"
 kind: "event"
 status: "concluded"
 schedule: "3:00 PM to 6:00 PM"
-location: "Dr. Martin Luther King Jr. Library, 150 East San Fernando Street, San Jose, California"
+location: "Dr. Martin Luther King Jr. Library, San Jose State University, 150 East San Fernando Street, San Jose, California"
+organisers:
+  - "Periyar International, California Chapter"
+  - "B. R. Ambedkar Sikh Foundation"
+  - "Organization For Minorities Of India"
+  - "Ambedkar King Study Circle"
 summary: "A public celebration and discussion of Periyar's Self-Respect Movement and humanism."
 topics:
   - "periyar"

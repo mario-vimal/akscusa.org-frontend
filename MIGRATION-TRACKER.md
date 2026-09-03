@@ -303,3 +303,27 @@ extending to the editorial collections when their images are brought over.
   would mislead readers.
 - **One unresolved link.** `/who-said-what/` is linked from the SB 403
   intervention but has no destination yet.
+- **Book reading provenance — unresolved.** Both source sites together document
+  only six readings: the five 2020 sittings on
+  `/reading-and-discussions/monthly-book-reading/` and the Palestine list. The
+  collection holds 25. The other **19**, every 2024, 2025, and 2026 sitting,
+  carry dates, venues, chapter ranges, registration links, and flyers that
+  neither retiring site corroborates. They are most likely from AKSC's Meetup
+  listings or its own records, but nothing states that. Confirm with AKSC and
+  record the source here; the four entries dated after August 2026 assert in the
+  past tense that a reading has already happened, so they need checking first.
+- **Programs were transcribed from flyer artwork.** `/programs/` gave one line
+  per program, so the body of most program entries was read off the flyer JPEG
+  and, where there was no flyer, out of the General Body report PDFs. That is
+  the real source for 14 entries and it is not recorded anywhere else. It is
+  also where every content error found in the audit originated, because it is
+  the one place a writer had to compose rather than copy. See
+  `CONTENT-FIDELITY-AUDIT.md`.
+- **The 2017–2018 annual report is not readable as text.**
+  `/annual-report-2017-2018/` is a 32,700-character HTML page — an introduction,
+  a numbered table of eight programs with dates and venues, the books read, the
+  audio conferences, and the interventions. Only the 15-page PDF was migrated,
+  so that copy is no longer selectable, searchable, translatable, or reachable
+  by a screen reader. Nothing is lost, since the PDF is committed, but rendering
+  the report body on `/organization/general-body/` and keeping the PDF as the
+  archival artefact would restore it. Awaiting a decision.

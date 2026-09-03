@@ -421,6 +421,14 @@ collections:
           hint: "Use the time and time zone shown in the announcement.",
         }
       - { name: location, label: Location, widget: string, required: false }
+      - name: organisers
+        label: Organised by
+        widget: list
+        required: false
+        field: { name: name, label: Organisation, widget: string }
+        hint: >-
+          Every organisation that convened the program, as the flyer credits
+          them. AKSC organises in coalition, so name the partners too.
       - name: summary
         label: Summary
         widget: text

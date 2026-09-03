@@ -5,6 +5,10 @@ kind: "event"
 status: "concluded"
 schedule: "4:00 PM to 8:00 PM"
 location: "Irvington Community Center, 41885 Blacow Road, Fremont, California"
+organisers:
+  - "Ambedkar King Study Circle"
+  - "Non-Resident Tamil Indians Association"
+  - "San Francisco Bay Area Periyarists"
 summary: "A San Francisco Bay Area celebration of Periyar's legacy through talks, music, songs, poetry, art, essays, and community participation."
 topics:
   - "periyar"

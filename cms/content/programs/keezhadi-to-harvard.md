@@ -4,6 +4,9 @@ date: "2018-02-25"
 kind: "event"
 status: "concluded"
 location: "Irvington Community Center, Fremont, California"
+organisers:
+  - "Ambedkar King Study Circle"
+  - "American Adirai Forum"
 summary: "A public hall meeting with Aloor Shanavas on attacks against Tamil history, language, and secular culture."
 topics:
   - "history"

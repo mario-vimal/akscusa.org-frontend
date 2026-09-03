@@ -5,6 +5,15 @@ kind: "event"
 status: "concluded"
 schedule: "5:00 PM to 8:00 PM"
 location: "Odd Fellows Cupertino, 20589 Homestead Road, Cupertino, California"
+organisers:
+  - "Ambedkar King Study Circle"
+  - "Association for India's Development – Bay Area"
+  - "San Jose Peace and Justice Center"
+  - "Ambedkar Association of North America"
+  - "Kabila Paari Friendship Study Circle"
+  - "Ambedkar International Center"
+  - "American Tamil Radio"
+  - "Ambedkar International Mission"
 summary: "A celebration of Periyar's 140th birth anniversary with talks on rationalism, self-respect, women's rights, caste annihilation, and humanism."
 topics:
   - "periyar"
@@ -23,10 +32,14 @@ draft: false
 
 Ambedkar King Study Circle and allied progressive organizations commemorated the 140th birth anniversary of social revolutionist **Periyar E. V. Ramasamy**.
 
-The program included:
+The flyer announced speeches on **Rationalism, Self-Respect, Women's Rights and Caste Annihilation**:
 
-- **Dr. V. Geetha:** Rationalism, Self-Respect, Women's Rights and Caste Annihilation
-- **Dr. Ma. So. Victor:** Linguist and historian
-- **Mani M. Manivannan:** Language Rights Activist
+- **Dr. V. Geetha**, Activist, Writer & Historian — "Periyar: A Model Public Life"
+- **Dr. Ma. So. Victor**, Linguist & Historian — "Social justice in Sangam period & Periyar era"
+- **Mr. Mani M. Manivannan**, Language Rights Activist — "Rationalist Foundation of Periyarism"
+
+> Man is equal to man. There should not be exploitation.
+>
+> — Periyar
 
 The historical Programs index labels this event **2018-09-23**. The original flyer and the annual report give **Saturday, September 22, 2018**, which is the date retained here.

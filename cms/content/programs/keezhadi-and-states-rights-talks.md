@@ -4,7 +4,7 @@ date: "2018-07-15"
 kind: "event"
 status: "concluded"
 schedule: "5:00 PM"
-location: "Valley Pond Irvington Community Center, 41885 Blacow Road, Fremont, California"
+location: "Wally Pond Irvington Community Center, 41885 Blacow Road, Fremont, California"
 summary: "Special speeches by Su Venkatesan and Aazhi Senthilnathan on the Keezhadi archaeological site and the autonomy and language rights of Indian states."
 topics:
   - "history"

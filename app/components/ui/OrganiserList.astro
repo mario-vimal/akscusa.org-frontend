@@ -1,0 +1,53 @@
+---
+/**
+ * The organisations that convened something, as a ruled roll-call.
+ *
+ * AKSC organises in coalition and its flyers credit as many as nine partners,
+ * so this cannot be a comma-joined value in the details list: at that length it
+ * runs as one grey sentence and the partners stop being readable as separate
+ * organisations. A ruled list gives each one a line of its own.
+ *
+ * The rules here separate list items, which is what the hairline tokens are
+ * for. There is deliberately no rule above the label.
+ */
+interface Props {
+  /** Section label. Programs say "Organised by", a statement "Issued by". */
+  heading?: string;
+  names: readonly string[];
+  class?: string;
+}
+
+const { heading = "Organised by", names, class: className } = Astro.props;
+
+// Derived from the heading rather than randomised, so the same content builds
+// to the same markup and a diff of the output stays readable.
+const headingId = `organisers-${heading
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-|-$/g, "")}`;
+---
+
+{
+  names.length > 0 && (
+    <section aria-labelledby={headingId} class:list={[className]}>
+      <h2 class="eyebrow" id={headingId}>
+        {heading}
+      </h2>
+
+      <ul class="mt-4">
+        {names.map((name) => (
+          <li class="flex gap-3 py-2.5 not-first:border-t not-first:border-rule">
+            {/* Fixed to the line height, so the dot centres on the first line
+                whatever the name wraps to. */}
+            <span class="flex h-6 shrink-0 items-center" aria-hidden="true">
+              <span class="size-1.5 rounded-full bg-accent-500" />
+            </span>
+            <span class="font-display text-sm leading-6 font-medium text-ambedkar-900">
+              {name}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

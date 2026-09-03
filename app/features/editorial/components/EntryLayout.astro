@@ -69,32 +69,22 @@ const topicLabel = await loadTermLabels("topics");
   <Container class="pt-10 pb-20 sm:pt-12 sm:pb-28">
     <div
       class:list={[
-        "items-start gap-10 lg:gap-14",
-        hasPosters && "grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)]",
+        "items-start",
+        hasPosters &&
+          "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)] lg:gap-x-14",
       ]}
     >
       {
-        hasPosters && (
-          <aside
-            class:list={[
-              "grid auto-rows-max content-start items-start gap-5 lg:order-2 lg:grid-cols-1",
-              hasMultiplePosters && "sm:grid-cols-2",
-            ]}
-            aria-label={`Original ${label.toLowerCase()} posters`}
-          >
-            {posters.map((poster, index) => (
-              <Poster
-                src={poster.src}
-                alt={poster.alt}
-                caption={poster.caption}
-                loading={index === 0 ? "eager" : "lazy"}
-              />
-            ))}
-          </aside>
-        )
+        /*
+        Three grid items rather than two, so the flyer can sit between the
+        header and the details on a phone and still hold the right-hand column
+        on a wide screen. Reading a poster before the title tells you nothing;
+        reading it straight after tells you what the entry is about.
+      */
       }
-
-      <div class:list={["min-w-0", hasPosters && "lg:order-1"]}>
+      <div
+        class:list={["min-w-0", hasPosters && "lg:col-start-1 lg:row-start-1"]}
+      >
         <EntryHeader
           eyebrow={label}
           title={title}
@@ -117,7 +107,32 @@ const topicLabel = await loadTermLabels("topics");
             )
           }
         </EntryHeader>
+      </div>
 
+      {
+        hasPosters && (
+          <aside
+            class:list={[
+              "mt-10 grid auto-rows-max content-start items-start gap-5 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:grid-cols-1",
+              hasMultiplePosters && "sm:grid-cols-2",
+            ]}
+            aria-label={`Original ${label.toLowerCase()} posters`}
+          >
+            {posters.map((poster, index) => (
+              <Poster
+                src={poster.src}
+                alt={poster.alt}
+                caption={poster.caption}
+                loading={index === 0 ? "eager" : "lazy"}
+              />
+            ))}
+          </aside>
+        )
+      }
+
+      <div
+        class:list={["min-w-0", hasPosters && "lg:col-start-1 lg:row-start-2"]}
+      >
         {
           details.length > 0 && (
             <dl class="mt-10 max-w-3xl border-t border-ambedkar-950 sm:grid sm:grid-cols-2 sm:gap-x-10">

@@ -19,7 +19,7 @@ flyerAlt: Poster promoting the anti-caste support helpline, with contact details
 flyerCaption: Share the helpline information with anyone who may need confidential community support.
 ---
 
-These experiences can produce stress, overwhelm, and trauma that affect mental well-being. **You are not alone. Our anti-caste community is here with you.**
+Any of the above can produce stress, overwhelm, and in some cases, trauma. **You are not alone. Our anti-caste community is here with you.**
 
 We provide support, an opportunity for dialogue, and referrals that may help with caste-based discrimination or isolation in employment, housing, domestic, social, or community spaces.
 
