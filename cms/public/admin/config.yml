@@ -331,9 +331,17 @@ collections:
     description: Reusable speaker biographies referenced by conferences.
     folder: cms/content/speakers
     create: true
+    # `{{slug}}` slugifies the identifier field, which Sveltia takes to be
+    # `title` unless it is named. This collection has no `title`, so without
+    # this a new speaker would be filed under a random UUID.
+    identifier_field: name
     slug: "{{slug}}"
     sortable_fields: [name, role]
     summary: "{{name}} — {{role}}"
+    # A thumbnail is picked from top-level `image` and `file` fields only, and
+    # every picture on this site hangs off an object or a list so it can carry
+    # its own alt text. Naming the path is what puts the face on the card.
+    thumbnail: portrait.src
     view_filters:
       - { label: Drafts, field: draft, pattern: true }
     fields:
@@ -380,6 +388,8 @@ collections:
     media_folder: /cms/public/media/programs
     public_folder: /media/programs
     sortable_fields: [date, title, kind, status]
+    # The first flyer, which is the one the program was announced with.
+    thumbnail: posters.*.src
     view_filters:
       - { label: Scheduled, field: status, pattern: scheduled }
       - { label: Concluded, field: status, pattern: concluded }
@@ -572,9 +582,12 @@ collections:
     media_folder: /cms/public/media/authors
     public_folder: /media/authors
     create: true
+    # See the note on `speakers`: an author is named by `name`, not `title`.
+    identifier_field: name
     slug: "{{slug}}"
     sortable_fields: [name]
     summary: "{{name}}"
+    thumbnail: portrait.src
     view_filters:
       - { label: Drafts, field: draft, pattern: true }
     fields:
@@ -666,7 +679,14 @@ collections:
     description: Scheduled and past readings, newest first.
     folder: cms/content/book-readings
     create: true
-    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    # Not `{{year}}-{{month}}-{{day}}-{{slug}}`. Those tags are the date the
+    # entry is created, never the `date` field, so writing up a sitting held in
+    # 2024 would file it under the day someone got round to typing it, and a
+    # reading whose date nobody recorded would be stamped with today's. The
+    # title already carries what tells one sitting from another — a chapter
+    # range, or "continued" and "revisited" for a book the circle came back to
+    # — so it distinguishes them without dating the address.
+    slug: "{{slug}}"
     # The flyer widget below needs its uploads to land beside the other
     # book-readings media: the schema requires `/media/book-readings/...`, and
     # without these the global folder would put a flyer at `/media/...` and
@@ -674,6 +694,7 @@ collections:
     media_folder: /cms/public/media/book-readings
     public_folder: /media/book-readings
     sortable_fields: [date, title]
+    thumbnail: posters.*.src
     fields:
       - { name: title, label: Title, widget: string }
       - { name: date, label: Date and time, widget: datetime }
@@ -745,13 +766,15 @@ collections:
       when there are any. Upload each PDF here; it is committed with the entry.
     folder: cms/content/general-body-meetings
     create: true
-    slug: "{{fields.edition}}-general-body-meeting-{{year}}"
+    # `{{year}}` would be the year the record was typed, and these are minuted
+    # years afterwards, so the meeting's own `date` is read instead.
+    slug: "{{fields.edition}}-general-body-meeting-{{date | date('YYYY')}}"
     # Uploads land beside the ones already committed, and are stored on the
     # entry as the `/media/general-body/...` path the site serves.
     media_folder: /cms/public/media/general-body
     public_folder: /media/general-body
     sortable_fields: [edition, date]
-    summary: "General Body {{fields.edition}} — {{year}}"
+    summary: "General Body {{fields.edition}} — {{date | date('YYYY')}}"
     view_filters:
       - { label: Drafts, field: draft, pattern: true }
     fields:
@@ -830,6 +853,8 @@ collections:
     public_folder: /media/comics
     sortable_fields: [date, title]
     summary: "{{title}}"
+    # Panel one, which the collection already treats as the cover.
+    thumbnail: panels.*.src
     view_filters:
       - { label: Featured, field: featured, pattern: true }
       - { label: Drafts, field: draft, pattern: true }
@@ -917,6 +942,7 @@ collections:
     public_folder: /media/anti-caste-toolkit
     sortable_fields: [order, title]
     summary: "{{order}}. {{title}}"
+    thumbnail: panels.*.src
     view_filters:
       - { label: Drafts, field: draft, pattern: true }
     fields:

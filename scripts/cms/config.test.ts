@@ -22,6 +22,7 @@ interface CmsField {
   value_field?: string;
   options?: Array<{ label: string; value: string }>;
   fields?: CmsField[];
+  field?: CmsField;
 }
 
 interface CmsConfig {
@@ -38,6 +39,10 @@ interface CmsConfig {
     name: string;
     folder?: string;
     create?: boolean;
+    identifier_field?: string;
+    slug?: string;
+    summary?: string;
+    thumbnail?: string;
     files?: Array<{ file: string }>;
     fields?: CmsField[];
   }>;
@@ -201,6 +206,88 @@ describe("Sveltia CMS taxonomy options", () => {
       expect(
         vocabulary.fields?.find((field) => field.name === "label"),
       ).toBeDefined();
+    }
+  });
+
+  // `{{slug}}` slugifies the collection's identifier field, which Sveltia
+  // defaults to `title` with no fallback. A collection that names its entries
+  // something else and does not say so gets a random UUID filename instead of
+  // a readable one, which is then the entry's permanent web address.
+  it("names the identifier field of every collection whose slug is derived from one", () => {
+    for (const entry of config.collections) {
+      if (!entry.slug?.includes("{{slug}}")) {
+        continue;
+      }
+
+      const identifier = entry.identifier_field ?? "title";
+
+      expect(
+        entry.fields?.map((field) => field.name),
+        `collection "${entry.name}" derives its slug from "${identifier}"`,
+      ).toContain(identifier);
+    }
+  });
+
+  // `{{year}}`, `{{month}}` and `{{day}}` are the moment the entry is created,
+  // not any date it carries: Sveltia only derives them from a field for a
+  // preview path, and a slug template falls back to the current time. An entry
+  // recorded after the event it describes — a reading written up later, a
+  // meeting minuted the following year — would be filed under the day it was
+  // typed, and a filename is the permanent web address. Read the entry's own
+  // date field instead, as `{{date | date('YYYY')}}`.
+  it("never dates a slug or summary by when the entry was typed", () => {
+    const creationDateTag = /{{(year|month|day|hour|minute|second)}}/;
+
+    for (const entry of config.collections) {
+      expect(
+        entry.slug ?? "",
+        `collection "${entry.name}" dates its slug by entry creation`,
+      ).not.toMatch(creationDateTag);
+      expect(
+        entry.summary ?? "",
+        `collection "${entry.name}" dates its summary by entry creation`,
+      ).not.toMatch(creationDateTag);
+    }
+  });
+
+  // Sveltia picks a list thumbnail from top-level `image` and `file` fields
+  // only, and it never descends into an object or a list. Every picture here
+  // except a book's cover hangs off one, so it can carry its own alt text and
+  // credit — which means a collection full of artwork shows a wall of blank
+  // cards unless it names the path itself.
+  it("shows a thumbnail wherever a collection holds artwork", () => {
+    const imagePaths = (fields: CmsField[] = [], prefix = ""): string[] =>
+      fields.flatMap((field) => {
+        const path = prefix ? `${prefix}.${field.name}` : field.name;
+        const nested = field.widget === "list" ? `${path}.*` : path;
+        const inner = [
+          ...(field.fields ?? []),
+          ...(field.field ? [field.field] : []),
+        ];
+
+        return [
+          ...(field.widget === "image" ? [path] : []),
+          ...imagePaths(inner, nested),
+        ];
+      });
+
+    for (const entry of config.collections) {
+      const paths = imagePaths(entry.fields);
+
+      if (paths.length === 0) {
+        continue;
+      }
+
+      const automatic = entry.fields?.some((field) => field.widget === "image");
+
+      if (automatic) {
+        continue;
+      }
+
+      expect(
+        paths,
+        `collection "${entry.name}" buries its images and names no thumbnail`,
+      ).toContain(entry.thumbnail);
     }
   });
 

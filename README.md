@@ -222,6 +222,49 @@ offered.
 `app/features/editorial/` holds the shared list, card, and entry components, so
 a change to one section's chrome lands on all six.
 
+### Entry slugs
+
+A slug is a filename in `cms/content/`, and Astro reads it as the `[slug]`
+route parameter, so it is the entry's permanent web address.
+
+Sveltia builds one from the collection's `slug` template when the entry is
+first saved. `{{slug}}` is the slugified identifier field, which Sveltia
+assumes is `title` unless the collection names another with
+`identifier_field`. Authors and speakers are named by `name`, and topics and
+categories by `label`; a collection that leaves this unsaid where it has no
+`title` field gets a random UUID for a filename instead of a readable one, so
+`scripts/cms/config.test.ts` fails if any collection's identifier field is
+missing from its own `fields`.
+
+No template dates a slug by `{{year}}-{{month}}-{{day}}`. Those tags are the
+moment the entry is created, not any date it carries — Sveltia derives them
+from a field only for a preview path — so a reading written up months after the
+sitting, or a meeting minuted the following year, would be filed under the day
+someone typed it. A General Body meeting reads its own date instead, as
+`{{date | date('YYYY')}}`, and a reading is named by its title alone, which
+already carries the chapter range or the "continued" that tells one sitting
+from another. A test fails on the creation-date tags so they cannot come back.
+
+The slug is not shown while an entry is being written, and renaming the title
+afterwards does not rename the file. To read one back, look at the filename in
+`cms/content/<collection>/`, at the last segment of the entry's URL, or at
+**Edit Slug** in the entry editor's 3-dot menu, which is also how it is
+changed. Renaming there is a Git rename, and Sveltia rewrites every relation
+pointing at the entry — a book's authors, an article's topics — so no reference
+is left dangling.
+
+### List thumbnails
+
+Sveltia puts a picture on a collection card by itself only when the collection
+has an image field at the top level, and a book's cover is the only one on this
+site. Every other picture hangs off an object or a list so that it can carry its
+own alt text and credit, and the automatic search does not descend into either.
+Those collections name the path themselves — `thumbnail: portrait.src` for an
+author or a speaker, `thumbnail: panels.*.src` for a comic, where the `*` takes
+the first entry the list holds. A test fails if a collection buries its images
+and names nothing, because the symptom otherwise is a wall of blank cards that
+looks like missing content rather than missing configuration.
+
 Entries marked `draft` are visible in `npm run dev` and left out of the build.
 
 ### Speakers, shared across conferences
