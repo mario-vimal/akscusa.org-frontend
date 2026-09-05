@@ -7,12 +7,13 @@
  * component receives a view model rather than three collections to join.
  */
 import { bookByline } from "~/features/books/presenters";
-import { bookHref } from "~/features/books/queries/books";
+import { bookHref } from "~/features/books/links";
 import { sessionLabel } from "~/features/book-readings/titles";
+import { isUpcomingReading } from "~/features/book-readings/calendar";
 import { entryHref } from "~/features/editorial/sections";
 import { formatPacificShortDate } from "~/lib/dates";
-import { isUpcoming } from "~/lib/collections";
-import type { AuthorShelf } from "./queries/shelf";
+import { byNewestFirst } from "~/lib/collection-policy";
+import type { AuthorShelf } from "~/features/authors/queries/shelf";
 
 /** One sitting on a book, as the run of sittings under it names it. */
 export interface ShelfSession {
@@ -67,7 +68,7 @@ export interface AuthorPage {
   };
   sourceUrl?: string;
   books: ShelfBook[];
-  /** "3 books · 7 sessions", or the honest half of it when there are none. */
+  /** Counts the published records, including scheduled sessions. */
   shelfLine: string;
   /** What a search engine and a shared link are told the page is about. */
   description: string;
@@ -98,8 +99,8 @@ export function authorPage(shelf: AuthorShelf): AuthorPage {
     }),
     summary: entry.book.data.summary,
     cover: entry.book.data.cover,
-    upcoming: entry.readings.some(isUpcoming),
-    sessions: entry.readings.map((reading) => ({
+    upcoming: entry.readings.some(isUpcomingReading),
+    sessions: [...entry.readings].sort(byNewestFirst).map((reading) => ({
       href: entryHref("bookReadings", reading.id),
       label: sessionLabel(
         reading.data.title,
@@ -118,13 +119,7 @@ export function authorPage(shelf: AuthorShelf): AuthorPage {
     portrait: author.data.portrait,
     sourceUrl: author.data.sourceUrl,
     books: shelfBooks,
-    shelfLine:
-      sessions === 0
-        ? `${count(books.length, "book")} · not yet read`
-        : `${count(books.length, "book")} · ${count(sessions, "session")}`,
-    description:
-      sessions === 0
-        ? `${count(books.length, "book")} by ${name} on the Ambedkar King Study Circle's reading list, not yet read at a session.`
-        : `${count(books.length, "book")} by ${name} on the Ambedkar King Study Circle's reading list, read across ${count(sessions, "session")}.`,
+    shelfLine: `${count(books.length, "book")} · ${count(sessions, "session")}`,
+    description: `${count(books.length, "book")} by ${name} on the Ambedkar King Study Circle's reading list, with ${count(sessions, "session")} listed.`,
   };
 }

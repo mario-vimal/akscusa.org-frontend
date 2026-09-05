@@ -41,12 +41,12 @@ const variantClasses = {
   href={href}
   aria-current={isActive ? "page" : undefined}
 >
-  {label}
+  {isMobile ? <span class="min-w-0 wrap-anywhere">{label}</span> : label}
   {
     isMobile && (
       <span
         class:list={[
-          "text-accent-600 transition-opacity",
+          "shrink-0 text-accent-600 transition-opacity",
           isActive ? "opacity-100" : "opacity-0",
         ]}
         aria-hidden="true"

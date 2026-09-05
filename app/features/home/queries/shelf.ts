@@ -1,12 +1,8 @@
 import { bookByline } from "~/features/books/presenters";
-import {
-  bookHref,
-  loadReadingBooks,
-  type BookWithAuthors,
-} from "~/features/books/queries/books";
+import { bookHref } from "~/features/books/links";
+import { loadReadingBooks } from "~/features/books/queries/books";
 import { loadEditorialEntries } from "~/features/editorial/queries/entries";
-import { shelve, type HeldSession } from "~/features/home/shelf";
-import { isUpcoming } from "~/lib/collections";
+import { readingShelf } from "~/features/home/shelf";
 
 /** One book on the homepage shelf. */
 export interface ShelfBook {
@@ -48,14 +44,11 @@ export async function loadShelf(limit = 12): Promise<Shelf> {
     loadReadingBooks(),
   ]);
 
-  const held: HeldSession<BookWithAuthors>[] = readings
-    .filter((reading) => !isUpcoming(reading))
-    .flatMap((reading) => {
-      const book = booksByReading.get(reading.id);
-      return book ? [{ book, date: reading.data.date }] : [];
-    });
-
-  const entries = shelve(held, (entry) => entry.book.id);
+  const entries = readingShelf(
+    readings,
+    booksByReading,
+    (entry) => entry.book.id,
+  );
 
   return {
     books: entries.slice(0, limit).map(({ book, sessions, lastReadOn }) => ({

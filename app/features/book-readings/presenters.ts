@@ -5,9 +5,8 @@
  * editorial presenters, because a reading resolves its book through the books
  * collection and the other editorial sections have no such relation.
  *
- * Nothing here returns an image. An entry carries the ISBN of the edition read
- * and the component looks the cover up, so these functions stay strings in and
- * strings out.
+ * Book metadata is already resolved by stable entry ID. These functions only
+ * present that data; they never load collections or look up editions by ISBN.
  */
 import { entryHref, type EditorialEntry } from "~/features/editorial/sections";
 import {
@@ -21,9 +20,11 @@ import {
 import type { AuthorLink } from "~/features/authors/links";
 import type { Badge, Detail } from "~/features/editorial/presenters";
 import { bookAuthorLinks, bookByline } from "~/features/books/presenters";
-import { bookHref, type BookWithAuthors } from "~/features/books/queries/books";
-import { isUpcoming } from "~/lib/collections";
-import { sessionLabel } from "~/features/book-readings/titles";
+import { bookHref } from "~/features/books/links";
+import type { BookWithAuthors } from "~/features/books/queries/books";
+import { byNewestFirst, bySoonestFirst } from "~/lib/collection-policy";
+import { isUpcomingReading } from "./calendar";
+import { sessionLabel } from "./titles";
 
 type Reading = EditorialEntry<"bookReadings">;
 
@@ -46,9 +47,25 @@ const bookTitleAndAuthors = (entry: BookWithAuthors) => {
 };
 
 export const bookReadingBadge = (reading: Reading): Badge =>
-  isUpcoming(reading)
+  isUpcomingReading(reading)
     ? { label: "Upcoming", tone: "accent" }
     : { label: "Past reading", tone: "muted" };
+
+export interface Participation {
+  label: string;
+  href: string;
+}
+
+const readingParticipation = (reading: Reading): Participation | undefined =>
+  reading.data.registrationUrl
+    ? {
+        // A shortened participation URL can open Zoom or a registration form.
+        label: isUpcomingReading(reading)
+          ? "Join or register"
+          : "Session participation link",
+        href: reading.data.registrationUrl,
+      }
+    : undefined;
 
 export function bookReadingDetails(
   reading: Reading,
@@ -58,6 +75,15 @@ export function bookReadingDetails(
     { term: "When", description: formatPacificTime(reading.data.date) },
     { term: "Where", description: reading.data.location },
   ];
+
+  const participation = readingParticipation(reading);
+  if (participation) {
+    details.push({
+      term: "Participation",
+      description: participation.label,
+      href: participation.href,
+    });
+  }
 
   if (entry) {
     details.push({
@@ -119,10 +145,10 @@ export interface SessionLink {
  * was announced with are stacked beside them, because that artwork is the one
  * part of the record that is worth looking at rather than reading.
  */
-export interface ReadingEntry {
-  /** Stable key: the book's id, or the session's when there is no book. */
+interface ReadingEntryContent {
+  /** The published book's ID, or the standalone session's ID. */
   key: string;
-  /** The book's page, or the session's own page when it read no book. */
+  /** The published book's page, or the session's own public record. */
   href: string;
   title: string;
   subtitle?: string;
@@ -141,19 +167,13 @@ export interface ReadingEntry {
   sessionCount: number;
   /** "June – October 2025", or one month when the run stayed inside it. */
   spanLabel: string;
-  /** Every year the entry was read in, for the year dropdown. */
+  /** Every Pacific year represented by its sessions, for the year dropdown. */
   years: number[];
   /** Most recent sitting, which is the date the entry is ordered by. */
   dateTime: string;
   /** True while any of the entry's sittings is still ahead of us. */
   upcoming: boolean;
-  /**
-   * True when the entry read articles or papers rather than a book. Distinct
-   * from an entry whose book is simply not published yet, which shows nothing
-   * rather than claiming it read articles.
-   */
-  readsArticles: boolean;
-  /** The sittings in reading order, so chapter ranges count upwards. */
+  /** The sittings newest first, matching the log's dated order. */
   sessions: SessionLink[];
   posters: EntryPoster[];
   topics: string[];
@@ -161,11 +181,23 @@ export interface ReadingEntry {
   search: string;
 }
 
+/**
+ * A withheld book cannot be offered as a book facet or called an article.
+ * Keeping these states distinct also prevents its private metadata leaking
+ * into the search text, cover, or byline.
+ */
+export type ReadingEntry = ReadingEntryContent &
+  (
+    | { bookState: "published"; readsArticles: false }
+    | { bookState: "unpublished"; readsArticles: false }
+    | { bookState: "none"; readsArticles: true }
+  );
+
 const sessionHref = (reading: Reading) => entryHref("bookReadings", reading.id);
 
 /** Oldest first, for working out the run a book was read over. */
 const chronological = (sessions: readonly Reading[]): Reading[] =>
-  [...sessions].sort((a, b) => a.data.date.getTime() - b.data.date.getTime());
+  [...sessions].sort(bySoonestFirst);
 
 const sessionLinks = (
   sessions: readonly Reading[],
@@ -180,7 +212,7 @@ const sessionLinks = (
       ? formatPacificShortDate(reading.data.date)
       : formatPacificMonthDay(reading.data.date),
     dateTime: reading.data.date.toISOString(),
-    upcoming: isUpcoming(reading),
+    upcoming: isUpcomingReading(reading),
   }));
 
 const entryPosters = (sessions: readonly Reading[]): EntryPoster[] =>
@@ -194,7 +226,7 @@ const entryPosters = (sessions: readonly Reading[]): EntryPoster[] =>
 
 const unique = <T>(values: readonly T[]): T[] => [...new Set(values)];
 
-/** Every year an entry was read in, newest first, for the year dropdown. */
+/** Every Pacific session year, newest first, for the year dropdown. */
 const readingYears = (sessions: readonly Reading[]): number[] =>
   unique(sessions.map((reading) => pacificYear(reading.data.date))).sort(
     (a, b) => b - a,
@@ -251,7 +283,7 @@ function bookEntry(
    * order, because a span reads from its start to its end whichever way round
    * the sittings under it are shown.
    */
-  const sessions = [...run].reverse();
+  const sessions = [...run].sort(byNewestFirst);
 
   const topics = unique([
     ...book.data.topics,
@@ -276,7 +308,8 @@ function bookEntry(
     spanLabel: formatPacificMonthRange(first.data.date, last.data.date),
     years: readingYears(run),
     dateTime: last.data.date.toISOString(),
-    upcoming: run.some(isUpcoming),
+    upcoming: run.some(isUpcomingReading),
+    bookState: "published",
     readsArticles: false,
     sessions: sessionLinks(sessions, book.data, spansYears),
     posters: entryPosters(sessions),
@@ -285,24 +318,30 @@ function bookEntry(
   };
 }
 
-/** A sitting that worked through no book, which stands as its own entry. */
-function articlesEntry(reading: Reading, topicLabel: TopicLabel): ReadingEntry {
+/** Without a published book, the session's own public record stands alone. */
+function standaloneEntry(
+  reading: Reading,
+  topicLabel: TopicLabel,
+): ReadingEntry {
   const topics = reading.data.topics.map(topicLabel);
   const sessions = [reading];
+  const material = reading.data.book
+    ? ({ bookState: "unpublished", readsArticles: false } as const)
+    : ({ bookState: "none", readsArticles: true } as const);
 
   return {
+    ...material,
     key: reading.id,
     href: sessionHref(reading),
     title: reading.data.title,
-    // A reading list of articles has no one author to file it under.
+    // There is no published book byline to file this session under.
     authors: [],
     summary: reading.data.summary,
     sessionCount: 1,
     spanLabel: formatPacificMonthRange(reading.data.date, reading.data.date),
     years: readingYears(sessions),
     dateTime: reading.data.date.toISOString(),
-    upcoming: isUpcoming(reading),
-    readsArticles: true,
+    upcoming: isUpcomingReading(reading),
     // Its own title is the entry's heading, so stripping it leaves the sitting
     // with just its date — which is all that is left to say about it.
     sessions: sessionLinks(sessions, { title: reading.data.title }, false),
@@ -314,7 +353,7 @@ function articlesEntry(reading: Reading, topicLabel: TopicLabel): ReadingEntry {
 
 /**
  * The log, newest first: one entry per book, plus an entry for each sitting
- * that read no book.
+ * that has no published book to link to.
  *
  * The readings arrive newest first and an entry is emitted where its most
  * recent sitting sits, so a book the circle returns to moves back to the top
@@ -325,9 +364,10 @@ export function readingEntries(
   books: ReadonlyMap<string, BookWithAuthors>,
   topicLabel: TopicLabel,
 ): ReadingEntry[] {
+  const ordered = [...readings].sort(byNewestFirst);
   const sessionsByBook = new Map<string, Reading[]>();
 
-  for (const reading of readings) {
+  for (const reading of ordered) {
     const entry = books.get(reading.id);
     if (!entry) continue;
 
@@ -339,11 +379,11 @@ export function readingEntries(
   const emitted = new Set<string>();
   const entries: ReadingEntry[] = [];
 
-  for (const reading of readings) {
+  for (const reading of ordered) {
     const entry = books.get(reading.id);
 
     if (!entry) {
-      entries.push(articlesEntry(reading, topicLabel));
+      entries.push(standaloneEntry(reading, topicLabel));
       continue;
     }
 
@@ -379,6 +419,7 @@ export interface NextSession {
   whenLabel: string;
   location: string;
   upcoming: boolean;
+  participation?: Participation;
   book?: {
     title: string;
     /** The authors on one line, absent when the entry names none. */
@@ -399,7 +440,8 @@ export function nextSession(
     dateTime: reading.data.date.toISOString(),
     whenLabel: formatPacificTime(reading.data.date),
     location: reading.data.location,
-    upcoming: isUpcoming(reading),
+    upcoming: isUpcomingReading(reading),
+    participation: readingParticipation(reading),
     book: entry
       ? {
           title: entry.book.data.title,

@@ -1,12 +1,13 @@
 ---
-import { getEntry, render } from "astro:content";
+import { render } from "astro:content";
 
+import { loadPage } from "~/features/page-copy/queries/entries";
 import TestimoniesPage from "~/features/testimonies/components/TestimoniesPage.astro";
 import SiteLayout from "~/layouts/SiteLayout.astro";
 
-const testimonies = await getEntry("pages", "testimonies");
+const testimonies = await loadPage("testimonies");
 
-if (!testimonies || testimonies.data.pageType !== "testimonies") {
+if (testimonies.data.pageType !== "testimonies") {
   throw new Error("Testimonies content is missing or invalid.");
 }
 

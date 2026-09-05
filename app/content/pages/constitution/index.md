@@ -4,7 +4,6 @@ title: Constitution
 description: The constitution of the Ambedkar King Study Circle, setting out its aim, membership, governing bodies, and Annual General Body.
 eyebrow: Organization
 intro: The principles and democratic structure that govern the Ambedkar King Study Circle.
-sourceUrl: "https://akscusa.org/constitution/"
 ---
 
 ## Article I - Name

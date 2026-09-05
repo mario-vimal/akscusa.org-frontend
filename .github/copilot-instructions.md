@@ -116,8 +116,13 @@
 - Store feature-owned images in `app/features/<feature>/assets/`.
 - Store reusable brand files in `app/assets/brand/` and other genuinely shared
   imagery in `app/assets/shared/`.
-- Keep editorial media in Cloudflare R2 and reference its public URL from
-  Sveltia-managed content rather than committing uploads to Git.
+- Keep an editorial entry and its media together:
+  `cms/content/<collection-folder>/<slug>/index.md`, with its images and
+  documents beside that file. Media belongs to an entry, not to an archive
+  directory or a second copy under `cms/public/`.
+- Publish those assets through `/media/<collection-folder>/<slug>/...` using
+  the shared build/dev integration. Do not expose Markdown or configuration as
+  media. Reserve `cms/public/media/shared/` for genuinely shared editor assets.
 - Use `ResponsiveImage.astro` or Astro's image components for imported images so
   dimensions, responsive sources, and optimized formats are generated.
 - Use lowercase kebab-case filenames and meaningful alternative text. Use an
@@ -139,6 +144,9 @@
 - Put only repeating, structured records in `cms/content/`, where the CMS edits
   them. Do not add one-off page copy to a CMS collection.
 - Give every page one authoritative source; do not duplicate it elsewhere.
+- Do not retain links or provenance pointing to the retired AKSC sites.
+  `akscusa.org` is the canonical domain of this implementation, not an archive
+  host. Keep genuine third-party citations and media credits.
 
 ## CMS or static rendering
 

@@ -1,12 +1,13 @@
 ---
-import { getEntry, render } from "astro:content";
+import { render } from "astro:content";
 
 import AntiCasteHelpline from "~/features/anti-caste-helpline/components/AntiCasteHelpline.astro";
+import { loadPage } from "~/features/page-copy/queries/entries";
 import SiteLayout from "~/layouts/SiteLayout.astro";
 
-const helpline = await getEntry("pages", "anti-caste-helpline");
+const helpline = await loadPage("anti-caste-helpline");
 
-if (!helpline || helpline.data.pageType !== "helpline") {
+if (helpline.data.pageType !== "helpline") {
   throw new Error("Anti-Caste Helpline content is missing or invalid.");
 }
 

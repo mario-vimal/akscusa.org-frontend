@@ -80,9 +80,7 @@ const columnClasses = {
         items.map((item) => (
           <li class="group relative flex flex-col border-t border-rule-strong pt-5 pb-9">
             {item.meta && (
-              <span class="label label-sm text-ambedkar-900/55">
-                {item.meta}
-              </span>
+              <span class="label label-sm text-ink-muted">{item.meta}</span>
             )}
             <h2 class="card-title mt-4 font-display text-[1.5rem] leading-[1.12] font-semibold tracking-title text-balance text-ambedkar-950">
               {item.href ? (

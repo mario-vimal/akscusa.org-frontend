@@ -4,14 +4,36 @@ import { z } from "astro/zod";
 
 import {
   editorialBase,
+  editorialImageSchema,
   isbn13,
+  linkSchema,
   optionalCmsField,
   optionalCmsList,
-  optionalRemoteImage,
+  optionalEditorialImage,
   optionalUrl,
-  remoteImageSchema,
+  readingDate,
+  resourceUrl,
   topicsSchema,
 } from "~/schemas/shared";
+
+describe("reading instants", () => {
+  it.each([
+    "2026-09-19T15:00:00-07:00",
+    "2026-09-19T22:00:00Z",
+    new Date("2026-09-19T22:00:00Z"),
+  ])("preserves an explicit authored instant: %s", (value) => {
+    expect(readingDate.parse(value).toISOString()).toBe(
+      "2026-09-19T22:00:00.000Z",
+    );
+  });
+
+  it("keeps date-only values valid for editorial dates, not readings", () => {
+    expect(editorialBase.date.parse("2026-09-19").toISOString()).toBe(
+      "2026-09-19T00:00:00.000Z",
+    );
+    expect(readingDate.safeParse("2026-09-19").success).toBe(false);
+  });
+});
 
 /**
  * Sveltia writes an explicit YAML `null` for a `required: false` widget an
@@ -30,7 +52,7 @@ describe("optionalCmsField", () => {
   const cases = [
     {
       label: "object widget (image)",
-      schema: remoteImageSchema,
+      schema: editorialImageSchema,
       valid: { src: "https://example.com/a.jpg", alt: "A description" },
       invalid: { src: "not-a-url", alt: "A description" },
     },
@@ -147,7 +169,7 @@ describe("topicsSchema", () => {
 describe("editorialBase.heroImage", () => {
   // The regression this file exists to prevent: Sveltia writes `heroImage:
   // null` for a hero image an editor never fills in, and
-  // `remoteImageSchema.optional()` alone rejects it because `.optional()`
+  // `editorialImageSchema.optional()` alone rejects it because `.optional()`
   // accepts only `undefined`.
   it("accepts an explicit null, as Sveltia writes for a blank hero image", () => {
     expect(editorialBase.heroImage.parse(null)).toBeUndefined();
@@ -195,7 +217,67 @@ draft: false
   };
 
   it("parses heroImage: null", () => {
-    expect(optionalRemoteImage.parse(frontmatter.heroImage)).toBeUndefined();
+    expect(optionalEditorialImage.parse(frontmatter.heroImage)).toBeUndefined();
+  });
+
+  describe("static editorial images and resources", () => {
+    it.each([
+      "/media/articles/new-article/image.jpg",
+      "/media/speakers/new-speaker/portrait.webp",
+      "/media/shared/shared-image.png",
+      "https://example.com/image.jpg",
+    ])("accepts a public or genuine external editorial image: %s", (src) => {
+      expect(
+        editorialImageSchema.parse({ src, alt: "An event gathering" }).src,
+      ).toBe(src);
+    });
+
+    it.each([
+      "/media/press-releases/new-statement/statement.pdf",
+      "/media/shared/reports/statement.pdf#page=2",
+      "/media/conferences/new-conference/flyer.jpg?download=1",
+      "/who-said-what/",
+      "/book-readings/?book=example#sessions",
+      "#references",
+      "https://example.com/reference.pdf",
+      "http://example.com/reference",
+    ])("preserves a valid local or third-party resource: %s", (url) => {
+      expect(resourceUrl.parse(url)).toBe(url);
+      expect(linkSchema.parse({ label: "Read the document", url }).url).toBe(
+        url,
+      );
+    });
+
+    it.each([
+      "javascript:alert(1)",
+      "data:text/html,test",
+      "//example.com/file.pdf",
+      "/../private",
+      "/%2e%2e/private",
+      "/safe/%2fprivate",
+      "/safe/%252e%252e/private",
+      "/safe/%00private",
+      "/safe/%GG",
+      "/media/shared/../private.pdf",
+      "/media/archive/2023/08/statement.pdf",
+      "/media/archive/2018/07/conference-poster.jpg",
+      "/media/archive/2023/08/../private.pdf",
+      "/media/archive/2023/%2e%2e/private.pdf",
+      "/media/books/entry/private.txt",
+      "/media/report.pdf",
+    ])("rejects an unsafe or unserved local resource: %s", (url) => {
+      expect(resourceUrl.safeParse(url).success).toBe(false);
+    });
+
+    it("does not turn local resources into external-source provenance", () => {
+      expect(optionalUrl.parse(undefined)).toBeUndefined();
+      expect(optionalUrl.parse("https://example.com/source")).toBe(
+        "https://example.com/source",
+      );
+      expect(optionalUrl.safeParse("/media/shared/source.pdf").success).toBe(
+        false,
+      );
+    });
   });
 
   it("parses the blank sourceUrl and registrationUrl strings", () => {

@@ -26,15 +26,19 @@ const { currentPath } = Astro.props;
   of the page.
 -->
 <nav
-  class="hidden items-stretch gap-7 self-stretch lg:flex"
+  class="hidden min-w-0 items-stretch gap-7 self-stretch lg:flex"
   aria-label="Primary navigation"
 >
-  <ul class="flex items-stretch gap-6">
+  <ul class="flex min-w-0 flex-wrap items-stretch justify-end gap-x-6">
     {
-      primaryNavigation.map((item) => (
-        <li class="relative flex items-stretch">
+      primaryNavigation.map((item, index) => (
+        <li class="relative flex items-stretch has-[[open]]:z-10">
           {isNavigationGroup(item) ? (
-            <NavGroup group={item} currentPath={currentPath} />
+            <NavGroup
+              group={item}
+              currentPath={currentPath}
+              align={index === primaryNavigation.length - 1 ? "end" : "start"}
+            />
           ) : (
             <NavLink {...item} currentPath={currentPath} />
           )}
@@ -42,7 +46,7 @@ const { currentPath } = Astro.props;
       ))
     }
   </ul>
-  <div class="flex items-center">
+  <div class="flex shrink-0 items-center">
     <NavLink {...joinNavigation} currentPath={currentPath} variant="action" />
   </div>
 </nav>

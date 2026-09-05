@@ -1,0 +1,22 @@
+---
+import { render } from "astro:content";
+
+import { loadPage } from "~/features/page-copy/queries/entries";
+import GamePage from "~/features/who-said-what/components/GamePage.astro";
+import { presentGame } from "~/features/who-said-what/presenters";
+import SiteLayout from "~/layouts/SiteLayout.astro";
+
+const page = await loadPage("who-said-what");
+if (page.data.pageType !== "who-said-what") {
+  throw new Error("Who said What?! content is missing or invalid.");
+}
+
+const game = presentGame(page.data);
+const { Content } = await render(page);
+---
+
+<SiteLayout title={game.title} description={game.description}>
+  <GamePage game={game}>
+    <Content />
+  </GamePage>
+</SiteLayout>

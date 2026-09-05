@@ -1,11 +1,9 @@
 ---
 import EditorialIndex from "~/features/editorial/components/EditorialIndex.astro";
 import libraryShelves from "~/features/books/assets/library-shelves-2jivbogleho.jpg";
+import { bookHref } from "~/features/books/links";
 import { bookByline } from "~/features/books/presenters";
-import {
-  bookHref,
-  loadBooksWithReadings,
-} from "~/features/books/queries/books";
+import { loadBooksWithReadings } from "~/features/books/queries/books";
 import BookCard from "./BookCard.astro";
 
 const entries = await loadBooksWithReadings();

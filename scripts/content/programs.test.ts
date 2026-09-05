@@ -1,51 +1,53 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-
+import { z } from "astro/zod";
+import { stringify } from "yaml";
 import { describe, expect, it } from "vitest";
 
-const projectRoot = fileURLToPath(new URL("../..", import.meta.url));
-const collectionDirectory = `${projectRoot}cms/content/programs`;
-const mediaDirectory = `${projectRoot}cms/public/media/programs`;
+import { mediaImageExtensions, posterListSchema } from "~/schemas/shared";
+import { readContentCollection } from "./collection";
+import { parseFrontmatter } from "./frontmatter";
+import { missingContentMedia } from "./media-references";
 
-const entries = readdirSync(collectionDirectory)
-  .filter((name) => name.endsWith(".md"))
-  .map((name) => ({
-    name,
-    source: readFileSync(`${collectionDirectory}/${name}`, "utf8"),
-  }));
+const programFields = z.object({ posters: posterListSchema("programs") });
+const postersIn = (source: string) =>
+  parseFrontmatter(source, programFields).posters.map((poster) => poster.src);
+
+const entries = readContentCollection("programs", programFields);
 
 const posterPaths = entries.flatMap((entry) =>
-  [...entry.source.matchAll(/^\s*-\s+src:\s*"([^"]+)"\s*$/gm)].map(
-    (match) => match[1],
-  ),
+  entry.data.posters.map((poster) => poster.src),
 );
 
 describe("Program posters", () => {
-  it("serves every poster from this site", () => {
-    for (const poster of posterPaths) {
-      expect(poster).toMatch(/^\/media\/programs\/[a-z0-9-]+\.jpg$/);
-    }
+  it("references only resolvable posters, without rejecting retained files", async () => {
+    expect(await missingContentMedia(posterPaths)).toEqual([]);
   });
 
-  it("references only committed poster files", () => {
-    for (const poster of posterPaths) {
-      const onDisk = `${mediaDirectory}/${poster.split("/").pop()}`;
+  it.each(["PLAIN", "QUOTE_SINGLE", "QUOTE_DOUBLE"] as const)(
+    "finds every accepted poster format after a %s YAML serialization",
+    (defaultStringType) => {
+      const posters = mediaImageExtensions.map((extension) => ({
+        src: `/media/programs/new-event/new_event.${extension}`,
+        alt: "The title, date, venue and speakers from the event announcement",
+      }));
+      const source = `---\n${stringify({ posters }, { defaultStringType })}---\n`;
 
-      expect(
-        existsSync(onDisk),
-        `${poster} is missing from cms/public/media/programs/`,
-      ).toBe(true);
-    }
+      expect(postersIn(source)).toEqual(posters.map((poster) => poster.src));
+    },
+  );
+
+  it("allows an editor to leave the optional poster list empty", () => {
+    expect(postersIn("---\nposters: null\n---\n")).toEqual([]);
   });
 
-  it("has no unused poster files", () => {
-    const referenced = new Set(
-      posterPaths.map((poster) => poster.split("/").pop()),
-    );
-    const orphans = readdirSync(mediaDirectory)
-      .filter((name) => name.endsWith(".jpg"))
-      .filter((name) => !referenced.has(name));
-
-    expect(orphans).toEqual([]);
+  it("does not quietly ignore an invalid selected poster", () => {
+    const source = `---\n${stringify({
+      posters: [
+        {
+          src: "/media/programs/new-event/poster.gif",
+          alt: "Event announcement",
+        },
+      ],
+    })}---\n`;
+    expect(() => postersIn(source)).toThrow();
   });
 });

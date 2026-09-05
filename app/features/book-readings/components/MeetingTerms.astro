@@ -43,7 +43,7 @@ const { heading, terms, strandsHeading, strands } = Astro.props;
         {
           terms.map((item) => (
             <div class="border-b border-rule py-4 last:border-b-0 sm:flex sm:items-baseline sm:justify-between sm:gap-8">
-              <dt class="label text-ambedkar-900/60">{item.term}</dt>
+              <dt class="label text-ink-muted">{item.term}</dt>
               <dd class="mt-1.5 font-display text-lg leading-tight font-semibold tracking-title text-ambedkar-950 sm:mt-0 sm:text-right sm:text-xl">
                 {item.description}
               </dd>
@@ -53,7 +53,7 @@ const { heading, terms, strandsHeading, strands } = Astro.props;
       </dl>
 
       <div>
-        <h3 class="label text-ambedkar-900/60">{strandsHeading}</h3>
+        <h3 class="label text-ink-muted">{strandsHeading}</h3>
 
         <ol class="mt-7 space-y-9">
           {

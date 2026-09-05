@@ -10,23 +10,14 @@
 
 import { getCollection } from "astro:content";
 
+import {
+  byTermLabel,
+  termLabels,
+  type Term,
+} from "~/features/editorial/vocabulary";
+
 /** Which vocabulary a term belongs to. */
 export type Vocabulary = "topics" | "categories";
-
-export interface Term {
-  /** The entry's filename, which is what an entry stores. */
-  id: string;
-  label: string;
-  description?: string;
-}
-
-/**
- * Alphabetical by label. A curated order would need an editor to maintain a
- * position on every term to add one in the middle, and a filter row a reader
- * scans is easier to find a term in when it is ordered the way a list of names
- * is ordered.
- */
-const byLabel = (a: Term, b: Term) => a.label.localeCompare(b.label);
 
 /** Every term in a vocabulary, alphabetically. */
 export async function loadTerms(vocabulary: Vocabulary): Promise<Term[]> {
@@ -38,7 +29,7 @@ export async function loadTerms(vocabulary: Vocabulary): Promise<Term[]> {
       label: entry.data.label,
       description: entry.data.description,
     }))
-    .sort(byLabel);
+    .sort(byTermLabel);
 }
 
 /**
@@ -53,24 +44,5 @@ export async function loadTerms(vocabulary: Vocabulary): Promise<Term[]> {
 export async function loadTermLabels(
   vocabulary: Vocabulary,
 ): Promise<(id: string) => string> {
-  const terms = await loadTerms(vocabulary);
-  const labels = new Map(terms.map((term) => [term.id, term.label]));
-
-  return (id) => labels.get(id) ?? id;
-}
-
-/**
- * The terms of a vocabulary that entries actually use, in vocabulary order.
- *
- * A filter row is built from this so a chip never empties the list it filters,
- * and so a term an editor has added but not yet filed anything under does not
- * advertise an empty shelf.
- */
-export function termsInUse<E>(
-  terms: readonly Term[],
-  entries: readonly E[],
-  termOf: (entry: E) => string | undefined,
-): Term[] {
-  const used = new Set(entries.map(termOf));
-  return terms.filter((term) => used.has(term.id));
+  return termLabels(await loadTerms(vocabulary));
 }

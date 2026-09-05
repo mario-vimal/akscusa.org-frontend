@@ -11,7 +11,7 @@ hero:
     href: /anti-caste-helpline
   secondaryAction:
     label: Annual Conference 2026
-    href: "https://akscusa.squarespace.com/conf-26"
+    href: "/conferences/aksc-7th-annual-conference-2026/"
 quotes:
   - text: So learn and break the chains of caste. Throw away the Brahman’s scriptures fast.
     author: Savitribai Phule

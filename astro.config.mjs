@@ -4,6 +4,7 @@ import { defineConfig } from "astro/config";
 import { loadEnv } from "vite";
 
 import sitemap from "@astrojs/sitemap";
+import { satteri } from "@astrojs/markdown-satteri";
 import tailwindcss from "@tailwindcss/vite";
 
 import { resolveCmsDirectory } from "./scripts/cms/dev-routing";
@@ -12,6 +13,8 @@ import {
   cmsRepoOverride,
   cmsRepoSetupHint,
 } from "./scripts/cms/repo";
+import { accessibleTables } from "./scripts/markdown/accessible-tables";
+import { contentMedia } from "./scripts/media/integration";
 
 const cmsConfigFile = new URL("./cms/public/admin/config.yml", import.meta.url);
 const cmsConfigPathname = "/admin/config.yml";
@@ -106,7 +109,14 @@ export default defineConfig({
   output: "static",
   srcDir: "./app",
   publicDir: "./cms/public",
-  integrations: [sitemap(), cmsBackendRepo()],
+  integrations: [sitemap(), cmsBackendRepo(), contentMedia()],
+  markdown: {
+    processor: satteri({
+      // Raw HTML tables need the same keyboard wrapper as Markdown tables.
+      features: { rawHtml: true },
+      hastPlugins: [accessibleTables],
+    }),
+  },
   vite: {
     plugins: [tailwindcss(), cmsDevServer()],
   },

@@ -1,5 +1,5 @@
 ---
-import { getEntry } from "astro:content";
+import { loadPage } from "~/features/page-copy/queries/entries";
 
 import BookReadingsOverview from "~/features/book-readings/components/BookReadingsOverview.astro";
 import { editorialSections } from "~/features/editorial/sections";
@@ -7,9 +7,9 @@ import SiteLayout from "~/layouts/SiteLayout.astro";
 
 const section = editorialSections.bookReadings;
 
-const page = await getEntry("pages", "book-readings");
+const page = await loadPage("book-readings");
 
-if (!page || page.data.pageType !== "book-readings") {
+if (page.data.pageType !== "book-readings") {
   throw new Error("Book readings content is missing or invalid.");
 }
 ---

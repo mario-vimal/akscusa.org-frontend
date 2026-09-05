@@ -14,15 +14,18 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
 import {
+  cmsEntryId,
+  cmsSlug,
   editorialBase,
-  isbn13,
   linkSchema,
   localImageSchema,
   mediaImagePath,
   optionalCmsField,
   optionalCmsList,
+  optionalIsbn13,
   optionalUrl,
   posterListSchema,
+  readingDate,
   slugReferences,
   topicsSchema,
 } from "~/schemas/shared";
@@ -37,6 +40,7 @@ export const authors = defineCollection({
   loader: glob({
     base: "./cms/content/authors",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     /** The name as a byline prints it: "bell hooks", "B. R. Ambedkar". */
@@ -50,7 +54,7 @@ export const authors = defineCollection({
     bio: optionalCmsField(z.string()),
     /**
      * The portrait an author's page opens with, uploaded through the CMS and
-     * committed under `cms/public/media/authors/`.
+     * committed beside this entry's index.md.
      *
      * `credit` carries what a borrowed photograph obliges us to say: who made
      * it, where it came from, and on what terms. It is optional because a
@@ -87,6 +91,7 @@ export const books = defineCollection({
   loader: glob({
     base: "./cms/content/books",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     /**
@@ -109,10 +114,10 @@ export const books = defineCollection({
      * catalogue or inventing a number for them. Correcting it does not affect
      * a reading's link to this book, which is by this entry's stable id.
      */
-    isbn: optionalCmsField(isbn13),
+    isbn: optionalIsbn13,
     /**
-     * Cover art an editor uploaded, committed under `cms/public/media/books/`
-     * and served as uploaded. A book without one simply renders no cover.
+     * Cover art an editor uploaded beside this entry's index.md and served as
+     * uploaded. A book without one simply renders no cover.
      */
     cover: optionalCmsField(mediaImagePath("books")),
     /**
@@ -146,9 +151,11 @@ export const bookReadings = defineCollection({
   loader: glob({
     base: "./cms/content/book-readings",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     ...editorialBase,
+    date: readingDate,
     /** Where the session met, or how to join it when it is held online. */
     location: z.string(),
     /**
@@ -157,16 +164,15 @@ export const bookReadings = defineCollection({
      * rather than one book. Referencing the id rather than the ISBN means
      * correcting a book's ISBN cannot break this link.
      */
-    book: optionalCmsField(z.string().min(1)),
+    book: optionalCmsField(cmsSlug),
     participants: optionalCmsList(z.array(z.string()).default([])),
     registrationUrl: optionalUrl,
     /** Anything else read for the session, such as a linked PDF. */
     resources: optionalCmsList(z.array(linkSchema).default([])),
     /**
-     * AKSC's own flyers announcing the session, committed to Git in their
-     * original colours rather than hosted on the media host. Left empty for
-     * a session no flyer survives for, which shows no image rather than a
-     * broken one.
+     * AKSC's own flyers announcing the session, committed beside the entry in
+     * their original colours. Left empty for a session no flyer survives for,
+     * which shows no image rather than a broken one.
      */
     posters: posterListSchema("book-readings"),
   }),

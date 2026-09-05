@@ -16,6 +16,10 @@ interface DisclosureOptions {
   lockScroll?: boolean;
   /** Swapped onto the summary, so its purpose is announced in both states. */
   labels?: { closed: string; open: string };
+  /** A breakpoint at which this disclosure is replaced by another navigation. */
+  closeAt?: string;
+  /** The panel whose available height starts at its actual viewport position. */
+  viewportPanel?: string;
   /**
    * Opens the menu when a mouse rests on it, as a shortcut over clicking.
    *
@@ -39,13 +43,44 @@ const CLOSE_DELAY_MS = 160;
 
 export const enhanceDisclosure = (
   menu: HTMLDetailsElement,
-  { lockScroll = false, labels, openOnHover = false }: DisclosureOptions = {},
+  {
+    lockScroll = false,
+    labels,
+    closeAt,
+    viewportPanel,
+    openOnHover = false,
+  }: DisclosureOptions = {},
 ): void => {
-  const summary = menu.querySelector("summary");
+  if (menu.dataset.disclosureReady !== undefined) return;
 
-  menu.addEventListener("toggle", () => {
+  const summary = menu.querySelector("summary");
+  const replacement = closeAt ? window.matchMedia(closeAt) : undefined;
+  const panel = viewportPanel
+    ? menu.querySelector<HTMLElement>(viewportPanel)
+    : null;
+  let previousOverflow: string | undefined;
+
+  const fitPanel = () => {
+    if (!menu.open || !panel) return;
+
+    const viewport = window.visualViewport;
+    const bottom = viewport
+      ? viewport.offsetTop + viewport.height
+      : window.innerHeight;
+    panel.style.maxHeight = `${Math.max(0, bottom - panel.getBoundingClientRect().top)}px`;
+  };
+
+  const sync = () => {
+    if (replacement?.matches) menu.open = false;
+
     if (lockScroll) {
-      document.documentElement.style.overflow = menu.open ? "hidden" : "";
+      if (menu.open && previousOverflow === undefined) {
+        previousOverflow = document.documentElement.style.overflow;
+        document.documentElement.style.overflow = "hidden";
+      } else if (!menu.open && previousOverflow !== undefined) {
+        document.documentElement.style.overflow = previousOverflow;
+        previousOverflow = undefined;
+      }
     }
 
     if (labels) {
@@ -54,7 +89,31 @@ export const enhanceDisclosure = (
         menu.open ? labels.open : labels.closed,
       );
     }
+    fitPanel();
+  };
+
+  menu.addEventListener("toggle", sync);
+  replacement?.addEventListener("change", () => {
+    const hadFocus = menu.contains(document.activeElement);
+    sync();
+    if (replacement.matches && hadFocus) {
+      menu
+        .closest("header")
+        ?.querySelector("a")
+        ?.focus({ preventScroll: true });
+    }
   });
+
+  if (panel) {
+    window.addEventListener("resize", fitPanel);
+    window.addEventListener("scroll", fitPanel, { passive: true });
+    window.visualViewport?.addEventListener("resize", fitPanel);
+    window.visualViewport?.addEventListener("scroll", fitPanel);
+    new ResizeObserver(fitPanel).observe(menu.parentElement ?? menu);
+  }
+
+  menu.dataset.disclosureReady = "";
+  sync();
 
   // Pointer down rather than click: dismissing a menu should not also activate
   // whatever happens to be underneath the pointer.

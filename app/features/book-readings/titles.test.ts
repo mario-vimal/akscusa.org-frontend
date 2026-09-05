@@ -71,6 +71,22 @@ describe("sessionLabel", () => {
     );
   });
 
+  it("does not strip a book title from the middle of a longer word", () => {
+    expect(sessionLabel("Ambedkarism and Marxism", "Ambedkar")).toBe(
+      "Ambedkarism and Marxism",
+    );
+    expect(sessionLabel("CASTELESS futures", "Caste")).toBe(
+      "CASTELESS futures",
+    );
+    expect(sessionLabel("Ambedkar’s legacy", "Ambedkar")).toBe(
+      "Ambedkar’s legacy",
+    );
+  });
+
+  it("keeps a complete title when the supplied book title is only whitespace", () => {
+    expect(sessionLabel("a reading list", "   ")).toBe("a reading list");
+  });
+
   it("keeps the whole title for a session with no book", () => {
     expect(sessionLabel("Palestine – A reading list")).toBe(
       "Palestine – A reading list",

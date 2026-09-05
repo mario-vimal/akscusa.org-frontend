@@ -67,9 +67,9 @@ const filters = [
           data-log-controls
           hidden
         >
-          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))]">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))]">
             <div>
-              <label class="label block text-ambedkar-900/60" for="log-search">
+              <label class="label block text-ink-muted" for="log-search">
                 Find a reading
               </label>
               <input
@@ -85,7 +85,7 @@ const filters = [
 
             {filters.map((filter) => (
               <div>
-                <label class="label block text-ambedkar-900/60" for={filter.id}>
+                <label class="label block text-ink-muted" for={filter.id}>
                   {filter.label}
                 </label>
                 <select
@@ -103,7 +103,7 @@ const filters = [
           </div>
 
           <div class="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-            <p class="text-sm text-ambedkar-900/65" id="log-search-hint">
+            <p class="text-sm text-ink-muted" id="log-search-hint">
               The search box also matches the chapters read, the topics, and the
               ISBN of the edition.
             </p>
@@ -135,7 +135,7 @@ const filters = [
             held, so a total would claim a completeness the record lacks.
           */}
           <p
-            class="label mt-10 text-ambedkar-900/60"
+            class="label mt-10 text-ink-muted"
             data-log-status
             role="status"
             aria-live="polite"
@@ -150,18 +150,21 @@ const filters = [
                   class="border-b border-rule"
                   data-log-entry
                   data-search={entry.search}
-                  data-book={facetSet([entry.key])}
+                  data-book={facetSet(
+                    entry.bookState === "published" ? [entry.key] : [],
+                  )}
                   data-author={facetSet(
                     entry.authors.map((author) => author.slug),
                   )}
                   data-year={facetSet(entry.years)}
                 >
-                  <article class="grid gap-8 py-8 sm:py-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-12">
-                    <div class="flex gap-4 sm:gap-8">
+                  <article class="grid grid-cols-1 gap-8 py-8 sm:py-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-12">
+                    <div class="flex flex-wrap gap-4 sm:gap-8">
                       {entry.cover ? (
                         <a
                           class="shrink-0 self-start"
                           href={entry.href}
+                          aria-label={entry.title}
                           tabindex="-1"
                         >
                           <ResponsiveImage
@@ -186,15 +189,15 @@ const filters = [
                           aria-hidden={entry.readsArticles ? undefined : "true"}
                         >
                           {entry.readsArticles && (
-                            <span class="label text-center text-ambedkar-900/60">
+                            <span class="label text-center text-ink-muted">
                               Articles &amp; papers
                             </span>
                           )}
                         </div>
                       )}
 
-                      <div class="min-w-0">
-                        <p class="label flex flex-wrap items-center gap-x-2 gap-y-1 text-ambedkar-900/60">
+                      <div class="min-w-0 flex-1 basis-40">
+                        <p class="label flex flex-wrap items-center gap-x-2 gap-y-1 text-ink-muted">
                           <span>{count(entry.sessionCount, "session")}</span>
                           <span aria-hidden="true">·</span>
                           <time datetime={entry.dateTime}>
@@ -220,7 +223,7 @@ const filters = [
                         </h3>
 
                         {entry.subtitle && (
-                          <p class="mt-1.5 text-[0.9375rem] leading-6 text-ambedkar-900/65">
+                          <p class="mt-1.5 text-[0.9375rem] leading-6 text-ink-muted">
                             {entry.subtitle}
                           </p>
                         )}
@@ -237,12 +240,6 @@ const filters = [
                           </p>
                         )}
 
-                        {/*
-                          The sittings, in the order they were read, so the
-                          chapter ranges count upwards. This is what the clubbed
-                          entry would otherwise lose: one line per evening, each
-                          still its own page.
-                        */}
                         <ul class="mt-5 flex flex-wrap gap-2">
                           {entry.sessions.map((session) => (
                             <li>
@@ -271,7 +268,7 @@ const filters = [
 
                     {entry.posters.length > 0 && (
                       <div class="lg:pt-1">
-                        <p class="label label-sm text-ambedkar-900/55">
+                        <p class="label label-sm text-ink-muted">
                           {count(entry.posters.length, "flyer")}
                         </p>
                         <div class="mt-3">

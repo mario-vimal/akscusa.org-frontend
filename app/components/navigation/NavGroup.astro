@@ -9,9 +9,10 @@ import type { NavigationGroup } from "~/lib/navigation";
 interface Props {
   group: NavigationGroup;
   currentPath: string;
+  align?: "start" | "end";
 }
 
-const { group, currentPath } = Astro.props;
+const { group, currentPath, align = "start" } = Astro.props;
 const isActive = isCurrentNode(currentPath, group);
 ---
 
@@ -62,8 +63,9 @@ const isActive = isCurrentNode(currentPath, group);
     The panel is pulled left by its own inset, so a child's label starts on the
     same vertical as the trigger's. Aligned to the trigger's box instead, every
     name in the menu sat twenty pixels to the right of the name that opened it.
-    That inset is the trigger's `px-3` padding plus this panel's 1px border,
-    which is the 3.25 spacing units of `-left-3.25`.
+    The final group opens toward the start of the bar instead, so enlarged text
+    cannot push its panel beyond the viewport. The wrapped navigation rows stay
+    end-aligned, keeping that edge safe even when the final group moves down.
 
     It hangs from the header's hairline rather than floating below it: no top
     border, square top corners, and `shadow-lift` rather than the wide cast
@@ -71,7 +73,11 @@ const isActive = isCurrentNode(currentPath, group);
     as a smudge under something this size.
   -->
   <div
-    class="absolute top-[calc(100%+1px)] -left-3.25 w-60 max-w-[calc(100vw-2rem)] overflow-hidden rounded-b-lg border-x border-b border-rule-strong bg-paper shadow-lift"
+    class:list={[
+      "absolute top-[calc(100%+1px)] w-60 max-w-[calc(100vw-2rem)] overflow-y-auto overscroll-contain rounded-b-lg border-x border-b border-rule-strong bg-paper shadow-lift",
+      align === "end" ? "-right-3.25" : "-left-3.25",
+    ]}
+    data-nav-panel
   >
     <ul>
       {
@@ -125,8 +131,24 @@ const isActive = isCurrentNode(currentPath, group);
   </div>
 </details>
 
+<style>
+  /*
+   * Without the measured panel height, enlarged menus must be able to scroll
+   * with the document rather than stay pinned below a tall, wrapped header.
+   */
+  @media (width >= 64rem) {
+    :global(header:has([data-nav-menu]:not([data-disclosure-ready]))) {
+      position: relative;
+    }
+  }
+</style>
+
 <script>
   import { enhanceDisclosures } from "./nav-disclosure";
 
-  enhanceDisclosures("[data-nav-menu]", { openOnHover: true });
+  enhanceDisclosures("[data-nav-menu]", {
+    openOnHover: true,
+    closeAt: "(width < 64rem)",
+    viewportPanel: "[data-nav-panel]",
+  });
 </script>

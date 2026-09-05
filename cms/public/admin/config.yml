@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms@0.201.1/schema/sveltia-cms.json
 
 backend:
   name: github
@@ -20,16 +20,56 @@ backend:
   # Land each entry as a single commit instead of one per intermediate save.
   squash_merges: true
 
-# Route every change through a pull request rather than committing straight to
-# `branch` above. Saving an entry opens a branch and a draft pull request, and
-# nothing reaches `main` until the entry is published from the CMS or the pull
-# request is merged.
+# Entry saves use a pull request. Standalone media-library saves still write
+# directly to the backend branch, so production branch protection must cover
+# those writes as well.
 publish_mode: editorial_workflow
 
-# `cms/public/` is the Astro public directory, so uploads here are published at
-# `/media/`. Sveltia requires this even when a cloud media library is added.
-media_folder: /cms/public/media
-public_folder: /media
+# Published-entry previews need a live-site base even when no deployment
+# status is available. Workflow deployment URLs override it for branch previews.
+site_url: https://akscusa.org
+
+# The same filename is the CMS relation value and the Astro content ID.
+# Sveltia's ASCII normalizer preserves underscores and tildes; Astro loaders
+# intentionally preserve that filename rather than run a second slugger.
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+  trim: true
+  lowercase: true
+
+# Entry-owned uploads live beside index.md. Only genuinely shared files use
+# this global library; both are served as static /media/ assets.
+# Owned media folders below use absolute templates because Sveltia otherwise
+# serializes entry-relative files as bare names, ignoring public_folder.
+media_folder: /cms/public/media/shared
+public_folder: /media/shared
+
+media_libraries: &repository_media
+  all:
+    slugify_filename: true
+  default:
+    config:
+      slugify_filename: true
+  cloudinary: false
+  uploadcare: false
+  aws_s3: false
+  cloudflare_r2: false
+  digitalocean_spaces: false
+  backblaze_b2: false
+  scaleway_object_storage: false
+  supabase_storage: false
+  stock_assets: false
+
+# The picker offers this entry's owned media and the shared /media/shared/
+# library. Changing a shared asset can affect several entries.
+
+# Preview links open rendered site routes, not the generic CMS field preview.
+# `draft: true` omits a record from every build, including deployment previews.
+# Clear it to inspect the entry in a review-branch deployment; that does not
+# merge the editorial-workflow pull request. Shared media is retained when an
+# entry is deleted. Remove an asset only after checking every remaining use.
 
 # Only repeating, structured records belong here. Static page copy stays in
 # `app/content/pages/` and is edited in Git, not through the CMS.
@@ -53,15 +93,25 @@ collections:
     icon: article
     description: Essays and analysis, newest first.
     folder: cms/content/articles
+    path: "{{slug}}/index"
+    media_folder: /cms/content/articles/{{slug}}
+    public_folder: /media/articles/{{slug}}
     create: true
     slug: "{{slug}}"
+    preview_path: /blog/{{slug}}/
+    thumbnail: heroImage.src
     sortable_fields: [date, title, category]
     view_filters:
       - { label: Featured, field: featured, pattern: true }
       - { label: Drafts, field: draft, pattern: true }
     fields:
       - { name: title, label: Title, widget: string }
-      - { name: date, label: Publication date, widget: datetime }
+      - &calendar_date
+        name: date
+        label: Publication date
+        widget: datetime
+        type: date
+        format: YYYY-MM-DD
       - name: category
         label: Category
         widget: relation
@@ -98,28 +148,44 @@ collections:
         required: false
         collapsed: true
         fields: &hero_image_fields
-          - {
-              name: src,
-              label: Image URL,
-              widget: string,
-              hint: Full URL of an image on the media host.,
-            }
+          - &editorial_image
+            name: src
+            label: Image
+            widget: image
+            accept: .png,.jpg,.jpeg,.webp
+            choose_url: true
+            pattern:
+              - "^(?:$|undefined|null|https?://[^\\s]+|(?:/media/(?:shared/(?:[a-z0-9_~-]+/)*|[a-z0-9_~-]+/[a-z0-9_~-]+/))?[a-z0-9_~-]+\\.(?:png|jpe?g|webp))$"
+              - Upload or select a PNG, JPG, JPEG or WebP, or enter a genuine external HTTP(S) image URL.
+            media_libraries: *repository_media
+            hint: >-
+              Upload an image beside this entry or select one from the shared
+              media library. A genuine external image URL may also be used.
           - {
               name: alt,
               label: Alternative text,
               widget: string,
               hint: Describe the image. Leave empty only if it is decorative.,
             }
-      - {
-          name: sourceUrl,
-          label: Original URL,
-          widget: string,
-          required: false,
-          hint: Where this was first published,
-          if it is being republished here.,
-        }
+      - &external_source
+        name: sourceUrl
+        label: External source URL
+        widget: string
+        required: false
+        hint: >-
+          Optional link to a genuine external publication, biography or
+          document. Leave blank when no external source applies.
       - { name: featured, label: Featured, widget: boolean, default: false }
-      - { name: draft, label: Draft, widget: boolean, default: false }
+      - &draft_field
+        name: draft
+        label: Draft
+        widget: boolean
+        default: false
+        hint: >-
+          Hides this entry from every build, including deployment previews.
+          Turn this off to review the rendered entry on a branch preview.
+          This switch is separate from the CMS workflow and does not
+          publish the entry.
       - { name: body, label: Article, widget: markdown }
 
   - name: press-releases
@@ -128,15 +194,20 @@ collections:
     icon: campaign
     description: Public statements issued by AKSC, newest first.
     folder: cms/content/press-releases
+    path: "{{slug}}/index"
+    media_folder: /cms/content/press-releases/{{slug}}
+    public_folder: /media/press-releases/{{slug}}
     create: true
     slug: "{{slug}}"
+    preview_path: /press-releases/{{slug}}/
+    thumbnail: heroImage.src
     sortable_fields: [date, title]
     view_filters:
       - { label: Featured, field: featured, pattern: true }
       - { label: Drafts, field: draft, pattern: true }
     fields:
       - { name: title, label: Title, widget: string }
-      - { name: date, label: Release date, widget: datetime }
+      - { <<: *calendar_date, label: Release date }
       - name: dateline
         label: Dateline
         widget: string
@@ -163,21 +234,30 @@ collections:
         required: false
         fields: &link_fields
           - { name: label, label: Label, widget: string }
-          - { name: url, label: URL, widget: string }
+          - &resource_url
+            name: url
+            label: Document or link
+            widget: file
+            accept: .pdf,.png,.jpg,.jpeg,.webp
+            choose_url: true
+            media_libraries: *repository_media
+            pattern:
+              - "^(?:https?://[^\\s]+|#[^\\s\\\\]+|(?:/media/(?:shared/(?:[a-z0-9_~-]+/)*|[a-z0-9_~-]+/[a-z0-9_~-]+/))?[a-z0-9_~-]+\\.(?:pdf|png|jpe?g|webp)(?:[?#][^\\s\\\\]*)?|/(?!/|media(?:/|[?#]|$))[^\\s\\\\]*)$"
+              - Upload or select a PDF or image, or enter a valid HTTP(S) URL or site-relative page link.
+            hint: >-
+              Upload a PDF or image beside this entry, select a shared file,
+              or enter an HTTP(S) URL or site-relative page link.
+              Keep any document fragment, such as #page=2, when it
+              helps readers.
       - name: heroImage
         label: Hero image
         widget: object
         required: false
         collapsed: true
         fields: *hero_image_fields
-      - {
-          name: sourceUrl,
-          label: Original URL,
-          widget: string,
-          required: false,
-        }
+      - *external_source
       - { name: featured, label: Featured, widget: boolean, default: false }
-      - { name: draft, label: Draft, widget: boolean, default: false }
+      - *draft_field
       - { name: body, label: Statement, widget: markdown }
 
   - name: interventions
@@ -186,8 +266,13 @@ collections:
     icon: gavel
     description: Campaigns, legal work, and public education, newest first.
     folder: cms/content/interventions
+    path: "{{slug}}/index"
+    media_folder: /cms/content/interventions/{{slug}}
+    public_folder: /media/interventions/{{slug}}
     create: true
     slug: "{{slug}}"
+    preview_path: /interventions/{{slug}}/
+    thumbnail: heroImage.src
     sortable_fields: [date, title, status]
     view_filters:
       - { label: Ongoing, field: status, pattern: ongoing }
@@ -195,7 +280,7 @@ collections:
       - { label: Drafts, field: draft, pattern: true }
     fields:
       - { name: title, label: Title, widget: string }
-      - { name: date, label: Start date, widget: datetime }
+      - { <<: *calendar_date, label: Start date }
       - name: kind
         label: Kind
         widget: select
@@ -213,8 +298,8 @@ collections:
           - { label: Ongoing, value: ongoing }
           - { label: Concluded, value: concluded }
       - name: concludedDate
+        <<: *calendar_date
         label: Concluded on
-        widget: datetime
         required: false
         hint: Fill this in once the status is set to concluded.
       - name: summary
@@ -238,14 +323,9 @@ collections:
         required: false
         collapsed: true
         fields: *hero_image_fields
-      - {
-          name: sourceUrl,
-          label: Original URL,
-          widget: string,
-          required: false,
-        }
+      - *external_source
       - { name: featured, label: Featured, widget: boolean, default: false }
-      - { name: draft, label: Draft, widget: boolean, default: false }
+      - *draft_field
       - { name: body, label: Details, widget: markdown }
 
   - name: conferences
@@ -254,18 +334,23 @@ collections:
     icon: groups
     description: Annual conferences, newest first.
     folder: cms/content/conferences
+    path: "{{slug}}/index"
+    media_folder: /cms/content/conferences/{{slug}}
+    public_folder: /media/conferences/{{slug}}
     create: true
     slug: "{{slug}}"
+    preview_path: /conferences/{{slug}}/
+    thumbnail: heroImage.src
     sortable_fields: [date, title, edition]
     view_filters:
       - { label: Featured, field: featured, pattern: true }
       - { label: Drafts, field: draft, pattern: true }
     fields:
       - { name: title, label: Title, widget: string }
-      - { name: date, label: Start date, widget: datetime }
+      - { <<: *calendar_date, label: Start date }
       - name: endDate
+        <<: *calendar_date
         label: End date
-        widget: datetime
         required: false
         hint: Only needed for a conference that runs over more than one day.
       - name: edition
@@ -314,14 +399,9 @@ collections:
         required: false
         collapsed: true
         fields: *hero_image_fields
-      - {
-          name: sourceUrl,
-          label: Original URL,
-          widget: string,
-          required: false,
-        }
+      - *external_source
       - { name: featured, label: Featured, widget: boolean, default: false }
-      - { name: draft, label: Draft, widget: boolean, default: false }
+      - *draft_field
       - { name: body, label: Programme, widget: markdown }
 
   - name: speakers
@@ -330,12 +410,18 @@ collections:
     icon: record_voice_over
     description: Reusable speaker biographies referenced by conferences.
     folder: cms/content/speakers
+    path: "{{slug}}/index"
+    media_folder: /cms/content/speakers/{{slug}}
+    public_folder: /media/speakers/{{slug}}
     create: true
     # `{{slug}}` slugifies the identifier field, which Sveltia takes to be
     # `title` unless it is named. This collection has no `title`, so without
     # this a new speaker would be filed under a random UUID.
     identifier_field: name
     slug: "{{slug}}"
+    # A biography appears only inside conferences that select this speaker.
+    # There is no standalone speaker URL or single authoritative conference.
+    preview_path: /conferences/
     sortable_fields: [name, role]
     summary: "{{name}} — {{role}}"
     # A thumbnail is picked from top-level `image` and `file` fields only, and
@@ -357,25 +443,15 @@ collections:
         required: false
         collapsed: true
         fields:
-          - {
-              name: src,
-              label: R2 image URL,
-              widget: string,
-              hint: "Use the public media.akscusa.org URL after uploading the portrait to R2.",
-            }
+          - { <<: *editorial_image, label: Portrait image }
           - {
               name: alt,
               label: Alternative text,
               widget: string,
               hint: Describe the person and setting rather than repeating their name.,
             }
-      - {
-          name: sourceUrl,
-          label: Original biography URL,
-          widget: string,
-          required: false,
-        }
-      - { name: draft, label: Draft, widget: boolean, default: false }
+      - *external_source
+      - *draft_field
 
   - name: programs
     label: Programs
@@ -383,10 +459,12 @@ collections:
     icon: event
     description: Public events and longer-running initiatives, newest first.
     folder: cms/content/programs
+    path: "{{slug}}/index"
     create: true
     slug: "{{slug}}"
-    media_folder: /cms/public/media/programs
-    public_folder: /media/programs
+    preview_path: /programs/{{slug}}/
+    media_folder: /cms/content/programs/{{slug}}
+    public_folder: /media/programs/{{slug}}
     sortable_fields: [date, title, kind, status]
     # The first flyer, which is the one the program was announced with.
     thumbnail: posters.*.src
@@ -397,9 +475,8 @@ collections:
     fields:
       - { name: title, label: Title, widget: string }
       - name: date
+        <<: *calendar_date
         label: Date or application deadline
-        widget: datetime
-        time_format: false
       - name: kind
         label: Kind
         widget: select
@@ -451,12 +528,20 @@ collections:
         required: false
         summary: "{{fields.caption}}"
         fields: &poster_fields
-          - {
-              name: src,
-              label: Image,
-              widget: image,
-              hint: "Keep AKSC posters in their original colors.",
-            }
+          - &local_image
+            name: src
+            label: Image
+            widget: image
+            accept: .png,.jpg,.jpeg,.webp
+            choose_url: false
+            # For pending uploads Sveltia validates the normalized filename,
+            # not the eventual public path. Optional media can also be unset.
+            # `accept` filters uploads, but not already-uploaded library items.
+            pattern:
+              - "^(?:$|undefined|null|(?:/media/(?:shared/(?:[a-z0-9_~-]+/)*|[a-z0-9_~-]+/[a-z0-9_~-]+/))?[a-z0-9_~-]+\\.(?:png|jpe?g|webp))$"
+              - Choose a PNG, JPG, JPEG or WebP from this site's media library. New uploads are named automatically.
+            media_libraries: *repository_media
+            hint: "Keep AKSC posters in their original colors."
           - {
               name: alt,
               label: Alternative text,
@@ -464,14 +549,9 @@ collections:
               hint: "Describe the information and people shown in the poster.",
             }
           - { name: caption, label: Caption, widget: string, required: false }
-      - {
-          name: sourceUrl,
-          label: Original URL,
-          widget: string,
-          required: false,
-        }
+      - *external_source
       - { name: featured, label: Featured, widget: boolean, default: false }
-      - { name: draft, label: Draft, widget: boolean, default: false }
+      - *draft_field
       - { name: body, label: Details, widget: markdown }
 
   - name: books
@@ -486,10 +566,12 @@ collections:
       selected from the Authors collection, and should be added there first if
       they are new.
     folder: cms/content/books
-    media_folder: /cms/public/media/books
-    public_folder: /media/books
+    path: "{{slug}}/index"
+    media_folder: /cms/content/books/{{slug}}
+    public_folder: /media/books/{{slug}}
     create: true
     slug: "{{slug}}"
+    preview_path: /books/{{slug}}/
     sortable_fields: [title]
     summary: "{{title}}"
     fields:
@@ -503,8 +585,8 @@ collections:
         required: false
         hint: "Subtitle on the edition, if it has one."
       - name: cover
+        <<: *local_image
         label: Cover
-        widget: image
         required: false
         hint: "Upload the cover of the edition the circle read. Keep the artwork in its original colors. A book with no cover simply shows none."
       - name: coverSource
@@ -521,9 +603,8 @@ collections:
               hint: "How the page should name it — “Open Library”.",
             }
           - {
-              name: url,
+              <<: *resource_url,
               label: Link,
-              widget: string,
               hint: "The page the file came from.",
             }
       - name: authors
@@ -542,8 +623,8 @@ collections:
         required: false
         pattern:
           [
-            "^(97(8|9))?[0-9-]{10,17}$",
-            "Enter the 13 digit ISBN of the edition read.",
+            "^(?:$|[\\s-]*9[\\s-]*7[\\s-]*[89](?:[\\s-]*[0-9]){10}[\\s-]*)$",
+            "Leave blank, or enter the 13-digit ISBN beginning 978 or 979. Spaces and hyphens are allowed; validation also checks the check digit.",
           ]
         hint: "ISBN-13 of the edition the circle read, if it has one. Leave blank for a pamphlet, a PDF, or an edition older than the ISBN system — the book is identified by its filename, not by this. Two books may not share an ISBN."
       - name: publisher
@@ -573,10 +654,8 @@ collections:
         label: Where to read it
         widget: list
         required: false
-        fields:
-          - { name: label, label: Label, widget: string }
-          - { name: url, label: URL, widget: string }
-      - { name: draft, label: Draft, widget: boolean, default: false }
+        fields: *link_fields
+      - *draft_field
 
   - name: authors
     label: Authors
@@ -587,12 +666,14 @@ collections:
       this list, so one author carries every book of theirs and has a page of
       their own. Add the author here before adding their first book.
     folder: cms/content/authors
-    media_folder: /cms/public/media/authors
-    public_folder: /media/authors
+    path: "{{slug}}/index"
+    media_folder: /cms/content/authors/{{slug}}
+    public_folder: /media/authors/{{slug}}
     create: true
     # See the note on `speakers`: an author is named by `name`, not `title`.
     identifier_field: name
     slug: "{{slug}}"
+    preview_path: /authors/{{slug}}/
     sortable_fields: [name]
     summary: "{{name}}"
     thumbnail: portrait.src
@@ -621,12 +702,8 @@ collections:
         collapsed: true
         hint: "The photograph the author's page opens with. An author with none opens on their name instead."
         fields:
-          - {
-              name: src,
-              label: Image,
-              widget: image,
-              hint: "Upload a portrait. Only use a photograph AKSC may publish — either one we hold, or one whose licence allows it, credited below.",
-            }
+          - <<: *local_image
+            hint: "Upload a portrait. Only use a photograph AKSC may publish — either one we hold, or one whose licence allows it, credited below."
           - {
               name: alt,
               label: Alternative text,
@@ -672,13 +749,8 @@ collections:
                   required: false,
                   hint: "Any change you made to the file before uploading, such as “cropped”. The page already says it recoloured the picture.",
                 }
-      - {
-          name: sourceUrl,
-          label: Where this biography came from,
-          widget: string,
-          required: false,
-        }
-      - { name: draft, label: Draft, widget: boolean, default: false }
+      - *external_source
+      - *draft_field
 
   - name: book-readings
     label: Book Readings
@@ -686,6 +758,7 @@ collections:
     icon: menu_book
     description: Scheduled and past readings, newest first.
     folder: cms/content/book-readings
+    path: "{{slug}}/index"
     create: true
     # Not `{{year}}-{{month}}-{{day}}-{{slug}}`. Those tags are the date the
     # entry is created, never the `date` field, so writing up a sitting held in
@@ -695,17 +768,22 @@ collections:
     # range, or "continued" and "revisited" for a book the circle came back to
     # — so it distinguishes them without dating the address.
     slug: "{{slug}}"
-    # The flyer widget below needs its uploads to land beside the other
-    # book-readings media: the schema requires `/media/book-readings/...`, and
-    # without these the global folder would put a flyer at `/media/...` and
-    # fail the build the moment an editor saved it.
-    media_folder: /cms/public/media/book-readings
-    public_folder: /media/book-readings
+    preview_path: /book-readings/{{slug}}/
+    media_folder: /cms/content/book-readings/{{slug}}
+    public_folder: /media/book-readings/{{slug}}
     sortable_fields: [date, title]
     thumbnail: posters.*.src
     fields:
       - { name: title, label: Title, widget: string }
-      - { name: date, label: Date and time, widget: datetime }
+      - name: date
+        label: Date and time (Pacific)
+        widget: datetime
+        input_timezone: America/Los_Angeles
+        output_utc: true
+        hint: >-
+          Enter the Pacific time announced for the session, regardless of
+          your computer's timezone. Daylight saving time is automatic; the
+          saved value includes Z (UTC), and the site displays Pacific time.
       - name: location
         label: Location
         widget: string
@@ -739,9 +817,7 @@ collections:
         label: What we read
         widget: list
         required: false
-        fields:
-          - { name: label, label: Label, widget: string }
-          - { name: url, label: URL, widget: string }
+        fields: *link_fields
       - name: heroImage
         label: Hero image
         widget: object
@@ -755,13 +831,9 @@ collections:
         required: false
         summary: "{{fields.caption}}"
         fields: *poster_fields
-      - name: sourceUrl
-        label: Original URL
-        widget: string
-        required: false
-        hint: "Where this reading was first published, kept so migrated copy is traceable."
+      - *external_source
       - { name: featured, label: Featured, widget: boolean, default: false }
-      - { name: draft, label: Draft, widget: boolean, default: false }
+      - *draft_field
       - { name: body, label: Details, widget: markdown, required: false }
 
   - name: general-body-meetings
@@ -773,14 +845,14 @@ collections:
       published. A meeting always submits a report, and adopts resolutions only
       when there are any. Upload each PDF here; it is committed with the entry.
     folder: cms/content/general-body-meetings
+    path: "{{slug}}/index"
     create: true
     # `{{year}}` would be the year the record was typed, and these are minuted
     # years afterwards, so the meeting's own `date` is read instead.
     slug: "{{fields.edition}}-general-body-meeting-{{date | date('YYYY')}}"
-    # Uploads land beside the ones already committed, and are stored on the
-    # entry as the `/media/general-body/...` path the site serves.
-    media_folder: /cms/public/media/general-body
-    public_folder: /media/general-body
+    preview_path: /organization/general-body/#general-body-meetings
+    media_folder: /cms/content/general-body-meetings/{{slug}}
+    public_folder: /media/general-body-meetings/{{slug}}
     sortable_fields: [edition, date]
     summary: "General Body {{fields.edition}} — {{date | date('YYYY')}}"
     view_filters:
@@ -793,9 +865,8 @@ collections:
         min: 1
         hint: "Counting from the first in 2017. The page titles itself from this, for example 6 becomes “6th General Body Meeting”."
       - name: date
+        <<: *calendar_date
         label: Date
-        widget: datetime
-        time_format: false
       - name: datePrecision
         label: Date precision
         widget: select
@@ -823,7 +894,13 @@ collections:
           - name: file
             label: PDF
             widget: file
-            hint: "Upload the PDF itself. It is committed to the repository and served from the site, so it keeps working once the old WordPress host is retired."
+            accept: .pdf
+            choose_url: false
+            pattern:
+              - "^(?:$|undefined|null|(?:/media/(?:shared/(?:[a-z0-9_~-]+/)*|[a-z0-9_~-]+/[a-z0-9_~-]+/))?[a-z0-9_~-]+\\.pdf)$"
+              - Choose a PDF from this site's media library, not an image or remote URL.
+            media_libraries: *repository_media
+            hint: "Upload the PDF itself. It is committed to the repository and served directly from this site."
           - name: pageCount
             label: Pages
             widget: number
@@ -831,12 +908,8 @@ collections:
             value_type: int
             min: 1
             hint: "Shown beside the link so a reader knows the size of the download before opening it."
-      - name: sourceUrl
-        label: Original URL
-        widget: string
-        required: false
-        hint: "Where these papers were first published, kept so migrated copy is traceable."
-      - { name: draft, label: Draft, widget: boolean, default: false }
+      - *external_source
+      - *draft_field
 
   # Drawn work. A comic and a toolkit scenario are both a titled sequence of
   # panels, and both ask the same two things of whoever publishes one: describe
@@ -855,10 +928,12 @@ collections:
       Illustrated comics, read panel by panel. Upload the panels in reading
       order; the first one is the cover shown on the comics index.
     folder: cms/content/comics
+    path: "{{slug}}/index"
     create: true
     slug: "{{slug}}"
-    media_folder: /cms/public/media/comics
-    public_folder: /media/comics
+    preview_path: /comics/{{slug}}/
+    media_folder: /cms/content/comics/{{slug}}
+    public_folder: /media/comics/{{slug}}
     sortable_fields: [date, title]
     summary: "{{title}}"
     # Panel one, which the collection already treats as the cover.
@@ -869,9 +944,7 @@ collections:
     fields:
       - { name: title, label: Title, widget: string }
       - name: date
-        label: Publication date
-        widget: datetime
-        time_format: false
+        <<: *calendar_date
       - name: summary
         label: Summary
         widget: text
@@ -911,12 +984,9 @@ collections:
         summary: "{{fields.alt}}"
         hint: "In reading order. The first panel is used as the cover."
         fields: &panel_fields
-          - {
-              name: src,
-              label: Panel image,
-              widget: image,
-              hint: "Square panels at least 1140 pixels wide read best. Keep the artwork in its original colors.",
-            }
+          - <<: *local_image
+            label: Panel image
+            hint: "Square panels at least 1140 pixels wide read best. Keep the artwork in its original colors."
           - name: alt
             label: Alternative text
             widget: string
@@ -926,14 +996,9 @@ collections:
             widget: text
             required: false
             hint: "Every word drawn in the panel, in reading order, one line per bubble. Write “Aish: Hmmm.” to name who is speaking."
-      - {
-          name: sourceUrl,
-          label: Original URL,
-          widget: string,
-          required: false,
-        }
+      - *external_source
       - { name: featured, label: Featured, widget: boolean, default: false }
-      - { name: draft, label: Draft, widget: boolean, default: false }
+      - *draft_field
 
   - name: toolkit-scenarios
     label: Toolkit Scenarios
@@ -944,10 +1009,12 @@ collections:
       that ends in a question to the reader, ordered by hand rather than by date
       because a playbook is read in the order its authors chose.
     folder: cms/content/toolkit-scenarios
+    path: "{{slug}}/index"
     create: true
     slug: "{{slug}}"
-    media_folder: /cms/public/media/anti-caste-toolkit
-    public_folder: /media/anti-caste-toolkit
+    preview_path: /anti-caste-toolkit/#{{slug}}
+    media_folder: /cms/content/toolkit-scenarios/{{slug}}
+    public_folder: /media/toolkit-scenarios/{{slug}}
     sortable_fields: [order, title]
     summary: "{{order}}. {{title}}"
     thumbnail: panels.*.src
@@ -987,13 +1054,8 @@ collections:
         required: false
         summary: "{{fields.name}}"
         fields: *credit_fields
-      - {
-          name: sourceUrl,
-          label: Original URL,
-          widget: string,
-          required: false,
-        }
-      - { name: draft, label: Draft, widget: boolean, default: false }
+      - *external_source
+      - *draft_field
 
   - name: topics
     label: Topics
@@ -1010,6 +1072,8 @@ collections:
     create: true
     identifier_field: label
     slug: "{{slug}}"
+    # Terms have no standalone routes. Inspect their labels on linked entries.
+    preview_path: /blog/
     sortable_fields: [label]
     summary: "{{label}}"
     fields:
@@ -1036,6 +1100,7 @@ collections:
     create: true
     identifier_field: label
     slug: "{{slug}}"
+    preview_path: /blog/
     sortable_fields: [label]
     summary: "{{label}}"
     fields:

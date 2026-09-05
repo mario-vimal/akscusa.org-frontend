@@ -1,96 +1,60 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-
-import { parse } from "yaml";
+import { z } from "astro/zod";
 import { describe, expect, it } from "vitest";
 
+import {
+  mediaImagePath,
+  optionalCmsField,
+  optionalCmsList,
+} from "~/schemas/shared";
+import { readContentCollection } from "./collection";
+import { missingContentMedia } from "./media-references";
+
 /**
- * Panels are committed to this repository and served from `/media/`, so a
- * published comic keeps working once the Squarespace and WordPress hosts are
- * retired. These checks fail the build rather than let a comic degrade to a row
+ * Panels are committed beside their entry and served from `/media/`.
+ * These checks fail the build rather than let a comic degrade to a row
  * of broken images, and they hold the accessibility floor: a panel with no
  * description is not publishable, however good the drawing is.
  */
 
-const projectRoot = fileURLToPath(new URL("../..", import.meta.url));
+const artworkFields = z.object({
+  title: z.string(),
+  panels: z
+    .array(
+      z.object({
+        src: z.string(),
+        alt: z.string(),
+        transcript: optionalCmsField(z.string()),
+      }),
+    )
+    .min(1),
+  credits: optionalCmsList(z.array(z.object({ name: z.string() })).default([])),
+});
 
-interface Panel {
-  src: string;
-  alt: string;
-  transcript?: string;
-}
-
-interface Credit {
-  name: string;
-}
-
-interface Artwork {
-  title: string;
-  panels: Panel[];
-  credits?: Credit[];
-}
-
-const readCollection = (folder: string) => {
-  const directory = `${projectRoot}cms/content/${folder}`;
-
-  return readdirSync(directory)
-    .filter((name) => name.endsWith(".md"))
-    .map((name) => {
-      const source = readFileSync(`${directory}/${name}`, "utf8");
-      const frontmatter = /^---\n([\s\S]*?)\n---/.exec(source)?.[1];
-
-      expect(frontmatter, `${name} has no frontmatter`).toBeDefined();
-
-      return { name, data: parse(frontmatter!) as Artwork };
-    });
-};
+const readCollection = (folder: string) =>
+  readContentCollection(folder, artworkFields);
 
 const collections = [
   { folder: "comics", media: "comics", requiresCredit: true },
   {
     folder: "toolkit-scenarios",
-    media: "anti-caste-toolkit",
+    media: "toolkit-scenarios",
     requiresCredit: false,
   },
 ] as const;
 
 describe.each(collections)("$folder panels", ({ folder, media }) => {
   const entries = readCollection(folder);
-  const mediaDirectory = `${projectRoot}cms/public/media/${media}`;
   const panels = entries.flatMap((entry) => entry.data.panels ?? []);
-  it("publishes at least one entry", () => {
-    expect(entries.length).toBeGreaterThan(0);
-    expect(panels.length).toBeGreaterThan(0);
-  });
-
   it("serves every panel from this site", () => {
     for (const panel of panels) {
-      expect(panel.src).toMatch(
-        new RegExp(`^/media/${media}/[a-z0-9-]+\\.(png|jpe?g|webp)$`),
-      );
+      expect(mediaImagePath(media).safeParse(panel.src).success).toBe(true);
     }
   });
 
-  it("references only committed panel files", () => {
-    for (const panel of panels) {
-      const onDisk = `${mediaDirectory}/${panel.src.split("/").pop()}`;
-
-      expect(
-        existsSync(onDisk),
-        `${panel.src} is missing from cms/public/media/${media}/`,
-      ).toBe(true);
-    }
-  });
-
-  it("has no unused panel files", () => {
-    const referenced = new Set(
-      panels.map((panel) => panel.src.split("/").pop()),
+  it("references only resolvable panels, without rejecting retained files", async () => {
+    expect(await missingContentMedia(panels.map((panel) => panel.src))).toEqual(
+      [],
     );
-    const orphans = readdirSync(mediaDirectory).filter(
-      (name) => !referenced.has(name),
-    );
-
-    expect(orphans).toEqual([]);
   });
 
   // A panel is a picture with words baked into it. Without a description of

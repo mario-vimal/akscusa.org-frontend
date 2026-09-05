@@ -1,13 +1,13 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
-import { type EditorialEntry } from "~/features/editorial/sections";
+import type { EditorialEntry } from "~/features/editorial/sections";
 import { loadEditorialEntries } from "~/features/editorial/queries/entries";
 import {
   resolveBookAuthors,
   type Author,
 } from "~/features/authors/queries/authors";
-import { isPublished } from "~/lib/collections";
-import { checkUniqueIsbns, resolveReadings } from "./resolve";
+import { byId, isPublished } from "~/lib/collections";
+import { checkUniqueIsbns, resolveReadings } from "~/features/books/resolve";
 
 export type Book = CollectionEntry<"books">;
 export type Reading = EditorialEntry<"bookReadings">;
@@ -28,7 +28,8 @@ export interface BookWithReadings extends BookWithAuthors {
 }
 
 const byTitle = (a: Book, b: Book) =>
-  a.data.title.localeCompare(b.data.title, "en", { sensitivity: "base" });
+  a.data.title.localeCompare(b.data.title, "en", { sensitivity: "base" }) ||
+  byId(a, b);
 
 async function loadBooks() {
   const all = (await getCollection("books")).sort(byTitle);
@@ -84,7 +85,7 @@ export async function loadBooksWithReadings(): Promise<BookWithReadings[]> {
   }));
 }
 
-/** The book each reading points at, with its authors, keyed by reading id. */
+/** The published book each reading points at, with its authors, by reading ID. */
 export async function loadReadingBooks(): Promise<
   Map<string, BookWithAuthors>
 > {
@@ -97,5 +98,3 @@ export async function loadReadingBooks(): Promise<
     ]),
   );
 }
-
-export const bookHref = (book: Book) => `/books/${book.id}/`;

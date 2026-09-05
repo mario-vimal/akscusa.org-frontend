@@ -1,10 +1,10 @@
 ---
 import { Image } from "astro:assets";
-import { getEntry } from "astro:content";
 
 import logo from "~/assets/brand/aksc-logo.webp";
 import { helplineNavigation } from "~/config/navigation";
 import Container from "~/components/ui/Container.astro";
+import { loadPage } from "~/features/page-copy/queries/entries";
 import DesktopNav from "./DesktopNav.astro";
 import MobileNav from "./MobileNav.astro";
 
@@ -18,9 +18,9 @@ const onHelpline = currentPath.replace(/\/+$/, "") === helplineNavigation.href;
 
 // Read from the helpline page rather than restating the number here, so the
 // strip and the helpline itself can never drift apart.
-const helpline = await getEntry("pages", "anti-caste-helpline");
+const helpline = await loadPage("anti-caste-helpline");
 const phone =
-  helpline?.data.pageType === "helpline" ? helpline.data.phone : undefined;
+  helpline.data.pageType === "helpline" ? helpline.data.phone : undefined;
 ---
 
 <!--
@@ -33,7 +33,11 @@ const phone =
   offset that anchored headings scroll to small enough to stay honest.
 -->{
   phone && (
-    <div class="on-dark bg-ambedkar-1000 text-white">
+    <div
+      class="on-dark bg-ambedkar-1000 text-white"
+      role="region"
+      aria-label={helplineNavigation.label}
+    >
       <Container class="flex flex-wrap items-center justify-between gap-x-5 gap-y-1 py-1">
         <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.8125rem] leading-5">
           <span class="text-white/60">Facing casteism?</span>

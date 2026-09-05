@@ -1,4 +1,4 @@
-import { type CollectionEntry } from "astro:content";
+import type { CollectionEntry } from "astro:content";
 
 /**
  * The six collections that share the editorial base schema. They are listed,

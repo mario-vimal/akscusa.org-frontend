@@ -1,6 +1,10 @@
 ---
+import archivoLatin from "@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url";
+import instrumentSansLatin from "@fontsource-variable/instrument-sans/files/instrument-sans-latin-wdth-normal.woff2?url";
+
 import appleTouchIcon from "~/assets/brand/apple-touch-icon.png";
 import favicon from "~/assets/brand/favicon.png";
+import logo from "~/assets/brand/aksc-logo.webp";
 import "~/styles/global.css";
 
 interface Props {
@@ -14,6 +18,7 @@ const documentTitle = title ? `${title} | ${siteName}` : siteName;
 const canonicalUrl = Astro.site
   ? new URL(Astro.url.pathname, Astro.site)
   : Astro.url;
+const socialImageUrl = new URL(logo.src, canonicalUrl);
 ---
 
 <!doctype html>
@@ -32,6 +37,31 @@ const canonicalUrl = Astro.site
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={documentTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl.href} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:image" content={socialImageUrl.href} />
+    <meta property="og:image:alt" content={`${siteName} logo`} />
+    <meta property="og:image:width" content={String(logo.width)} />
+    <meta property="og:image:height" content={String(logo.height)} />
+    <meta name="twitter:card" content="summary" />
+    <!-- Both faces appear in every header; serif and italic files stay demand-loaded. -->
+    <link
+      rel="preload"
+      href={archivoLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href={instrumentSansLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
     <link rel="icon" type="image/png" href={favicon.src} />
     <link rel="apple-touch-icon" href={appleTouchIcon.src} />
     <title>{documentTitle}</title>

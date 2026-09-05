@@ -169,12 +169,13 @@ const filtering = filters.length > 0 && filterKey !== undefined;
         to have done anything. Here the result of a press is the next thing
         under it at every width.
       */
-      filters.length > 0 && (
+      filtering && (
         <div
           class="mb-9"
           role="group"
           aria-label={filtersLabel}
           data-filter-controls
+          hidden
         >
           <ul class="flex flex-wrap gap-x-5 gap-y-2">
             {filters.map((filter) => (
@@ -203,7 +204,7 @@ const filtering = filters.length > 0 && filterKey !== undefined;
         <>
           {leadHtml && (
             <h2
-              class="label mb-7 text-ambedkar-900/55"
+              class="label mb-7 text-ink-muted"
               data-filter-list-label={filtering ? "" : undefined}
             >
               {listLabel}

@@ -14,11 +14,11 @@ import {
   type ReadingEntry,
 } from "~/features/book-readings/presenters";
 import { loadTermLabels } from "~/features/editorial/queries/taxonomy";
-import { isUpcoming } from "~/lib/collections";
+import { currentReading } from "~/features/book-readings/calendar";
 
 /** The reading circle as this page states it. */
 export interface ReadingCircle {
-  /** One entry per book, newest reading first, plus any article sittings. */
+  /** Published books grouped by ID, plus standalone public session records. */
   entries: ReadingEntry[];
   /** The next sitting, or the last one held when nothing is scheduled. */
   opener?: NextSession;
@@ -31,15 +31,7 @@ export async function loadReadingCircle(): Promise<ReadingCircle> {
     loadTermLabels("topics"),
   ]);
 
-  /*
-   * The entries arrive newest first, so the soonest sitting still ahead of us
-   * is the *last* of the upcoming ones, not the first. Taking the first would
-   * open the page on whatever is furthest away, which is the one sitting a
-   * reader is least likely to be deciding about.
-   */
-  const opening =
-    readings.filter(isUpcoming).at(-1) ??
-    readings.find((entry) => !isUpcoming(entry));
+  const opening = currentReading(readings);
 
   /*
    * No totals are returned, deliberately. Not every session the circle has

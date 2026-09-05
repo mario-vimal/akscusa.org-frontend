@@ -1,9 +1,15 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
+import { readFile } from "node:fs/promises";
 import { createServer } from "node:net";
 import { fileURLToPath } from "node:url";
 
+import { readBuildInventory } from "./links/check.ts";
+
 const host = "127.0.0.1";
+const inventory = readBuildInventory(
+  fileURLToPath(new URL("../dist", import.meta.url)),
+);
 const routes = new Map([
   ["/", "Educate, Organize &amp; Agitate"],
   ["/anti-caste-helpline/", "Anti-Caste Helpline"],
@@ -12,56 +18,29 @@ const routes = new Map([
     "Testimonies of Caste in the USA",
   ],
   ["/blog/", "Blog"],
-  [
-    "/blog/caste-discrimination-where-is-it/",
-    "Caste discrimination, where is it?",
-  ],
   ["/press-releases/", "Press Releases and Statements"],
-  [
-    "/press-releases/aksc-condemns-the-killing-of-george-floyd/",
-    "For immediate release",
-  ],
   ["/interventions/", "Interventions"],
-  ["/interventions/yes-on-sb-403/", "YES on SB 403"],
-  [
-    "/interventions/lets-read-ambedkar-10-lectures-series/",
-    "About the instructor",
-  ],
   ["/actions/", "What we do"],
   ["/book-readings/", "Book Readings"],
   ["/books/", "Every book the reading circle has worked through"],
-  ["/authors/dr-b-r-ambedkar/", "What the circle has read of theirs"],
   ["/conferences/", "Conferences"],
-  ["/conferences/aksc-6th-annual-conference-2025/", "Conference speakers"],
-  [
-    "/conferences/aksc-7th-annual-conference-2026/",
-    "Call for student presentations",
-  ],
-  ["/programs/", "AKSC Young Ambassador Program"],
-  ["/programs/aksc-young-ambassador-program/", "Why we introduced the program"],
-  [
-    "/programs/periyar-147th-birth-anniversary-celebration/",
-    "Listen and learn from our special speakers",
-  ],
-  [
-    "/programs/dr-ambedkar-129th-birth-anniversary-celebration/",
-    "Date and time",
-  ],
+  ["/programs/", "Programs"],
   ["/join/", "Open membership application"],
   ["/organization/", "What is AKSC"],
   ["/organization/constitution/", "Article I - Name"],
-  ["/organization/general-body/", "6th General Body Meeting"],
-  ["/comics/", "How to talk to your kids"],
-  [
-    "/comics/does-caste-exist-in-the-us-today/",
-    "Does the caste system exist in the US?",
-  ],
-  ["/comics/caste-has-a-cost/", "Towards a Marxist Analysis of Caste"],
+  ["/organization/general-body/", "General Body"],
+  ["/comics/", "Comics"],
   ["/anti-caste-toolkit/", "A Playbook to kickstart our Toolkit"],
   ["/contact/", "Best way to reach us"],
   ["/donate/", "Donate"],
   ["/admin/", "AKSC USA Content Manager"],
-  ["/admin/config.yml", `repo: ${process.env.CMS_REPO ?? "OWNER/REPOSITORY"}`],
+  [
+    "/admin/config.yml",
+    await readFile(
+      new URL("../dist/admin/config.yml", import.meta.url),
+      "utf8",
+    ),
+  ],
 ]);
 
 async function findAvailablePort() {
@@ -206,6 +185,27 @@ try {
   }
 
   const listed = new Set(urls.map((url) => new URL(url).pathname));
+  for (const page of inventory.pages) {
+    if (page.file === "404.html" || page.file.startsWith("admin/")) continue;
+    if (!listed.has(page.route)) {
+      throw new Error(
+        `${page.route} was built but is missing from the sitemap.`,
+      );
+    }
+  }
+
+  // Editors can rename, draft or delete an entry. Verify the pages this build
+  // actually publishes rather than requiring a permanent set of sample slugs
+  // and titles that would reject those ordinary editorial changes.
+  const checked = new Set(routes.keys());
+  for (const path of listed) {
+    if (checked.has(path)) continue;
+    const body = await readText(path);
+    if (!body.includes('id="main-content"') || !/<h1(?:\s|>)/.test(body)) {
+      throw new Error(`${path} is missing its main content or heading.`);
+    }
+    checked.add(path);
+  }
 
   for (const path of ["/", ...routes.keys()].filter(
     (path) => path.endsWith("/") && !path.startsWith("/admin"),
@@ -249,7 +249,7 @@ try {
   }
 
   console.log(
-    `Wrangler Pages verified ${routes.size} routes and the root favicon.`,
+    `Wrangler Pages verified ${checked.size} routes and the root favicon.`,
   );
 } catch (error) {
   console.error(output);

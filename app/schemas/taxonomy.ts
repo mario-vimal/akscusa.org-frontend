@@ -22,7 +22,7 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
-import { optionalCmsField } from "~/schemas/shared";
+import { cmsEntryId, optionalCmsField } from "~/schemas/shared";
 
 const term = z.object({
   /** The name as the site prints it on a chip, a filter, or a heading. */
@@ -37,7 +37,11 @@ const term = z.object({
 
 const termCollection = (folder: string) =>
   defineCollection({
-    loader: glob({ base: `./cms/content/${folder}`, pattern: "**/*.md" }),
+    loader: glob({
+      base: `./cms/content/${folder}`,
+      pattern: "**/*.md",
+      generateId: cmsEntryId,
+    }),
     schema: term,
   });
 

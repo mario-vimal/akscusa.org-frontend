@@ -1,6 +1,6 @@
 ---
 import type { GetStaticPaths } from "astro";
-import { getEntry } from "astro:content";
+import { loadPage } from "~/features/page-copy/queries/entries";
 
 import { sizePanels } from "~/features/artwork/panels";
 import ComicReader from "~/features/comics/components/ComicReader.astro";
@@ -39,9 +39,9 @@ const panels = await sizePanels(comic.data.panels);
 // The invitation to other artists is written once on the comics index and
 // repeated at the end of a comic, which is where somebody who could draw one is
 // most likely to be reading.
-const page = await getEntry("pages", "comics");
+const page = await loadPage("comics");
 
-if (!page || page.data.pageType !== "comics") {
+if (page.data.pageType !== "comics") {
   throw new Error("Comics page content is missing or invalid.");
 }
 ---

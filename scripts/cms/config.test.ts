@@ -1,7 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 
-import { parse } from "yaml";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -12,49 +10,15 @@ import {
   programKinds,
   programStatuses,
   type TaxonomyTerm,
-} from "../../app/features/editorial/taxonomy";
+} from "~/features/editorial/taxonomy";
+import {
+  config,
+  configSource,
+  nestedFields,
+  projectRoot,
+  type CmsField,
+} from "./config";
 import { CMS_REPO_PLACEHOLDER } from "./repo";
-
-interface CmsField {
-  name: string;
-  widget?: string;
-  collection?: string;
-  value_field?: string;
-  options?: Array<{ label: string; value: string }>;
-  fields?: CmsField[];
-  field?: CmsField;
-}
-
-interface CmsConfig {
-  backend: {
-    name: string;
-    repo: string;
-    branch: string;
-    squash_merges?: unknown;
-  };
-  publish_mode?: unknown;
-  media_folder?: unknown;
-  public_folder?: unknown;
-  collections: Array<{
-    name: string;
-    folder?: string;
-    create?: boolean;
-    identifier_field?: string;
-    slug?: string;
-    summary?: string;
-    thumbnail?: string;
-    files?: Array<{ file: string }>;
-    fields?: CmsField[];
-  }>;
-}
-
-const projectRoot = fileURLToPath(new URL("../..", import.meta.url));
-const configPath = new URL(
-  "../../cms/public/admin/config.yml",
-  import.meta.url,
-);
-const configSource = readFileSync(configPath, "utf8");
-const config = parse(configSource) as CmsConfig;
 
 describe("Sveltia CMS configuration", () => {
   // A committed repository would let a local dev server commit to the live site
@@ -65,9 +29,9 @@ describe("Sveltia CMS configuration", () => {
     expect(config.backend.repo).toBe(CMS_REPO_PLACEHOLDER);
   });
 
-  // Without this the CMS commits straight to the configured branch, so an
-  // editor's save would land on `main` with no review.
-  it("routes every change through a pull request", () => {
+  // Standalone media saves do not use the entry workflow and also require
+  // production branch protection.
+  it("routes entry saves through a pull request", () => {
     expect(config.publish_mode).toBe("editorial_workflow");
   });
 
@@ -75,9 +39,9 @@ describe("Sveltia CMS configuration", () => {
   // library is enabled, and the published JSON schema does not cover the rule.
   it("defines a media folder that resolves to a served path", () => {
     expect(typeof config.media_folder).toBe("string");
-    expect(config.media_folder).toBe("/cms/public/media");
+    expect(config.media_folder).toBe("/cms/public/media/shared");
 
-    expect(config.public_folder).toBe("/media");
+    expect(config.public_folder).toBe("/media/shared");
     expect(config.public_folder).not.toMatch(/^\.{1,2}\//);
     expect(config.public_folder).not.toMatch(/^https?:/);
   });
@@ -117,6 +81,42 @@ describe("Sveltia CMS configuration", () => {
       "https://unpkg.com/@sveltia/cms@0.201.1/dist/sveltia-cms.js",
     );
     expect(configSource).not.toMatch(/^\s*secret_access_key:/m);
+  });
+
+  it("keeps optional external sources without promoting source-system provenance", () => {
+    for (const collection of config.collections) {
+      const source = collection.fields?.find(
+        (field) => field.name === "sourceUrl",
+      );
+      if (source) {
+        expect(source.required, collection.name).toBe(false);
+        expect(source.label, collection.name).toBe("External source URL");
+        expect(source.hint, collection.name).toContain("genuine external");
+        expect(source.hint, collection.name).toContain("Leave blank");
+      }
+    }
+    expect(config.site_url).toBe("https://akscusa.org");
+  });
+
+  it("does not put retired-site guidance or examples in editor-visible copy", () => {
+    for (const collection of config.collections) {
+      const visibleCopy = [
+        collection.label,
+        collection.description,
+        ...nestedFields(collection.fields).flatMap(({ field }) => [
+          field.label,
+          field.hint,
+          field.pattern?.[1],
+          ...(field.options?.map((option) => option.label) ?? []),
+        ]),
+      ].filter((text): text is string => typeof text === "string");
+
+      for (const text of visibleCopy) {
+        expect(text, collection.name).not.toMatch(
+          /\b(?:wordpress|squarespace|migrat(?:ed|ion)|(?:old|retired) (?:site|host))\b/i,
+        );
+      }
+    }
   });
 });
 

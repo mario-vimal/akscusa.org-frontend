@@ -4,6 +4,160 @@
 @import "@fontsource-variable/newsreader/opsz-italic.css";
 @import "tailwindcss";
 
+/*
+ * Measured against Arial/Liberation Sans and Times New Roman/Liberation Serif
+ * at Archivo wdth 104 and Newsreader opsz 20. The local faces keep content
+ * immediately readable; matching advances and the fonts' hhea metrics limits
+ * rewrapping and baseline movement while the self-hosted fonts arrive.
+ */
+@font-face {
+  font-family: "Archivo Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans");
+  font-style: normal;
+  font-weight: 100 500;
+  size-adjust: 102.72%;
+  ascent-override: 85.48%;
+  descent-override: 20.44%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Archivo Fallback";
+  src:
+    local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold");
+  font-style: normal;
+  font-weight: 501 650;
+  size-adjust: 99.72%;
+  ascent-override: 88.05%;
+  descent-override: 21.06%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Archivo Fallback";
+  src:
+    local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold");
+  font-style: normal;
+  font-weight: 651 900;
+  size-adjust: 102.86%;
+  ascent-override: 85.36%;
+  descent-override: 20.42%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Instrument Sans Fallback";
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans");
+  font-style: normal;
+  font-weight: 400 500;
+  size-adjust: 101.05%;
+  ascent-override: 96%;
+  descent-override: 24.74%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Instrument Sans Fallback";
+  src:
+    local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold");
+  font-style: normal;
+  font-weight: 501 650;
+  size-adjust: 96.54%;
+  ascent-override: 100.48%;
+  descent-override: 25.9%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Instrument Sans Fallback";
+  src:
+    local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold");
+  font-style: normal;
+  font-weight: 651 700;
+  size-adjust: 97.97%;
+  ascent-override: 99.01%;
+  descent-override: 25.52%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Newsreader Fallback";
+  src:
+    local("Times New Roman"), local("TimesNewRomanPSMT"),
+    local("Liberation Serif");
+  font-style: normal;
+  font-weight: 200 500;
+  size-adjust: 99.87%;
+  ascent-override: 73.6%;
+  descent-override: 26.53%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Newsreader Fallback";
+  src:
+    local("Times New Roman Bold"), local("TimesNewRomanPS-BoldMT"),
+    local("Liberation Serif Bold");
+  font-style: normal;
+  font-weight: 501 650;
+  size-adjust: 99.54%;
+  ascent-override: 73.84%;
+  descent-override: 26.62%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Newsreader Fallback";
+  src:
+    local("Times New Roman Bold"), local("TimesNewRomanPS-BoldMT"),
+    local("Liberation Serif Bold");
+  font-style: normal;
+  font-weight: 651 800;
+  size-adjust: 102.68%;
+  ascent-override: 71.58%;
+  descent-override: 25.81%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Newsreader Fallback";
+  src:
+    local("Times New Roman Italic"), local("TimesNewRomanPS-ItalicMT"),
+    local("Liberation Serif Italic");
+  font-style: italic;
+  font-weight: 200 500;
+  size-adjust: 93.61%;
+  ascent-override: 78.51%;
+  descent-override: 28.31%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Newsreader Fallback";
+  src:
+    local("Times New Roman Bold Italic"), local("TimesNewRomanPS-BoldItalicMT"),
+    local("Liberation Serif Bold Italic");
+  font-style: italic;
+  font-weight: 501 650;
+  size-adjust: 99.67%;
+  ascent-override: 73.74%;
+  descent-override: 26.59%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Newsreader Fallback";
+  src:
+    local("Times New Roman Bold Italic"), local("TimesNewRomanPS-BoldItalicMT"),
+    local("Liberation Serif Bold Italic");
+  font-style: italic;
+  font-weight: 651 800;
+  size-adjust: 103.91%;
+  ascent-override: 70.73%;
+  descent-override: 25.5%;
+  line-gap-override: 0%;
+}
+
 @theme {
   /*
    * Three faces, three jobs. A site that sets everything in one serif and one
@@ -22,22 +176,24 @@
    *
    * Newsreader carries argument: article bodies, ledes, and quotation. It was
    * drawn for reading news on a screen and has a true italic, which a study
-   * circle that publishes at length actually needs.
+   * circle that publishes at length actually needs. Emoji faces come after
+   * the text fallbacks: Noto Color Emoji also supplies spaces and digits, whose
+   * wide advances otherwise rewrap emergency text during a cold font load.
    */
   --font-display:
-    "Archivo Variable", Archivo, "Helvetica Neue", "Segoe UI",
-    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", Helvetica, Arial,
-    sans-serif;
+    "Archivo Variable", "Archivo Fallback", Archivo, "Helvetica Neue",
+    "Segoe UI", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji",
+    "Noto Color Emoji", sans-serif;
   --font-display--font-variation-settings: "wdth" 104;
 
   --font-sans:
-    "Instrument Sans Variable", "Instrument Sans", "Segoe UI",
-    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", Helvetica, Arial,
-    sans-serif;
+    "Instrument Sans Variable", "Instrument Sans Fallback", "Instrument Sans",
+    "Segoe UI", Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji",
+    "Noto Color Emoji", sans-serif;
 
   --font-serif:
-    "Newsreader Variable", Newsreader, "Iowan Old Style", Georgia,
-    "Times New Roman", "Apple Color Emoji", "Segoe UI Emoji",
+    "Newsreader Variable", "Newsreader Fallback", Newsreader, "Iowan Old Style",
+    Georgia, "Times New Roman", "Apple Color Emoji", "Segoe UI Emoji",
     "Noto Color Emoji", serif;
   --font-serif--font-variation-settings: "opsz" 20;
 
@@ -105,6 +261,9 @@
   /* A step deeper than mist, for banding one light section against the next. */
   --color-haze: #eaecf0;
 
+  /* Opaque metadata clears 5:1 on paper, mist, haze, and the light blue tints. */
+  --color-ink-muted: #52647b;
+
   /*
    * Hairlines carry the structure of the page, so they are named rather than
    * re-mixed at every call site. `rule` is the ordinary divider, `rule-strong`
@@ -166,7 +325,8 @@
   }
 
   body {
-    min-width: 20rem;
+    /* Enlarging text must not also enlarge the minimum viewport width. */
+    min-width: 320px;
     min-height: 100vh;
     background: var(--color-mist);
     color: var(--color-ambedkar-950);
@@ -176,6 +336,16 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Large display type still needs a last-resort break at enlarged text sizes. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    overflow-wrap: anywhere;
   }
 
   ::selection {
@@ -451,12 +621,14 @@
    * sliver, so a ring drawn on it would trace nothing the eye can read as the
    * thing being focused. An element's own outline escapes its own `clip`.
    */
-  .card:has(:focus-visible) {
+  .card:has(:focus-visible),
+  .poster-stack__tile:has(:focus-visible) {
     outline: 2px solid var(--color-accent-600);
     outline-offset: 3px;
   }
 
-  .on-dark .card:has(:focus-visible) {
+  .on-dark .card:has(:focus-visible),
+  .on-dark .poster-stack__tile:has(:focus-visible) {
     outline-color: var(--color-accent-300);
   }
 
@@ -627,7 +799,7 @@
     font-weight: 600;
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.08em;
-    color: color-mix(in srgb, var(--color-ambedkar-900) 58%, transparent);
+    color: var(--color-ink-muted);
   }
 
   /*
@@ -655,7 +827,7 @@
   }
 
   .field::placeholder {
-    color: color-mix(in srgb, var(--color-ambedkar-900) 55%, transparent);
+    color: var(--color-ink-muted);
   }
 
   /*
@@ -774,12 +946,14 @@
     display: flex;
     align-items: flex-start;
     width: fit-content;
+    max-width: 100%;
   }
 
   .poster-stack__tile {
     position: relative;
     width: 4.5rem;
-    flex: none;
+    min-width: 0;
+    flex: 0 1 auto;
     border: 1px solid var(--color-rule-strong);
     border-radius: 0.25rem;
     background: var(--color-paper);
@@ -858,6 +1032,11 @@
     cursor: zoom-in;
   }
 
+  /* Its clipped child hands the focus ring to the tile, even without motion. */
+  .poster-stack__open:focus-visible {
+    outline: none;
+  }
+
   /*
    * The tiles are one portrait ratio and the artwork is fitted inside it
    * rather than filled into it. Flyers are drawn to whatever proportion their
@@ -898,7 +1077,9 @@
    */
   .session-chip {
     display: inline-flex;
+    max-width: 100%;
     min-height: 2.25rem;
+    flex-wrap: wrap;
     align-items: center;
     gap: 0.5rem;
     border: 1px solid var(--color-rule);
@@ -915,20 +1096,24 @@
   }
 
   .session-chip__label {
+    min-width: 0;
     font-family: var(--font-display);
     font-size: 0.8125rem;
     font-weight: 600;
     letter-spacing: -0.005em;
     line-height: 1.3;
     color: var(--color-ambedkar-950);
+    overflow-wrap: anywhere;
   }
 
   .session-chip__date {
+    min-width: 0;
     font-family: var(--font-display);
     font-size: 0.75rem;
     font-variant-numeric: tabular-nums;
     line-height: 1.3;
-    color: color-mix(in srgb, var(--color-ambedkar-900) 62%, transparent);
+    color: var(--color-ink-muted);
+    overflow-wrap: anywhere;
   }
 
   /*

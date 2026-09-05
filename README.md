@@ -1,8 +1,9 @@
 # AKSC USA frontend
 
 Astro site for [akscusa.org](https://akscusa.org), styled with Tailwind CSS,
-edited through Sveltia CMS, and deployed to Cloudflare Pages. Media goes to
-Cloudflare R2; customer orders will go to Cloudflare D1.
+edited through Sveltia CMS, and deployed to Cloudflare Pages. Editorial media is
+committed beside the entry that owns it and published as static assets; customer
+orders will go to Cloudflare D1.
 
 Output is static. The Cloudflare adapter is installed but stays disabled until
 some routes need server rendering.
@@ -36,10 +37,10 @@ app/                 # Code and one-off page copy, maintained in Git
 ├── pages/           # File-based routes
 └── schemas/         # Content collection definitions, one file per domain
 cms/                 # Everything the CMS owns
-├── content/         # Structured records, read by Astro, never served
+├── content/         # Structured records and their entry-owned media
 └── public/          # Astro `publicDir`, served verbatim
     ├── admin/       # Sveltia CMS application and content model
-    └── media/       # CMS uploads, published at `/media/`
+    └── media/shared/ # Genuinely shared editor assets
 scripts/             # Build tooling, never shipped
 └── cms/             # Backend repository and dev routing for `/admin/`
 ```
@@ -49,8 +50,22 @@ a nontechnical editor. One-off page copy stays in `app/content/pages/` and is
 reviewed like code. A test fails if a CMS collection points into `app/`.
 
 Only `cms/public/` is the `publicDir`, so the Sveltia admin is served as a
-static file while editorial Markdown stays build input. Build tooling belongs in
-`scripts/`, never in `cms/`, where everything is published.
+static file while editorial Markdown stays build input. The media integration
+publishes only supported asset files from entry directories; it does not expose
+their Markdown or configuration. Build tooling belongs in `scripts/`.
+
+An entry that can own media has one directory:
+
+```text
+cms/content/articles/<slug>/
+├── index.md
+├── photograph.jpg
+└── document.pdf
+```
+
+Its public assets use `/media/articles/<slug>/photograph.jpg` and the matching
+document path. The public address is a build/dev projection, not a second
+committed copy. Taxonomy records without media can remain simple Markdown files.
 
 Feature directories use lowercase kebab-case; keep section-specific components
 with their feature. `config/navigation.ts` is the single source of truth for
@@ -76,6 +91,14 @@ Siblings keep a relative path (`./EntryCard.astro`), because a sibling import
 says "this belongs with me" and survives the directory being moved. There are no
 `../` imports; if you find yourself writing one, use the alias.
 
+ESLint enforces this in application code. It also rejects casts through
+`unknown` and direct content reads outside feature queries and the shared
+collection loader.
+
+Node-run build tools use the `#content-media` package import for the shared
+media resolver. Node cannot resolve Astro's `~/` alias; both names reach the
+same module rather than maintaining separate filesystem rules.
+
 ### Where things go
 
 | Kind of code                                  | Goes in                            |
@@ -99,7 +122,9 @@ filtering, grouping, joining, or reducing, that work belongs in the feature's
 - `app/lib/collections.ts` — what counts as published and what order entries
   come back in. `loadPublished(collection, compare)` is how a collection is
   read; the comparator is required so a list's order is stated where the list is
-  loaded. Never re-implement the draft rule.
+  loaded. Never re-implement the draft rule. Pure ordering/calendar helpers are
+  implemented in `collection-policy.ts` and re-exported by `collections.ts`, so
+  presenter tests need not load Astro's build-only content API.
 - `app/lib/dates.ts` — every date format the site uses. Dates are read as UTC
   unless the thing happens at an hour in a place, which is why a reading uses
   the Pacific formatters and an article does not.
@@ -107,6 +132,12 @@ filtering, grouping, joining, or reducing, that work belongs in the feature's
   routes, and their titles. `entryHref` builds every editorial link.
 - `app/schemas/shared.ts` — schema fragments used by more than one collection,
   including `editorialBase`, the shape those six sections share.
+- `app/features/page-copy/queries/entries.ts` — `loadPage(id)` reads required
+  one-off copy. Routes keep their `pageType` narrowing and presentation rather
+  than importing a content reader directly.
+- `app/lib/content-media.ts` — the source-file and format rules for entry-owned
+  and shared media. `scripts/media/` uses the same resolver for development
+  serving and static build copying.
 
 ### Components
 
@@ -147,7 +178,9 @@ families.
 
 - Section images: `app/features/<feature>/assets/`.
 - Brand artwork: `app/assets/brand/`; other shared images: `app/assets/shared/`.
-- Editorial media lives in R2; store its public URL in CMS content.
+- Editorial media lives beside its entry's `index.md`. The CMS supplies the
+  `/media/<collection-folder>/<slug>/...` URL used by the published page.
+  Do not collect entry-owned files in a shared `archive/` directory.
 - Render imports through `ResponsiveImage.astro` or Astro's image components so
   dimensions, `srcset`, and optimized formats are generated.
 - Posters and flyers go through `Poster.astro`, which sizes the figure to the
@@ -164,9 +197,11 @@ records live in `cms/content/` and are edited in the CMS instead.
 When migrating existing AKSC pages, preserve the original copy. Do not
 paraphrase or drop substantive assurances or calls to action without approval.
 
-`MIGRATION-TRACKER.md` tracks every page on the two source sites
-(`akscusa.org` and `akscusa.squarespace.com`) and what has moved so far. It is a
-temporary working document; delete it once both sites are retired.
+`akscusa.org` is the canonical domain of this implementation. Published content
+must not point to a retired application, including through `sourceUrl`
+provenance. Keep genuine third-party citations and media credits. The strict
+link gate checks the built output; [QUALITY-GATE.md](QUALITY-GATE.md) tracks
+remaining acceptance work.
 
 ## Editorial collections
 
@@ -224,8 +259,10 @@ a change to one section's chrome lands on all six.
 
 ### Entry slugs
 
-A slug is a filename in `cms/content/`, and Astro reads it as the `[slug]`
-route parameter, so it is the entry's permanent web address.
+A media-owning entry's slug is its directory name in `cms/content/`; its
+Markdown is `index.md` inside that directory. Flat taxonomy records use their
+filename instead. Astro reads that stable identifier as the `[slug]` route
+parameter, so it is the entry's permanent web address.
 
 Sveltia builds one from the collection's `slug` template when the entry is
 first saved. `{{slug}}` is the slugified identifier field, which Sveltia
@@ -246,12 +283,25 @@ already carries the chapter range or the "continued" that tells one sitting
 from another. A test fails on the creation-date tags so they cannot come back.
 
 The slug is not shown while an entry is being written, and renaming the title
-afterwards does not rename the file. To read one back, look at the filename in
-`cms/content/<collection>/`, at the last segment of the entry's URL, or at
-**Edit Slug** in the entry editor's 3-dot menu, which is also how it is
-changed. Renaming there is a Git rename, and Sveltia rewrites every relation
-pointing at the entry — a book's authors, an article's topics — so no reference
-is left dangling.
+afterwards does not rename the entry directory. To read one back, look at its
+directory in `cms/content/<collection>/`, at the last segment of the entry's URL, or at
+**Edit Slug** in the entry editor's 3-dot menu.
+
+**Changing a permalink is a maintainer operation for an entry with media.**
+The pinned CMS can rename the Markdown file and rewrite configured-branch
+relations, but does not move existing asset files with that rename. Do not use
+Edit Slug alone for a media-owning entry. Move its whole directory in a reviewed
+Git change, update its `/media/<collection>/<slug>/...` URLs and references to
+the old entry ID/address, then run `npm run validate`. The ownership and link
+guards reject incomplete moves instead of silently serving orphaned files.
+
+Coordinate independent unpublished branches before renaming: the CMS's relation
+cascade does not rewrite them. Ordinary display-name or label edits do not
+require a slug rename and remain normal CMS operations.
+
+Publish a new related record before selecting it from another entry. Relation
+choices are read from the configured branch, not assembled across other editors'
+unpublished branches.
 
 ### List thumbnails
 
@@ -271,10 +321,12 @@ Entries marked `draft` are visible in `npm run dev` and left out of the build.
 
 Speaker biographies live once in `cms/content/speakers/` and have no standalone
 route. A conference stores an ordered list of stable speaker slugs; its page
-resolves and presents those biographies in the conference context. Missing,
-draft, or misspelled references fail the build rather than silently dropping a
-speaker. Portraits are optional R2 URLs, so the same biography and image can be
-reused by future conferences without copying either.
+resolves and presents those biographies in the conference context. Genuinely
+missing or misspelled references fail the build. A known speaker withheld as a
+draft is omitted from production without breaking the conference, and remains
+visible in development. Portraits are optional uploads in the static media
+library, so the same biography and image can be reused by future conferences
+without copying either.
 
 ### Books, linked by stable id
 
@@ -318,18 +370,19 @@ so the site does not invent hyphenation; the reading log's search accepts an
 ISBN typed either way.
 
 A new book is entered as a complete record: title, authors, edition details, an
-ISBN if the edition has one, and an AKSC-written summary. The filename is chosen
+ISBN if the edition has one, and an AKSC-written summary. The entry slug is chosen
 before publishing, because it is the book's permanent address and what every
 reading links to. The cover belongs to the entry: it is
-uploaded from the Books collection, committed under `cms/public/media/books/`,
-and served from `/media/books/`. An optional `coverSource` names where the file
+uploaded from the Books collection, committed beside
+`cms/content/books/<slug>/index.md`, and served from `/media/books/<slug>/`.
+An optional `coverSource` names where the file
 came from — the current set was taken from Open Library — and prints under the
 picture; a book with none prints the generic caption instead, and a book with
 no cover shows none. No external catalogue is contacted during a build.
 
-Authors can upload portraits under `cms/public/media/authors/`, and book
-readings can upload flyers under `cms/public/media/book-readings/`. These local
-uploads are validated as media paths and remain available without R2.
+Author portraits live beside the author's `index.md`, and reading flyers beside
+the reading's `index.md`. These local uploads are validated as media paths and
+remain available with the site itself.
 
 ### Authors, and the page each one gets
 
@@ -363,7 +416,7 @@ lists of the same reading, and a second list of it ordered by author would be a
 page duplicating what those two say.
 
 Portraits belong to the author entry. Its `portrait` is an image the editor
-uploads, committed under `cms/public/media/authors/`, and its optional `credit`
+uploads, committed beside `cms/content/authors/<slug>/index.md`, and its optional `credit`
 records the photographer, the licence, and the source page, which the site
 prints under the picture. The credit is what lets a borrowed photograph be
 published at all: a CC BY-SA portrait needs its attribution shown, and an
@@ -405,16 +458,16 @@ with keyboard paging. Transcripts are `details` elements and work with no
 JavaScript; the viewer's controls stay hidden until the script that gives them
 meaning has run.
 
-Panels are committed under `cms/public/media/comics/` and
-`cms/public/media/anti-caste-toolkit/` and served from `/media/`, so a published
-comic is a file this site serves. Astro never sees them as an import and so
-cannot supply their dimensions, which `app/features/artwork/panels.ts` reads off
-each committed file at build time; a page of 37 images would otherwise reflow as
-each one arrives.
+Panels are committed beside their comic or toolkit scenario's `index.md` and
+served from that entry's `/media/<collection-folder>/<slug>/` path.
+`app/features/artwork/panels.ts` uses the shared source-file resolver to read
+dimensions at build time; a page of 37 images would otherwise reflow as each one
+arrives.
 
 `scripts/content/artwork.test.ts` fails the build on a panel with no
-description, on a panel that is referenced but not committed, on an uploaded
-panel that nothing references, and on a comic with no credit. Publishing other
+description, on a panel that is referenced but not committed, and on a comic
+with no credit. Retained unreferenced files are a housekeeping concern, not a
+reason to reject an otherwise valid edit. Publishing other
 artists' work is the point of the collection, so an uncredited comic is a bug.
 
 `cms/content/` is in `.prettierignore`. Sveltia writes those files when an
@@ -423,20 +476,40 @@ them would fail every pull request the CMS opens.
 
 ## Commands
 
-| Command                  | Purpose                                       |
-| ------------------------ | --------------------------------------------- |
-| `npm run dev`            | Start Astro at `http://localhost:4321`        |
-| `npm run build`          | Build the static site into `dist/`            |
-| `npm run preview`        | Preview the production build locally          |
-| `npm run check`          | Run Astro and TypeScript diagnostics          |
-| `npm run lint`           | Run ESLint                                    |
-| `npm run format`         | Format supported files                        |
-| `npm run format:check`   | Verify formatting                             |
-| `npm test`               | Run Vitest once                               |
-| `npm run generate-types` | Generate Cloudflare runtime binding types     |
-| `npm run verify:pages`   | Smoke-test `dist` through Wrangler Pages      |
-| `npm run deploy:pages`   | Deploy `dist` with the Pages command          |
-| `npm run validate`       | Run all checks, build, and Pages verification |
+| Command                  | Purpose                                                                 |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `npm run dev`            | Start Astro at `http://localhost:4321`                                  |
+| `npm run build`          | Build the static site into `dist/`                                      |
+| `npm run preview`        | Preview the production build locally                                    |
+| `npm run check`          | Run Astro and TypeScript diagnostics                                    |
+| `npm run lint`           | Run ESLint                                                              |
+| `npm run format`         | Format supported files                                                  |
+| `npm run format:check`   | Verify formatting                                                       |
+| `npm test`               | Run Vitest once                                                         |
+| `npm run test:browser`   | Exercise the built site in Chromium and Firefox                         |
+| `npm run generate-types` | Generate Cloudflare runtime binding types                               |
+| `npm run verify:pages`   | Smoke-test `dist` through Wrangler Pages                                |
+| `npm run verify:links`   | Check built links, assets, anchors, and retired-site references         |
+| `npm run deploy:pages`   | Deploy `dist` with the Pages command                                    |
+| `npm run validate`       | Run all checks, build, Pages/link verification, and browser regressions |
+
+The browser suite runs against a local Wrangler Pages server and needs a build
+in `dist/`. Install its browser engines once after installing dependencies:
+
+```sh
+npx playwright install chromium firefox
+```
+
+CI also installs the engines' system libraries on its Ubuntu runner. On other
+systems, resolve any missing browser libraries using the platform's supported
+package manager. The suite does not require WebKit.
+
+Use `npm run test:browser -- --grep "<scenario>"` for a focused interaction
+change. The suite covers the published sitemap rather than pinning ordinary
+editorial titles. It blocks third-party requests so a network outage elsewhere
+does not decide a local regression result; `verify:links` independently enforces
+the cutover and local resource contracts. Browser failure traces and screenshots
+go to the ignored `test-results/` directory.
 
 ## Sveltia CMS
 
@@ -450,7 +523,7 @@ its URL as `backend.base_url`.
 
 ### Review workflow
 
-`publish_mode: editorial_workflow` keeps editors off `main`. Saving an entry
+`publish_mode: editorial_workflow` stages entry edits for review. Saving an entry
 creates branch `cms/<collection>/<slug>` and opens a **draft** pull request,
 titled from `backend.commit_messages`. One entry means one pull request, however
 many times it is saved. Draft requests do not run CI; validation starts when the
@@ -467,7 +540,20 @@ published entry also goes through a pull request. `squash_merges: true` collapse
 intermediate saves into one commit.
 
 Add `publish: false` to a collection to stop editors merging their own work.
-Branch protection on `main` enforces this at the Git level.
+Configure branch protection or repository rulesets on the production branch to
+require the validation status and appropriate reviews. The CMS interface alone
+does not enforce Git permissions.
+
+Standalone uploads and media-library deletion are not the same as saving an
+entry: they can use direct backend writes. Production branch rules must cover
+those operations too. Prefer entry-attached uploads for reviewed changes and
+make the approved media-maintenance workflow explicit to editors.
+
+The workflow's **Draft** stage and an entry's frontmatter **`draft`** flag are
+independent. Publishing a pull request does not clear `draft: true`; that entry
+remains absent from production-style builds, including their preview output.
+Clear the content flag when the entry should appear, then review its rendered
+preview before publishing.
 
 **Token permissions.** Signing in with a token needs more than write access. A
 classic token with the `repo` scope covers everything; the sign-in dialog links
@@ -501,7 +587,7 @@ server, and is read from the shell and `.env`.
   CMS_REPO=akscsfba/akscusa.org-frontend npm run build
   ```
 
-- GitHub Actions previews: `gh variable set CMS_REPO --body <owner>/<repo>`.
+- GitHub Actions validation: `gh variable set CMS_REPO --body <owner>/<repo>`.
 
 Locally, prefer **Work with Local Repository** on the sign-in screen: it writes
 to your working copy only and needs no repository setting, but requires a
@@ -511,26 +597,40 @@ Chromium-based browser. To test GitHub sign-in, point `CMS_REPO` at your fork:
 cp .env.example .env
 ```
 
-### R2 media
+### Entry-owned static media
 
-1. Create the `akscusa-media` bucket and attach `media.akscusa.org` as its
-   public custom domain.
-2. Create a bucket-scoped token with **Object Read & Write**.
-3. Add `media_libraries` to `cms/public/admin/config.yml`. Never commit the
-   Secret Access Key; Sveltia asks each editor for it, and a test fails if one
-   is committed.
+Use an entry's image/file controls to upload beside its `index.md`. Media-owning
+collections use a per-entry media directory and publish through
+`/media/<collection-folder>/<slug>/...`. The development server and production
+build expose the same paths. No separate bucket or account is required.
 
-   ```yaml
-   media_libraries:
-     cloudflare_r2:
-       access_key_id: your-access-key-id
-       account_id: your-cloudflare-account-id
-       bucket: akscusa-media
-       public_url: https://media.akscusa.org
-   ```
+The CMS configuration uses explicit templates, for example:
 
-4. Allow the production and preview origins in the bucket's CORS policy for
-   `GET`, `PUT`, and `HEAD`.
+```yaml
+path: "{{slug}}/index"
+media_folder: /cms/content/articles/{{slug}}
+public_folder: /media/articles/{{slug}}
+```
+
+Do not replace the media folder with an empty string: the pinned CMS then writes
+bare filenames despite `public_folder`, which do not match this site's public
+media contract.
+
+The entry directory is the ownership unit. Keep its slug stable; permalink
+changes need the reviewed whole-directory procedure above, not a Markdown-only
+CMS rename. Removing a published entry still goes through review. The global
+media library is for genuinely shared files, not a substitute for entry
+ownership.
+
+The media projection accepts PNG, JPEG, WebP, and PDF files, not Markdown,
+configuration, or symlinks. Assets remain publicly addressable independently of
+the entry's HTML `draft` flag, as uploads were before colocation. Draft is an
+editorial visibility control, not secret storage.
+
+Deleting an entry is not permission to delete an image or PDF another entry
+uses. Retained, unreferenced files can be reviewed as housekeeping; a missing
+referenced file must still fail the content or link gate. Remove shared assets
+only after checking their references, in the same reviewed change where needed.
 
 ## Customer orders
 
@@ -569,8 +669,9 @@ Pull request previews come from the same Git integration, so no deployment
 workflow is needed. `.github/workflows/validate.yml` only runs `npm run
 validate`, and skips draft pull requests: the CMS opens one per saved entry, and
 validation waits until the entry leaves Draft and the request is marked ready
-for review. Set the `CMS_REPO` repository variable so that build matches the
-deployed one.
+for review. It also runs on pushes to `main`, so direct changes are not invisible
+to CI. This does not itself prevent deployment or replace branch protection.
+Set the `CMS_REPO` repository variable so that build matches the deployed one.
 
 ## Figma
 

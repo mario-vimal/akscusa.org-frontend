@@ -1,5 +1,5 @@
 ---
-import { getEntry } from "astro:content";
+import { loadPage } from "~/features/page-copy/queries/entries";
 
 import HomeCallToAction from "~/features/home/components/HomeCallToAction.astro";
 import HomeComics from "~/features/home/components/HomeComics.astro";
@@ -11,9 +11,9 @@ import HomeSpotlight from "~/features/home/components/HomeSpotlight.astro";
 import { loadHomeFeatures } from "~/features/home/queries/featured";
 import SiteLayout from "~/layouts/SiteLayout.astro";
 
-const home = await getEntry("pages", "home");
+const home = await loadPage("home");
 
-if (!home || home.data.pageType !== "home") {
+if (home.data.pageType !== "home") {
   throw new Error("Home content is missing or invalid.");
 }
 

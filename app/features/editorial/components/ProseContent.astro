@@ -197,17 +197,20 @@
     font-family: var(--font-sans);
     font-size: 0.8125rem;
     line-height: 1.5;
-    color: color-mix(in srgb, var(--color-ambedkar-900) 62%, transparent);
+    color: var(--color-ink-muted);
   }
 
-  /* Tables carry schedules and coverage lists, which are wide. Let them scroll
-     inside their own box rather than pushing the page sideways on a phone. */
-  .prose-editorial :global(table) {
-    display: block;
+  /* Generated at build time, so keyboard scrolling does not depend on scripts. */
+  .prose-editorial :global(.prose-table-scroll) {
     margin-top: 2rem;
-    width: 100%;
     max-width: 100%;
     overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-margin-top: 7rem;
+  }
+
+  .prose-editorial :global(table) {
+    width: 100%;
     border-collapse: collapse;
     font-family: var(--font-sans);
     font-size: 0.9375rem;

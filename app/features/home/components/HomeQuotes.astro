@@ -125,14 +125,11 @@ const { quotes } = Astro.props;
       tabindex="0"
       data-carousel-viewport
     >
-      <ul class="flex">
+      <ul class="flex" role="list">
         {
-          quotes.map((quote, index) => (
+          quotes.map((quote) => (
             <li
               class="w-full shrink-0 snap-start pr-6 sm:pr-10"
-              role="group"
-              aria-roledescription="slide"
-              aria-label={`${index + 1} of ${quotes.length}`}
               data-carousel-slide
             >
               {/*

@@ -4,24 +4,30 @@ import {
   type CollectionKey,
 } from "astro:content";
 
+export {
+  byId,
+  byNewestFirst,
+  bySoonestFirst,
+  isUpcoming,
+  startOfToday,
+  type Dated,
+  type Identified,
+} from "./collection-policy";
+
 /**
  * The rules every content collection on this site shares: what counts as
  * published, and what order entries come back in.
  *
  * These lived as private copies inside six different query modules, which meant
  * six places to change if the draft rule ever changed and no way to tell,
- * reading one of them, whether it agreed with the others. They are defined once
- * here and imported.
+ * reading one of them, whether it agreed with the others. Publication stays
+ * here; the pure ordering and calendar policies are re-exported so presenters
+ * can test the same policies without importing Astro's collection loader.
  */
 
 /** An entry that can be withheld from the built site while it is written. */
 export interface Draftable {
   data: { draft: boolean };
-}
-
-/** An entry that carries a publication or event date. */
-export interface Dated {
-  data: { date: Date };
 }
 
 /**
@@ -39,30 +45,6 @@ export type DraftableCollection = {
  */
 export const isPublished = (entry: Draftable): boolean =>
   import.meta.env.DEV || !entry.data.draft;
-
-/** Newest first: the order an archive is read in. */
-export const byNewestFirst = (a: Dated, b: Dated): number =>
-  b.data.date.getTime() - a.data.date.getTime();
-
-/** Soonest first: the order a list of upcoming events is read in. */
-export const bySoonestFirst = (a: Dated, b: Dated): number =>
-  a.data.date.getTime() - b.data.date.getTime();
-
-/**
- * Midnight today, UTC, so an event happening today still counts as upcoming.
- * Dates across this site are read as UTC, which keeps a build reproducible
- * wherever it runs.
- */
-export const startOfToday = (): Date => {
-  const now = new Date();
-  return new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
-};
-
-/** Whether a dated entry is today or still to come. */
-export const isUpcoming = (entry: Dated): boolean =>
-  entry.data.date.getTime() >= startOfToday().getTime();
 
 /**
  * Every published entry of a collection, in the order given.

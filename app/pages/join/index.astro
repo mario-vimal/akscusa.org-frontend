@@ -1,12 +1,13 @@
 ---
-import { getEntry, render } from "astro:content";
+import { render } from "astro:content";
 
 import JoinOverview from "~/features/join/components/JoinOverview.astro";
+import { loadPage } from "~/features/page-copy/queries/entries";
 import SiteLayout from "~/layouts/SiteLayout.astro";
 
-const page = await getEntry("pages", "join");
+const page = await loadPage("join");
 
-if (!page || page.data.pageType !== "join") {
+if (page.data.pageType !== "join") {
   throw new Error("Join content is missing or invalid.");
 }
 

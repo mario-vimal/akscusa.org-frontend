@@ -1,0 +1,8 @@
+# Some PDFs begin with a long text header; never normalize their line endings.
+*.pdf binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.ico binary
+*.woff2 binary

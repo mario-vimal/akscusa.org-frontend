@@ -110,7 +110,7 @@ const topicLabel = await loadTermLabels("topics");
                   <span class="font-semibold">{credit.name}</span>
                 )}
                 {credit.role && (
-                  <span class="text-ambedkar-900/65"> — {credit.role}</span>
+                  <span class="text-ink-muted"> — {credit.role}</span>
                 )}
               </>
             ))
@@ -175,7 +175,12 @@ const topicLabel = await loadTermLabels("topics");
         sourceUrl && (
           <p class="mx-auto mt-12 max-w-[46rem] text-sm text-white/60">
             First published at{" "}
-            <a class="link-underline" href={sourceUrl} rel="noopener">
+            <a
+              class="link-underline"
+              href={sourceUrl}
+              rel="noopener"
+              data-provenance
+            >
               {sourceUrl}
             </a>
             .

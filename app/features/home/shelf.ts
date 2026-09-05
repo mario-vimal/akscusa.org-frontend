@@ -12,6 +12,13 @@
  * goes on the shelf is what has been read.
  */
 
+import { isUpcomingReading } from "~/features/book-readings/calendar";
+import {
+  byNewestFirst,
+  type Dated,
+  type Identified,
+} from "~/lib/collection-policy";
+
 /** A session that has been held, and the book it worked through. */
 export interface HeldSession<B> {
   book: B;
@@ -59,7 +66,25 @@ export function shelve<B>(
     }
   }
 
-  return [...byBook.values()].sort(
-    (a, b) => b.lastReadOn.getTime() - a.lastReadOn.getTime(),
+  return [...byBook.values()].sort((a, b) =>
+    byNewestFirst(
+      { id: idOf(a.book), data: { date: a.lastReadOn } },
+      { id: idOf(b.book), data: { date: b.lastReadOn } },
+    ),
   );
+}
+
+/** Only held Pacific-day sessions with published books belong on this shelf. */
+export function readingShelf<R extends Dated & Identified, B>(
+  readings: readonly R[],
+  books: ReadonlyMap<string, B>,
+  idOf: (book: B) => string,
+): ShelfEntry<B>[] {
+  const held = readings
+    .filter((reading) => !isUpcomingReading(reading))
+    .flatMap((reading) => {
+      const book = books.get(reading.id);
+      return book ? [{ book, date: reading.data.date }] : [];
+    });
+  return shelve(held, idOf);
 }

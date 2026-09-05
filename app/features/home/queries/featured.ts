@@ -1,22 +1,33 @@
-import { bookByline } from "~/features/books/presenters";
-import { bookHref, loadReadingBooks } from "~/features/books/queries/books";
+import { loadReadingBooks } from "~/features/books/queries/books";
 import {
   loadComicsIndex,
   type ComicSummary,
 } from "~/features/comics/queries/comics";
-import {
-  editorialSections,
-  entryHref,
-  type EditorialCollection,
-  type EditorialEntry,
-} from "~/features/editorial/sections";
+import type { EditorialCollection } from "~/features/editorial/sections";
 import { loadEditorialEntries } from "~/features/editorial/queries/entries";
 import {
   loadShelf,
   type Shelf,
   type ShelfBook,
 } from "~/features/home/queries/shelf";
-import { bySoonestFirst, isUpcoming, type Dated } from "~/lib/collections";
+import {
+  byNewestRefFirst,
+  currentBook,
+  featuredRef,
+  spotlight,
+  type BookFeature,
+  type FeaturedRef,
+  type Spotlight,
+  type Writing,
+} from "~/features/home/presenters";
+
+export type {
+  BookFeature,
+  FeaturedRef,
+  LeadArticle,
+  Spotlight,
+  Writing,
+} from "~/features/home/presenters";
 
 /**
  * What the homepage puts in front of a first-time reader.
@@ -31,80 +42,9 @@ import { bySoonestFirst, isUpcoming, type Dated } from "~/lib/collections";
  * nowhere; the spotlight is the thing it was for.
  */
 
-/**
- * The shape every homepage feature reduces to: enough to render a link with a
- * date and a section, and nothing else. Components take these rather than raw
- * collection entries, so a schema change cannot quietly reshape the homepage.
- */
-export interface FeaturedRef {
-  collection: EditorialCollection;
-  id: string;
-  href: string;
-  /** The section the entry belongs to, for example "Conferences". */
-  section: string;
-  title: string;
-  summary: string;
-  date: Date;
-  upcoming: boolean;
-}
-
-const toRef = <C extends EditorialCollection>(
-  collection: C,
-  entry: EditorialEntry<C>,
-): FeaturedRef => ({
-  collection,
-  id: entry.id,
-  href: entryHref(collection, entry.id),
-  section: editorialSections[collection].label,
-  title: entry.data.title,
-  summary: entry.data.summary,
-  date: entry.data.date,
-  upcoming: isUpcoming(entry),
-});
-
-const byNewestRefFirst = (a: FeaturedRef, b: FeaturedRef) =>
-  b.date.getTime() - a.date.getTime();
-
 /* -------------------------------------------------------------------------- */
 /* The spotlight: what AKSC is doing next                                     */
 /* -------------------------------------------------------------------------- */
-
-export interface Spotlight extends FeaturedRef {
-  /** A conference theme, when the spotlight is a conference that names one. */
-  theme?: string;
-  location?: string;
-  registrationUrl?: string;
-}
-
-/**
- * A conference or a program, carrying which of the two it is.
- *
- * The two collections are considered together but have different fields, so the
- * collection travels with the entry instead of being worked out again later.
- * That is what lets `toSpotlight` read `theme` off a conference without a cast.
- */
-type Gathering =
-  | { collection: "conferences"; entry: EditorialEntry<"conferences"> }
-  | { collection: "programs"; entry: EditorialEntry<"programs"> };
-
-const toSpotlight = (gathering: Gathering): Spotlight => {
-  if (gathering.collection === "conferences") {
-    const { entry } = gathering;
-    return {
-      ...toRef("conferences", entry),
-      theme: entry.data.theme,
-      location: entry.data.location,
-      registrationUrl: entry.data.registrationUrl,
-    };
-  }
-
-  const { entry } = gathering;
-  return {
-    ...toRef("programs", entry),
-    location: entry.data.location,
-    registrationUrl: entry.data.registrationUrl,
-  };
-};
 
 /**
  * The one thing worth interrupting a reader for: what AKSC is doing next.
@@ -119,59 +59,12 @@ export async function loadSpotlight(): Promise<Spotlight | undefined> {
     loadEditorialEntries("programs"),
   ]);
 
-  const gatherings: Gathering[] = [
-    ...conferences.map((entry): Gathering => ({
-      collection: "conferences",
-      entry,
-    })),
-    ...programs.map((entry): Gathering => ({ collection: "programs", entry })),
-  ];
-
-  const isFlagged = ({ entry }: Gathering) => entry.data.featured;
-  const ahead = ({ entry }: Gathering) => isUpcoming(entry);
-  const soonest = (a: Gathering, b: Gathering) =>
-    bySoonestFirst(a.entry, b.entry);
-
-  const chosen =
-    gatherings.filter(ahead).filter(isFlagged).sort(soonest)[0] ??
-    gatherings.find(isFlagged) ??
-    gatherings.filter(ahead).sort(soonest)[0] ??
-    gatherings[0];
-
-  return chosen ? toSpotlight(chosen) : undefined;
+  return spotlight(conferences, programs);
 }
 
 /* -------------------------------------------------------------------------- */
 /* The reading circle                                                         */
 /* -------------------------------------------------------------------------- */
-
-/**
- * The entry a dated section is currently on: the soonest one still to come,
- * or the most recent one when nothing is scheduled.
- *
- * Not simply the newest, which is the trap here. A reading is published weeks
- * before it is held, so the newest entry is normally one that has not happened
- * yet, and anything that treats it as the latest thing done says the circle
- * has read a book it has only announced. Entries arrive newest first, so the
- * fallback is the first of them.
- */
-const currentOf = <T extends Dated>(entries: readonly T[]): T | undefined =>
-  entries.filter(isUpcoming).sort(bySoonestFirst)[0] ?? entries[0];
-
-export interface BookFeature {
-  title: string;
-  /** Absent for a book whose entry names no author. */
-  authors?: string;
-  href: string;
-  cover?: string;
-  /**
-   * The day of the session this book is the book of: the next one when one is
-   * scheduled, otherwise the last one held.
-   */
-  sessionOn: Date;
-  /** How many sessions the circle has given it. */
-  sessions: number;
-}
 
 /**
  * The book the circle is on: the one its next session works through, or the
@@ -180,7 +73,7 @@ export interface BookFeature {
  * This deliberately does not mean "the last book read". The newest session is
  * usually one that has not happened yet — a reading is announced before it is
  * held — so picking it and calling it read states as done a thing the circle
- * has only planned. `currentOf` selects the same honest "on now" state for the
+ * has only planned. `currentBook` selects the same honest "on now" state for the
  * sessions that name a book.
  */
 export async function loadCurrentBook(): Promise<BookFeature | undefined> {
@@ -192,40 +85,12 @@ export async function loadCurrentBook(): Promise<BookFeature | undefined> {
     loadReadingBooks(),
   ]);
 
-  const session = currentOf(
-    readings.filter((entry) => booksByReading.has(entry.id)),
-  );
-  const current = session && booksByReading.get(session.id);
-  if (!session || !current) return undefined;
-
-  const { book } = current;
-
-  return {
-    title: book.data.title,
-    authors: bookByline(current),
-    href: bookHref(book),
-    cover: book.data.cover,
-    sessionOn: session.data.date,
-    sessions: readings.filter(
-      (entry) => booksByReading.get(entry.id)?.book.id === book.id,
-    ).length,
-  };
+  return currentBook(readings, booksByReading);
 }
 
 /* -------------------------------------------------------------------------- */
 /* Writing, and everything else that happened lately                          */
 /* -------------------------------------------------------------------------- */
-
-export interface LeadArticle extends FeaturedRef {
-  authors: string;
-}
-
-export interface Writing {
-  /** The newest article, given room to be read. */
-  lead?: LeadArticle;
-  /** The ones after it, as a short list. */
-  more: FeaturedRef[];
-}
 
 export async function loadWriting(limit = 3): Promise<Writing> {
   const [lead, ...rest] = await loadEditorialEntries("articles");
@@ -233,10 +98,10 @@ export async function loadWriting(limit = 3): Promise<Writing> {
 
   return {
     lead: {
-      ...toRef("articles", lead),
+      ...featuredRef("articles", lead),
       authors: lead.data.authors.map((author) => author.name).join(", "),
     },
-    more: rest.slice(0, limit).map((entry) => toRef("articles", entry)),
+    more: rest.slice(0, limit).map((entry) => featuredRef("articles", entry)),
   };
 }
 
@@ -258,7 +123,7 @@ export async function loadRecentWork(
   const loaded = await Promise.all(
     sources.map(async (collection) =>
       (await loadEditorialEntries(collection)).map((entry) =>
-        toRef(collection, entry),
+        featuredRef(collection, entry),
       ),
     ),
   );

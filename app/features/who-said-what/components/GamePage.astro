@@ -1,0 +1,142 @@
+---
+import Container from "~/components/ui/Container.astro";
+import EntryHeader from "~/components/ui/EntryHeader.astro";
+import ProseContent from "~/features/editorial/components/ProseContent.astro";
+import type { GameView } from "~/features/who-said-what/presenters";
+import GamePhoto from "./GamePhoto.astro";
+import GameQuestion from "./GameQuestion.astro";
+
+interface Props {
+  game: GameView;
+}
+
+const { game } = Astro.props;
+---
+
+<Container class="pt-10 pb-14 wrap-anywhere sm:pt-14 sm:pb-20">
+  <div
+    class="grid items-start gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:gap-14"
+  >
+    <div class="min-w-0">
+      <EntryHeader
+        eyebrow={game.eyebrow}
+        title={game.title}
+        lede={game.lede}
+        meta={game.dateLabel}
+        backHref="/interventions/yes-on-sb-403/"
+        backLabel="YES on SB 403"
+      />
+      <aside
+        class="mt-7 max-w-2xl rounded-sm bg-ambedkar-100 p-5 font-sans text-base leading-relaxed text-ambedkar-900"
+        aria-label="Historical context"
+      >
+        {game.archiveNote}
+      </aside>
+    </div>
+    <div class="max-w-xl lg:pt-16">
+      <GamePhoto
+        photo={game.photo}
+        loading="eager"
+        sizes="(min-width: 1024px) 440px, (min-width: 640px) 576px, calc(100vw - 2.5rem)"
+      />
+    </div>
+  </div>
+
+  <section class="mt-12 sm:mt-16" aria-labelledby="game-introduction">
+    <h2
+      id="game-introduction"
+      class="max-w-3xl font-display text-2xl leading-tight font-bold tracking-title text-ambedkar-950 sm:text-3xl"
+    >
+      {game.description}
+    </h2>
+    <div class="mt-6">
+      <ProseContent><slot /></ProseContent>
+    </div>
+  </section>
+</Container>
+
+<section
+  class="wrap-anywhere"
+  aria-labelledby="game-heading"
+  data-who-said-what
+>
+  <div class="on-dark bg-ambedkar-950 py-10 sm:py-12">
+    <Container>
+      <h2
+        id="game-heading"
+        class="font-display text-3xl font-bold tracking-title text-paper sm:text-4xl"
+      >
+        {game.gameHeading}
+      </h2>
+      <p
+        class="mt-5 max-w-2xl font-sans text-lg leading-relaxed text-ambedkar-100"
+      >
+        {game.instructions}
+      </p>
+      <p class="mt-5 max-w-2xl font-sans text-sm leading-relaxed text-alert-50">
+        {game.contentNote}
+      </p>
+      <nav class="mt-7 max-w-sm" aria-label="Game questions">
+        <ol class="grid grid-cols-5 gap-2">
+          {
+            game.questions.map((question) => (
+              <li>
+                <a
+                  class="btn btn-outline-light w-full px-2"
+                  href={`#${question.id}`}
+                  aria-label={question.label}
+                >
+                  {String(question.number).padStart(2, "0")}
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
+      <noscript>
+        <p
+          class="mt-6 max-w-2xl font-sans text-base leading-relaxed text-ambedkar-100"
+        >
+          {game.noScriptInstructions}
+        </p>
+      </noscript>
+    </Container>
+  </div>
+
+  <Container class="pt-12 pb-16 sm:pt-16 sm:pb-24">
+    <div class="grid gap-14 sm:gap-20">
+      {game.questions.map((question) => <GameQuestion question={question} />)}
+    </div>
+    <div
+      class="mt-12 rounded-sm bg-ambedkar-100 p-5 sm:p-7"
+      data-game-actions
+      hidden
+    >
+      <p
+        class="font-sans text-lg leading-relaxed font-medium text-ambedkar-950"
+        role="status"
+        aria-atomic="true"
+        data-game-progress
+      >
+      </p>
+      <div class="mt-5 flex flex-wrap gap-3">
+        <button class="btn btn-primary max-w-full" type="button" data-check-all>
+          Check all answers
+        </button>
+        <button
+          class="btn btn-outline max-w-full"
+          type="button"
+          data-game-reset
+        >
+          Start again
+        </button>
+      </div>
+    </div>
+  </Container>
+</section>
+
+<script>
+  import { mountGame } from "~/features/who-said-what/browser";
+
+  mountGame();
+</script>

@@ -1,79 +1,66 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-
+import { z } from "astro/zod";
+import { stringify } from "yaml";
 import { describe, expect, it } from "vitest";
 
-const projectRoot = fileURLToPath(new URL("../..", import.meta.url));
-const collectionDirectory = `${projectRoot}cms/content/general-body-meetings`;
-const mediaDirectory = `${projectRoot}cms/public/media/general-body`;
+import { mediaFilePath } from "~/schemas/shared";
+import { readContentCollection } from "./collection";
+import { parseFrontmatter } from "./frontmatter";
+import { missingContentMedia } from "./media-references";
 
-const entries = readdirSync(collectionDirectory)
-  .filter((name) => name.endsWith(".md"))
-  .map((name) => ({
-    name,
-    source: readFileSync(`${collectionDirectory}/${name}`, "utf8"),
-  }));
+const meetingFields = z.object({
+  edition: z.number().int().positive(),
+  papers: z
+    .array(z.object({ file: mediaFilePath("general-body-meetings", ["pdf"]) }))
+    .min(1),
+});
 
-const entryNames = entries.map((entry) => entry.name);
-const sourceOf = (name: string) =>
-  entries.find((candidate) => candidate.name === name)!.source;
+const meetingIn = (source: string) => parseFrontmatter(source, meetingFields);
+
+const entries = readContentCollection("general-body-meetings", meetingFields);
 
 const filesIn = (source: string) =>
-  [...source.matchAll(/^\s*file:\s*"([^"]+)"\s*$/gm)].map((match) => match[1]);
+  meetingIn(source).papers.map((paper) => paper.file);
 
-const allFiles = entries.flatMap((entry) => filesIn(entry.source));
+const allFiles = entries.flatMap((entry) =>
+  entry.data.papers.map((paper) => paper.file),
+);
 
 describe("General Body meetings", () => {
-  it("has entries to check", () => {
-    expect(entries).not.toHaveLength(0);
-  });
-
-  it.each(entryNames)("gives %s at least one paper", (name) => {
-    expect(filesIn(sourceOf(name)).length).toBeGreaterThan(0);
-  });
-
-  // The old WordPress host is being retired, so a paper that still pointed at
-  // it would become a dead download the day that site is switched off.
-  it.each(entryNames)(
-    "serves the papers for %s from this site rather than the old host",
-    (name) => {
-      for (const file of filesIn(sourceOf(name))) {
-        expect(file).toMatch(/^\/media\/general-body\/[a-z0-9-]+\.pdf$/);
-      }
-    },
-  );
-
-  it.each(entryNames)("points %s at PDFs that are committed", (name) => {
-    for (const file of filesIn(sourceOf(name))) {
-      const onDisk = `${mediaDirectory}/${file.split("/").pop()}`;
-
-      expect(
-        existsSync(onDisk),
-        `${file} is missing from cms/public/media/general-body/`,
-      ).toBe(true);
-    }
+  it("references only resolvable PDFs, without rejecting retained files", async () => {
+    expect(await missingContentMedia(allFiles)).toEqual([]);
   });
 
   it("gives every meeting a distinct edition", () => {
-    const editions = entries.map(
-      (entry) => entry.source.match(/^edition:\s*(\d+)\s*$/m)?.[1],
-    );
+    const editions = entries.map((entry) => entry.data.edition);
 
-    expect(editions.every(Boolean)).toBe(true);
     expect(new Set(editions).size).toBe(editions.length);
   });
 
-  it("references each PDF exactly once", () => {
-    expect(new Set(allFiles).size).toBe(allFiles.length);
-  });
+  it.each(["PLAIN", "QUOTE_SINGLE", "QUOTE_DOUBLE"] as const)(
+    "finds a new meeting's paper after a %s YAML serialization",
+    (defaultStringType) => {
+      const data = {
+        edition: 12,
+        papers: [
+          {
+            file: "/media/general-body-meetings/meeting-2030/annual_report-2030.pdf",
+          },
+        ],
+      };
+      const source = `---\n${stringify(data, { defaultStringType })}---\n`;
 
-  // An orphan would be committed weight that nothing links to.
-  it("has no unused PDFs in the media folder", () => {
-    const referenced = new Set(allFiles.map((file) => file.split("/").pop()));
-    const orphans = readdirSync(mediaDirectory)
-      .filter((name) => name.endsWith(".pdf"))
-      .filter((name) => !referenced.has(name));
+      expect(filesIn(source)).toEqual([data.papers[0].file]);
+      expect(meetingIn(source).edition).toBe(12);
+    },
+  );
 
-    expect(orphans).toEqual([]);
+  it("does not quietly ignore malformed or non-PDF paper fields", () => {
+    for (const file of [
+      "https://example.com/report.pdf",
+      "/media/general-body-meetings/meeting-2030/scan.png",
+    ]) {
+      const source = `---\n${stringify({ edition: 12, papers: [{ file }] })}---\n`;
+      expect(() => filesIn(source)).toThrow();
+    }
   });
 });

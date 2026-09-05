@@ -8,7 +8,7 @@ interface Props {
   title: string;
   eyebrow: string;
   intro: string;
-  sourceUrl: string;
+  sourceUrl?: string;
   joinUrl: string;
 }
 
@@ -87,16 +87,21 @@ const { title, eyebrow, intro, sourceUrl, joinUrl } = Astro.props;
           </p>
         </div>
 
-        <p class="mt-10 max-w-3xl text-sm wrap-break-word text-ambedkar-900/70">
-          Originally published at{" "}
-          <a
-            class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
-            href={sourceUrl}
-          >
-            {sourceUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-          </a>
-          .
-        </p>
+        {
+          sourceUrl && (
+            <p class="mt-10 max-w-3xl text-sm wrap-break-word text-ambedkar-900/70">
+              Originally published at{" "}
+              <a
+                class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
+                href={sourceUrl}
+                data-provenance
+              >
+                {sourceUrl.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+              </a>
+              .
+            </p>
+          )
+        }
       </div>
 
       <aside

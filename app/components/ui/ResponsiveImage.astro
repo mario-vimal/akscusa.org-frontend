@@ -6,9 +6,9 @@ import { measurePublicImage } from "~/lib/public-image";
 
 interface Props {
   /**
-   * An imported image, or a path to a file already in `public/`. A CMS upload
-   * is the second kind: it is committed under `cms/public/media/` and served
-   * as it was uploaded, so Astro cannot generate a responsive set for it.
+   * An imported image, or a public `/media/` URL. CMS images live beside their
+   * entry (or in the intentional shared library) and are served as uploaded,
+   * so Astro cannot generate a responsive set for them.
    */
   src: ImageMetadata | string;
   alt: string;
@@ -30,9 +30,9 @@ const responsiveWidths =
   typeof src === "string" ? [] : widths.filter((width) => width <= src.width);
 
 /*
- * A file in `public/` is served byte for byte, so Astro never learns its
- * proportions and the browser reserves no room for it. Reading the header at
- * build time is what stops the page reflowing as each picture arrives.
+ * Public media is served byte for byte. The shared delivery resolver gives
+ * measurement the same source file, so the browser can reserve its proportions
+ * before the picture arrives.
  */
 const size =
   typeof src === "string" ? await measurePublicImage(src) : undefined;

@@ -14,7 +14,6 @@ contribute:
   eyebrow: "Add your voice"
   title: "Your voice builds the playbook."
   description: "Your experience becomes someone else’s toolkit. The freeze response has protected casteism for generations — let’s end that, together."
-sourceUrl: "https://akscusa.squarespace.com/anti-caste-toolkit"
 ---
 
 There’s no single “right” response to casteist remarks — context and power

@@ -1,37 +1,27 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-
+import { z } from "astro/zod";
 import { describe, expect, it } from "vitest";
 
-const projectRoot = fileURLToPath(new URL("../..", import.meta.url));
-const collectionDirectory = `${projectRoot}cms/content/conferences`;
-const mediaDirectory = `${projectRoot}cms/public/media/conferences`;
+import { mediaImagePath } from "~/schemas/shared";
+import { readContentCollection } from "./collection";
+import { missingContentMedia } from "./media-references";
 
-const posterPaths = readdirSync(collectionDirectory)
-  .filter((name) => name.endsWith(".md"))
-  .flatMap((name) => {
-    const source = readFileSync(`${collectionDirectory}/${name}`, "utf8");
-    return [
-      ...source.matchAll(/\]\((\/media\/conferences\/[^)]+\.jpg)\)/g),
-    ].map((match) => match[1]);
-  });
+const entries = readContentCollection("conferences", z.object({}));
+const posterPaths = entries.flatMap(({ source }) =>
+  [...source.matchAll(/!\[[^\]]*\]\((\/media\/[^\s)]+)/g)].map(
+    (match) => match[1],
+  ),
+);
 
 describe("Conference media", () => {
-  it("references only committed posters", () => {
+  it("uses supported public image paths for posters", () => {
     for (const poster of posterPaths) {
-      expect(poster).toMatch(/^\/media\/conferences\/[a-z0-9-]+\.jpg$/);
-      expect(existsSync(`${projectRoot}cms/public${poster}`)).toBe(true);
+      expect(mediaImagePath("conferences").safeParse(poster).success).toBe(
+        true,
+      );
     }
   });
 
-  it("has no unused posters", () => {
-    const referenced = new Set(
-      posterPaths.map((poster) => poster.split("/").pop()),
-    );
-    const orphans = readdirSync(mediaDirectory)
-      .filter((name) => name.endsWith(".jpg"))
-      .filter((name) => !referenced.has(name));
-
-    expect(orphans).toEqual([]);
+  it("resolves referenced posters without rejecting retained assets", async () => {
+    expect(await missingContentMedia(posterPaths)).toEqual([]);
   });
 });

@@ -86,7 +86,7 @@ const figure = (index: number) => String(index + 1).padStart(2, "0");
                 />
               </div>
               {credit && (
-                <figcaption class="mt-3 text-xs leading-5 text-ambedkar-900/65">
+                <figcaption class="mt-3 text-xs leading-5 text-ink-muted">
                   Image:{" "}
                   <a
                     class="underline underline-offset-2 hover:text-ambedkar-900"
@@ -129,6 +129,7 @@ const figure = (index: number) => String(index + 1).padStart(2, "0");
                 <a
                   class="font-semibold text-ambedkar-700 underline underline-offset-4 hover:text-ambedkar-900"
                   href={page.sourceUrl}
+                  data-provenance
                 >
                   Where this biography came from
                 </a>
@@ -159,7 +160,12 @@ const figure = (index: number) => String(index + 1).padStart(2, "0");
                 <div class="mb-5 flex items-start gap-4 sm:mb-0 sm:block sm:w-28 sm:shrink-0">
                   <span class="index-figure sm:mb-3">{figure(index)}</span>
                   {entry.cover ? (
-                    <a class="block shrink-0" href={entry.href} tabindex="-1">
+                    <a
+                      class="block shrink-0"
+                      href={entry.href}
+                      aria-label={entry.title}
+                      tabindex="-1"
+                    >
                       <ResponsiveImage
                         class="w-20 rounded-md shadow-lift sm:w-full"
                         src={entry.cover}
@@ -184,7 +190,7 @@ const figure = (index: number) => String(index + 1).padStart(2, "0");
                   </h3>
 
                   {entry.subtitle && (
-                    <p class="mt-1.5 text-[0.9375rem] leading-6 text-ambedkar-900/65">
+                    <p class="mt-1.5 text-[0.9375rem] leading-6 text-ink-muted">
                       {entry.subtitle}
                     </p>
                   )}
@@ -202,7 +208,7 @@ const figure = (index: number) => String(index + 1).padStart(2, "0");
                   )}
 
                   {entry.sessions.length === 0 ? (
-                    <p class="mt-5 text-sm text-ambedkar-900/65">
+                    <p class="mt-5 text-sm text-ink-muted">
                       No session on this book has been scheduled yet.
                     </p>
                   ) : (
@@ -213,7 +219,7 @@ const figure = (index: number) => String(index + 1).padStart(2, "0");
                         row, so a badge added to a chapter range runs off a
                         320px screen; this line wraps.
                       */}
-                      <p class="label mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-ambedkar-900/60">
+                      <p class="label mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-ink-muted">
                         <span>
                           {entry.sessions.length === 1
                             ? "1 session"

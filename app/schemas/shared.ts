@@ -36,23 +36,56 @@ export function optionalCmsList<Schema extends z.ZodTypeAny>(schema: Schema) {
 
 export const optionalUrl = optionalCmsField(z.url());
 
-export const remoteImageSchema = z.object({
-  src: z.url(),
-  alt: z.string(),
-});
+const webUrl = z.url({ protocol: /^https?$/ });
 
-// One rule for an image the CMS uploads and Astro serves unchanged out of
-// `cms/public/`. A cover, a portrait, and a flyer are the same kind of thing —
-// a committed file under `/media/<collection>/` — so they are checked in one
-// place. Three copies of this regex is how they come to disagree about which
-// extensions and filenames are allowed.
-export const mediaImagePath = (collection: string) =>
+// Sveltia's ASCII slugger keeps underscores and tildes. Astro's default
+// Markdown slugger does not keep all the same characters. Media-owning entries
+// use <slug>/index.md, while vocabularies use <slug>.md; neither ID should pass
+// through a second slugger.
+export const cmsSlug = z
+  .string()
+  .regex(
+    /^[a-z0-9_~-]+$/,
+    "Use a lowercase ASCII filename with letters, numbers, hyphens, underscores or tildes.",
+  );
+
+export function cmsEntryId({ entry }: { entry: string }): string {
+  return cmsSlug.parse(entry.replace(/(?:\/index)?\.md$/, ""));
+}
+
+// Uploads live beside their entry's index.md and are served at
+// /media/<collection>/<slug>/<filename>. The global picker offers genuinely
+// shared files at /media/shared/. These are the namespaces the media resolver
+// can actually serve; historical archive paths are not a storage contract.
+export const mediaImageExtensions = ["png", "jpg", "jpeg", "webp"] as const;
+
+export const mediaFilePath = (
+  collection: string,
+  extensions: readonly string[],
+) =>
   z
     .string()
     .regex(
-      new RegExp(`^/media/${collection}/[a-z0-9-]+\\.(?:png|jpe?g|webp)$`),
-      `Must be a lowercase kebab-case image under /media/${collection}/.`,
+      new RegExp(
+        `^/media/(?:shared/(?:[a-z0-9_~-]+/)*|[a-z0-9_~-]+/[a-z0-9_~-]+/)[a-z0-9_~-]+\\.(?:${extensions.join("|")})$`,
+      ),
+      `Use a normalized ${extensions.join("/")} file under /media/${collection}/<entry>/ or /media/shared/.`,
     );
+
+export const mediaImagePath = (collection: string) =>
+  mediaFilePath(collection, mediaImageExtensions);
+
+export const editorialImageSchema = z.object({
+  src: z.union([mediaImagePath("collection"), webUrl]),
+  alt: z.string(),
+});
+
+// A reading is an authored instant, not a calendar-only record. Require its
+// offset before coercion; otherwise the build timezone invents a time or day.
+// Astro may supply Date objects, so raw YAML is also checked before coercion.
+export const readingDate = z
+  .union([z.iso.datetime({ offset: true }), z.date()])
+  .pipe(z.coerce.date());
 
 // An uploaded image with its alternative text, for a portrait or any other
 // single image an editor attaches rather than a list of them.
@@ -65,7 +98,7 @@ export const localImageSchema = (collection: string) =>
 // A hero image, portrait, or other optional image object is collapsed by
 // Sveltia to `null` as a whole when an editor never opens the group, rather
 // than sending an object with blank fields.
-export const optionalRemoteImage = optionalCmsField(remoteImageSchema);
+export const optionalEditorialImage = optionalCmsField(editorialImageSchema);
 
 // Shared by every editorial-shaped collection that offers the topics widget,
 // and by books and comics, which offer the same widget outside `editorialBase`.
@@ -75,18 +108,7 @@ export const optionalRemoteImage = optionalCmsField(remoteImageSchema);
 // is no fixed list here to check against. A typo cannot arrive through the
 // CMS, because the relation widget only offers terms that exist, and
 // `scripts/content/taxonomy.test.ts` catches one typed into a file by hand.
-export const topicsSchema = optionalCmsList(
-  z
-    .array(
-      z
-        .string()
-        .regex(
-          /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-          "Must be a lowercase kebab-case topic slug.",
-        ),
-    )
-    .default([]),
-);
+export const topicsSchema = optionalCmsList(z.array(cmsSlug).default([]));
 
 // Editorial records share one shape so the blog, press releases, interventions,
 // and conferences can be listed, sorted, and cross-referenced by the same code.
@@ -99,19 +121,56 @@ export const editorialBase = {
   summary: z.string(),
   topics: topicsSchema,
   /**
-   * Absolute URL of a hero image. Editorial media lives outside Git, so this
-   * points at the media host rather than a repository path.
+   * A public /media/ path for an uploaded image, or a genuine external image
+   * URL. Uploading through the CMS never requires a separate storage account.
    */
-  heroImage: optionalRemoteImage,
-  /** Where this entry was first published, kept so migrated copy is traceable. */
+  heroImage: optionalEditorialImage,
+  /** A genuine external publication or document, when one should be credited. */
   sourceUrl: optionalUrl,
   featured: z.boolean().default(false),
   draft: z.boolean().default(false),
 };
 
+const mediaResourcePath = mediaFilePath("collection", [
+  ...mediaImageExtensions,
+  "pdf",
+]);
+
+function isSafeLocalResource(value: string): boolean {
+  if (/[\\\s\p{Cc}]/u.test(value)) return false;
+  if (value.startsWith("#")) return value.length > 1;
+  if (!value.startsWith("/") || value.startsWith("//")) return false;
+
+  const pathname = value.split(/[?#]/, 1)[0];
+  if (pathname === "/media" || pathname.startsWith("/media/")) {
+    return mediaResourcePath.safeParse(pathname).success;
+  }
+
+  // Validate before URL() can normalize away traversal or encoded separators.
+  try {
+    return pathname.split("/").every((part) => {
+      const decoded = decodeURIComponent(part);
+      return (
+        decoded !== "." && decoded !== ".." && !/[\\/%\s\p{Cc}]/u.test(decoded)
+      );
+    });
+  } catch (error) {
+    if (error instanceof URIError) return false;
+    throw error;
+  }
+}
+
+export const resourceUrl = z.union([
+  webUrl,
+  z.string().refine(isSafeLocalResource, {
+    message:
+      "Use a safe site-relative page or /media/ path, or an HTTP(S) URL.",
+  }),
+]);
+
 export const linkSchema = z.object({
   label: z.string(),
-  url: z.string(),
+  url: resourceUrl,
 });
 
 // A relation to another collection, stored as that collection's stable entry
@@ -126,22 +185,14 @@ export const linkSchema = z.object({
 export function slugReferences(noun: string, duplicateMessage: string) {
   return optionalCmsList(
     z
-      .array(
-        z
-          .string()
-          .regex(
-            /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-            `Must be a lowercase kebab-case ${noun} slug.`,
-          ),
-      )
+      .array(cmsSlug.describe(`Stable ${noun} filename.`))
       .default([])
       .refine((ids) => new Set(ids).size === ids.length, duplicateMessage),
   );
 }
 
-// A poster or flyer, committed to Git rather than hosted on the media host:
-// it is AKSC's own artwork, kept in its original colours, not editorial
-// photography. Shared by every collection that offers the Sveltia `image`
+// A poster or flyer is AKSC's own artwork, kept in its original colours.
+// Shared by every collection that offers the Sveltia `image`
 // widget for posters, so the committed path and the shape a page reads are
 // the same wherever a poster appears.
 export function posterListSchema(collection: string) {
@@ -170,3 +221,10 @@ export const isbn13 = z
     isValidIsbn13,
     "Must be a valid ISBN-13, with a correct check digit.",
   );
+
+// Sveltia trims strings before checking widget patterns, so whitespace-only
+// optional ISBN input must be as empty here as it is in the editor.
+export const optionalIsbn13 = z.preprocess(
+  (value) => (typeof value === "string" ? value.trim() : value),
+  optionalCmsField(isbn13),
+);

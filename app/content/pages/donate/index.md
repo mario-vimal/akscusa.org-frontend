@@ -6,7 +6,6 @@ eyebrow: Support the mission
 intro: Ambedkar King Study Circle is dedicated to advancing social justice and building a more equitable society for all, irrespective of race, caste, or socioeconomic status.
 donationLabel: Donate to AKSC
 donationUrl: https://bit.ly/donate-aksc
-sourceUrl: https://akscusa.org/donate/
 ---
 
 We started as a support group in 2016 and have expanded into advocating for policy changes and providing legal support to marginalized communities.

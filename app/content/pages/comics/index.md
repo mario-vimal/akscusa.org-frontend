@@ -20,7 +20,6 @@ contribute:
     label: "See the Anti-caste Toolkit"
     href: "/anti-caste-toolkit/"
   note: "Every comic is published under the artist's name, and artists keep the credit for their work. Translations of a comic already published are just as welcome as a new one."
-sourceUrl: "https://akscusa.squarespace.com/comics"
 ---
 
 The comics on this page were drawn to be read together, out loud, with someone

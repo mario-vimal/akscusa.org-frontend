@@ -4,7 +4,6 @@ title: "Organization"
 description: "How the Ambedkar King Study Circle organizes against caste, class, race, gender, and religious oppression in the United States."
 eyebrow: "About AKSC USA"
 intro: "AKSC promotes an egalitarian society by challenging oppression and standing with oppressed people in their struggle for freedom."
-sourceUrl: "https://akscusa.org/about/"
 ---
 
 The goal of **Ambedkar King Study Circle** (AKSC) is to promote an egalitarian society by challenging caste, class, race, gender and religious oppression and standing with the oppressed in their struggle for freedom.

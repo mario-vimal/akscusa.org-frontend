@@ -4,7 +4,8 @@
  * the templates stay declarative.
  */
 import type { EditorialEntry } from "~/features/editorial/sections";
-import { termsInUse, type Term } from "~/features/editorial/queries/taxonomy";
+import { termsInUse, type Term } from "./vocabulary";
+import { isUpcomingConference } from "./calendar";
 import { formatDate, formatDateRange, ordinal } from "~/lib/dates";
 import { measurePublicImage, type ImageSize } from "~/lib/public-image";
 import {
@@ -237,8 +238,7 @@ export function conferenceDetails(conference: Conference): Detail[] {
   if (conference.data.registrationUrl) {
     // Inviting registration to a conference that has already happened would be
     // misleading, so the same link is offered as an archive of the programme.
-    const upcoming =
-      (conference.data.endDate ?? conference.data.date).getTime() >= Date.now();
+    const upcoming = isUpcomingConference(conference);
 
     details.push({
       term: upcoming ? "Registration" : "Programme",

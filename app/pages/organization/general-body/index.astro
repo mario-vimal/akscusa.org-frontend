@@ -1,12 +1,13 @@
 ---
-import { getEntry, render } from "astro:content";
+import { render } from "astro:content";
 
 import GeneralBodyOverview from "~/features/organization/components/GeneralBodyOverview.astro";
+import { loadPage } from "~/features/page-copy/queries/entries";
 import SiteLayout from "~/layouts/SiteLayout.astro";
 
-const page = await getEntry("pages", "general-body");
+const page = await loadPage("general-body");
 
-if (!page || page.data.pageType !== "general-body") {
+if (page.data.pageType !== "general-body") {
   throw new Error("General Body content is missing or invalid.");
 }
 

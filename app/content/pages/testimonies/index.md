@@ -34,7 +34,7 @@ categories:
     id: caste-based-nepotism-at-the-workplace
   - label: Savarnas on casteism
     id: savarnas-speak-about-casteism
-shareUrl: https://akscusa.org/share-your-testimonies/
+shareUrl: https://bit.ly/CasteInUsa
 solidarityUrl: https://tinyurl.com/sol2ENDCaste
 ---
 

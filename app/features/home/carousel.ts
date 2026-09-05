@@ -76,7 +76,8 @@ function mount(carousel: HTMLElement): void {
   let current = 0;
   let timer: number | undefined;
   let userPaused = reducedMotion.matches;
-  let interactionPaused = false;
+  let pointerPaused = carousel.matches(":hover");
+  let focusPaused = carousel.contains(document.activeElement);
   let scrollFrame: number | undefined;
 
   /*
@@ -166,7 +167,8 @@ function mount(carousel: HTMLElement): void {
     stopTimer();
     if (
       userPaused ||
-      interactionPaused ||
+      pointerPaused ||
+      focusPaused ||
       reducedMotion.matches ||
       document.hidden ||
       !overflows()
@@ -215,17 +217,17 @@ function mount(carousel: HTMLElement): void {
   });
 
   carousel.addEventListener("pointerenter", () => {
-    interactionPaused = true;
+    pointerPaused = true;
     stopTimer();
   });
 
   carousel.addEventListener("pointerleave", () => {
-    interactionPaused = false;
+    pointerPaused = false;
     startTimer();
   });
 
   carousel.addEventListener("focusin", () => {
-    interactionPaused = true;
+    focusPaused = true;
     stopTimer();
   });
 
@@ -236,7 +238,7 @@ function mount(carousel: HTMLElement): void {
     ) {
       return;
     }
-    interactionPaused = false;
+    focusPaused = false;
     startTimer();
   });
 

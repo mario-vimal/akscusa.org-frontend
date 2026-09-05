@@ -5,7 +5,16 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
 import { generalBodyPaperKindIds } from "~/features/editorial/taxonomy";
-import { optionalCmsField, optionalUrl } from "~/schemas/shared";
+import {
+  cmsEntryId,
+  mediaFilePath,
+  optionalCmsField,
+  optionalUrl,
+} from "~/schemas/shared";
+
+export const generalBodyPdfPath = mediaFilePath("general-body-meetings", [
+  "pdf",
+]);
 
 // A General Body meeting, not a loose file. The meeting is the entity: it has
 // an edition, a date, and a place, and it publishes one or more papers. The 1st
@@ -19,6 +28,7 @@ export const generalBodyMeetings = defineCollection({
   loader: glob({
     base: "./cms/content/general-body-meetings",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     /** Which General Body meeting this is, counting from the first in 2017. */
@@ -37,16 +47,11 @@ export const generalBodyMeetings = defineCollection({
         z.object({
           kind: z.enum(generalBodyPaperKindIds),
           /**
-           * Site-relative path to the PDF, committed under
-           * `cms/public/media/general-body/` and served from `/media/`, so the
-           * papers survive the retirement of the old WordPress host.
+           * New PDFs are uploaded beside this meeting's index.md. Shared
+           * internal-library files can also be reused; every paper is served
+           * directly from this site's /media/ URLs.
            */
-          file: z
-            .string()
-            .regex(
-              /^\/media\/general-body\/[a-z0-9-]+\.pdf$/,
-              "Must be a lowercase kebab-case PDF under /media/general-body/.",
-            ),
+          file: generalBodyPdfPath,
           /** Printed beside the link, so the size of the download is known. */
           pageCount: optionalCmsField(z.number().int().positive()),
         }),

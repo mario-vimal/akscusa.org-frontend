@@ -5,6 +5,8 @@ import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
 import {
+  cmsEntryId,
+  mediaImagePath,
   optionalCmsField,
   optionalCmsList,
   optionalUrl,
@@ -19,17 +21,11 @@ import {
 // transcript the argument is invisible to a screen reader, to translation, and
 // to search; and repeating the words in `alt` would have them read out twice.
 //
-// Panels are committed under `cms/public/media/`, which is the Astro public
-// directory, so a published panel is a file this site serves rather than a link
-// to somebody else's host.
+// Panels are committed beside the entry's index.md and served at /media/
+// URLs, so a published panel does not depend on another storage account.
 const panelSchema = (mediaFolder: string) =>
   z.object({
-    src: z
-      .string()
-      .regex(
-        new RegExp(`^/media/${mediaFolder}/[a-z0-9-]+\\.(png|jpe?g|webp)$`),
-        `Must be a lowercase kebab-case image under /media/${mediaFolder}/.`,
-      ),
+    src: mediaImagePath(mediaFolder),
     /** Describes the drawing. The words in the panel go in `transcript`. */
     alt: z.string().min(1),
     /** Every word drawn inside the panel, in reading order. */
@@ -53,6 +49,7 @@ export const comics = defineCollection({
   loader: glob({
     base: "./cms/content/comics",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     title: z.string(),
@@ -85,6 +82,7 @@ export const toolkitScenarios = defineCollection({
   loader: glob({
     base: "./cms/content/toolkit-scenarios",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     title: z.string(),
@@ -95,7 +93,7 @@ export const toolkitScenarios = defineCollection({
     summary: z.string(),
     /** The question put to the reader once they have read the scenario. */
     prompt: z.string(),
-    panels: z.array(panelSchema("anti-caste-toolkit")).min(1),
+    panels: z.array(panelSchema("toolkit-scenarios")).min(1),
     credits: optionalCmsList(z.array(creditSchema).default([])),
     sourceUrl: optionalUrl,
     draft: z.boolean().default(false),

@@ -1,6 +1,6 @@
 /**
  * ISBN-13 identifies the edition a book entry names, so it is normalized and
- * check-digit validated at build time. A typo in an ISBN is otherwise
+ * prefix and check-digit validated at build time. A typo in an ISBN is otherwise
  * invisible, and it would be caught by nothing else, since a reading names its
  * book by the book entry's stable id rather than by this field.
  */
@@ -9,7 +9,7 @@
 export const normalizeIsbn = (value: string) => value.replace(/[\s-]/g, "");
 
 export function isValidIsbn13(value: string) {
-  if (!/^\d{13}$/.test(value)) {
+  if (!/^97[89]\d{10}$/.test(value)) {
     return false;
   }
 

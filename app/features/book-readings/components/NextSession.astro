@@ -8,7 +8,6 @@ interface Props {
 }
 
 const { session } = Astro.props;
-const cover = session.book?.cover;
 ---
 
 <!--
@@ -24,13 +23,18 @@ const cover = session.book?.cover;
   space answers nothing.
 -->
 <div class="mt-12 border-t border-white/15 pt-9 sm:mt-14">
-  <div class="flex gap-6 sm:gap-8">
+  <div class="flex flex-wrap gap-6 sm:gap-8">
     {
-      cover && (
-        <a class="shrink-0 self-start" href={session.book?.href} tabindex="-1">
+      session.book?.cover && (
+        <a
+          class="shrink-0 self-start"
+          href={session.book.href}
+          aria-label={session.book.title}
+          tabindex="-1"
+        >
           <ResponsiveImage
             class="w-20 rounded-md shadow-lift sm:w-24"
-            src={cover}
+            src={session.book.cover}
             alt={COVER_ALT}
             sizes="(min-width: 640px) 96px, 80px"
             widths={COVER_WIDTHS}
@@ -39,7 +43,7 @@ const cover = session.book?.cover;
       )
     }
 
-    <div class="min-w-0">
+    <div class="min-w-0 flex-1 basis-40">
       <p class="label text-accent-300">
         {session.upcoming ? "Next session" : "Last met"}
       </p>
@@ -63,6 +67,15 @@ const cover = session.book?.cover;
               <cite class="italic">{session.book.title}</cite>
             </a>
             {session.book.byline && <span> by {session.book.byline}</span>}
+          </p>
+        )
+      }
+      {
+        session.participation && (
+          <p class="mt-6">
+            <a class="btn btn-primary btn-sm" href={session.participation.href}>
+              {session.participation.label}
+            </a>
           </p>
         )
       }

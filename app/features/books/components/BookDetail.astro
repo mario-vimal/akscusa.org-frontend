@@ -50,7 +50,7 @@ const topicLabel = await loadTermLabels("topics");
         >
           {
             data.subtitle && (
-              <p class="mt-4 max-w-2xl font-display text-xl text-ambedkar-900/65 italic">
+              <p class="mt-4 max-w-2xl font-display text-xl text-ink-muted italic">
                 {data.subtitle}
               </p>
             )
@@ -143,10 +143,10 @@ const topicLabel = await loadTermLabels("topics");
       >
         {
           readings.length === 0
-            ? "Not yet read"
+            ? "No sessions yet"
             : readings.length === 1
-              ? "Read at one session"
-              : `Read across ${readings.length} sessions`
+              ? "One session"
+              : `${readings.length} sessions`
         }
       </h2>
       {

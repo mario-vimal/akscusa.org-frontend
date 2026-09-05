@@ -1,6 +1,6 @@
 ---
 import Container from "~/components/ui/Container.astro";
-import { isoDate } from "~/lib/dates";
+import { formatDate, isoDate } from "~/lib/dates";
 import type { Spotlight } from "~/features/home/queries/featured";
 
 interface Props {
@@ -37,11 +37,8 @@ const weekday = part({ weekday: "long" });
     >
       <div>
         <p class="eyebrow">{spotlight.upcoming ? "Next up" : "Most recent"}</p>
-        <time
-          class="mt-6 block"
-          datetime={isoDate(spotlight.date)}
-          aria-label={`${weekday}, ${month} ${day}, ${year}`}
-        >
+        <time class="mt-6 block" datetime={isoDate(spotlight.date)}>
+          <span class="sr-only">{formatDate(spotlight.date)}</span>
           <span
             aria-hidden="true"
             class="block font-display text-sm font-semibold tracking-[0.24em] text-ambedkar-900/70 uppercase"

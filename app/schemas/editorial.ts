@@ -18,11 +18,13 @@ import {
   programStatusIds,
 } from "~/features/editorial/taxonomy";
 import {
+  cmsEntryId,
+  cmsSlug,
   editorialBase,
   linkSchema,
   optionalCmsField,
   optionalCmsList,
-  optionalRemoteImage,
+  optionalEditorialImage,
   optionalUrl,
   posterListSchema,
   slugReferences,
@@ -32,6 +34,7 @@ export const articles = defineCollection({
   loader: glob({
     base: "./cms/content/articles",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     ...editorialBase,
@@ -40,12 +43,7 @@ export const articles = defineCollection({
      * blog's shelves are editorial judgement rather than a rule the templates
      * depend on, so a new one is added as content and not as an enum member.
      */
-    category: z
-      .string()
-      .regex(
-        /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-        "Must be a lowercase kebab-case category slug.",
-      ),
+    category: cmsSlug,
     authors: optionalCmsList(
       z
         .array(
@@ -63,6 +61,7 @@ export const pressReleases = defineCollection({
   loader: glob({
     base: "./cms/content/press-releases",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     ...editorialBase,
@@ -79,6 +78,7 @@ export const interventions = defineCollection({
   loader: glob({
     base: "./cms/content/interventions",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     ...editorialBase,
@@ -96,6 +96,7 @@ export const conferences = defineCollection({
   loader: glob({
     base: "./cms/content/conferences",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     ...editorialBase,
@@ -122,13 +123,14 @@ export const speakers = defineCollection({
   loader: glob({
     base: "./cms/content/speakers",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     name: z.string(),
     role: z.string(),
     /** Paragraphs are separated by blank lines in the CMS text field. */
     bio: z.string(),
-    portrait: optionalRemoteImage,
+    portrait: optionalEditorialImage,
     sourceUrl: optionalUrl,
     draft: z.boolean().default(false),
   }),
@@ -141,6 +143,7 @@ export const programs = defineCollection({
   loader: glob({
     base: "./cms/content/programs",
     pattern: "**/*.md",
+    generateId: cmsEntryId,
   }),
   schema: z.object({
     ...editorialBase,
@@ -152,8 +155,8 @@ export const programs = defineCollection({
     /**
      * Every organisation that convened the program, as its flyer credits them.
      * AKSC organises in coalition and the original flyers name their partners,
-     * so dropping them loses who actually did the work. Optional because the
-     * WordPress programs index recorded no organisers at all.
+     * so dropping them loses who actually did the work. Optional when the
+     * record does not identify its organisers.
      */
     organisers: optionalCmsList(z.array(z.string()).default([])),
     registrationUrl: optionalUrl,

@@ -28,6 +28,8 @@ pnpm-debug.log*
 # test output
 coverage/
 .tmp-cms-routing/
+playwright-report/
+test-results/
 
 # Cloudflare local state
 .wrangler/

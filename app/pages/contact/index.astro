@@ -1,12 +1,12 @@
 ---
-import { getEntry } from "astro:content";
+import { loadPage } from "~/features/page-copy/queries/entries";
 
 import ContactOverview from "~/features/contact/components/ContactOverview.astro";
 import SiteLayout from "~/layouts/SiteLayout.astro";
 
-const page = await getEntry("pages", "contact");
+const page = await loadPage("contact");
 
-if (!page || page.data.pageType !== "contact") {
+if (page.data.pageType !== "contact") {
   throw new Error("Contact content is missing or invalid.");
 }
 ---

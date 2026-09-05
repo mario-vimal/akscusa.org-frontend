@@ -16,6 +16,12 @@ describe("isValidIsbn13", () => {
   it("accepts real ISBN-13s", () => {
     expect(isValidIsbn13(annihilationOfCaste)).toBe(true);
     expect(isValidIsbn13(riddlesInHinduism)).toBe(true);
+    expect(isValidIsbn13("9798190357936")).toBe(true);
+  });
+
+  it("rejects check-digit-valid EANs outside the ISBN prefixes", () => {
+    expect(isValidIsbn13("0000000000000")).toBe(false);
+    expect(isValidIsbn13("4006381333931")).toBe(false);
   });
 
   it("rejects a wrong check digit", () => {

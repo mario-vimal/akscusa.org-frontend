@@ -30,10 +30,11 @@ const setHidden = (element: HTMLElement, hidden: boolean) => {
 const enhanceIndex = (root: HTMLElement) => {
   const key = root.dataset.indexFilter;
 
-  if (!key) {
+  if (!key || root.dataset.indexFilterReady !== undefined) {
     return;
   }
 
+  const controls = root.querySelector<HTMLElement>("[data-filter-controls]");
   const chips = [
     ...root.querySelectorAll<HTMLButtonElement>("[data-filter-value]"),
   ];
@@ -44,7 +45,7 @@ const enhanceIndex = (root: HTMLElement) => {
   ];
   const count = root.querySelector<HTMLElement>("[data-page-meta]");
 
-  if (chips.length === 0 || entries.length === 0) {
+  if (!controls || chips.length === 0 || entries.length === 0) {
     return;
   }
 
@@ -114,6 +115,8 @@ const enhanceIndex = (root: HTMLElement) => {
   // empty one.
   const requested = new URLSearchParams(window.location.search).get(key);
   select(requested && known.has(requested) ? requested : ALL_TERMS, false);
+  root.dataset.indexFilterReady = "";
+  controls.hidden = false;
 };
 
 export const mountIndexFilters = (): void => {

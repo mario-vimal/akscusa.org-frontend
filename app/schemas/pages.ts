@@ -9,6 +9,8 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
+import { optionalUrl } from "./shared";
+
 const actionSchema = z.object({
   label: z.string(),
   href: z.string(),
@@ -144,7 +146,7 @@ const donatePageSchema = z.object({
   intro: z.string(),
   donationLabel: z.string(),
   donationUrl: z.url(),
-  sourceUrl: z.url(),
+  sourceUrl: optionalUrl,
 });
 
 // The organization overview is one stable page, not a stream of records. Its
@@ -156,7 +158,7 @@ const organizationPageSchema = z.object({
   description: z.string(),
   eyebrow: z.string(),
   intro: z.string(),
-  sourceUrl: z.url(),
+  sourceUrl: optionalUrl,
 });
 
 // The constitution page is a stable organization document. Its copy stays in
@@ -167,7 +169,7 @@ const constitutionPageSchema = z.object({
   description: z.string(),
   eyebrow: z.string(),
   intro: z.string(),
-  sourceUrl: z.url(),
+  sourceUrl: optionalUrl,
 });
 
 // Joining is the site's primary call to action, so it has a page of its own at
@@ -180,7 +182,7 @@ const joinPageSchema = z.object({
   description: z.string(),
   eyebrow: z.string(),
   intro: z.string(),
-  sourceUrl: z.url(),
+  sourceUrl: optionalUrl,
   joinUrl: z.url(),
 });
 
@@ -223,7 +225,7 @@ const comicsPageSchema = z.object({
     secondaryAction: actionSchema.optional(),
     note: z.string().optional(),
   }),
-  sourceUrl: z.url(),
+  sourceUrl: optionalUrl,
 });
 
 // The toolkit is a playbook being written in public: the argument for it is
@@ -247,8 +249,68 @@ const antiCasteToolkitPageSchema = z.object({
     title: z.string(),
     description: z.string(),
   }),
-  sourceUrl: z.url(),
+  sourceUrl: optionalUrl,
 });
+
+const gamePhotoSchema = z.object({
+  file: z.string().regex(/^[a-z0-9-]+\.jpg$/),
+  alt: z.string().min(1),
+  credit: z.object({
+    name: z.string().min(1),
+    profile: z.url(),
+    source: z.url(),
+  }),
+});
+
+const gameQuestionSchema = z.object({
+  id: z.string().regex(/^[a-z][a-z0-9-]*$/),
+  prompt: z.string().min(1),
+  quotes: z.array(z.string().min(1)).default([]),
+  choices: z
+    .tuple([z.string().min(1), z.string().min(1)])
+    .refine(([first, second]) => first !== second, "Choices must differ."),
+  answer: z.enum(["first", "second", "both"]),
+  explanation: z.array(z.string().min(1)).min(1),
+  photo: gamePhotoSchema,
+  references: z
+    .array(
+      z.object({
+        before: z.string().optional(),
+        label: z.string().min(1),
+        href: z.url(),
+        after: z.string().optional(),
+      }),
+    )
+    .default([]),
+});
+
+// This is the fixed September 2023 game, not a growing collection. Its five
+// questions, explanations and answer key remain together in one static page.
+export const whoSaidWhatPageSchema = z.object({
+  pageType: z.literal("who-said-what"),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  eyebrow: z.string().min(1),
+  lede: z.string().min(1),
+  publishedAt: z.coerce.date(),
+  archiveNote: z.string().min(1),
+  gameHeading: z.string().min(1),
+  instructions: z.string().min(1),
+  noScriptInstructions: z.string().min(1),
+  contentNote: z.string().min(1),
+  photo: gamePhotoSchema,
+  questions: z
+    .array(gameQuestionSchema)
+    .length(5)
+    .refine(
+      (questions) =>
+        new Set(questions.map((question) => question.id)).size ===
+        questions.length,
+      "Question identifiers must be unique.",
+    ),
+});
+
+export type WhoSaidWhatPageCopy = z.infer<typeof whoSaidWhatPageSchema>;
 
 export const pages = defineCollection({
   loader: glob({
@@ -268,5 +330,6 @@ export const pages = defineCollection({
     generalBodyPageSchema,
     comicsPageSchema,
     antiCasteToolkitPageSchema,
+    whoSaidWhatPageSchema,
   ]),
 });

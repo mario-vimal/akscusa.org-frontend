@@ -2,6 +2,9 @@
   "name": "akscusa.org-frontend",
   "private": true,
   "type": "module",
+  "imports": {
+    "#content-media": "./app/lib/content-media.ts"
+  },
   "version": "0.1.0",
   "engines": {
     "node": ">=24.0.0 <27"
@@ -17,15 +20,18 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:browser": "playwright test",
     "generate-types": "wrangler types",
     "generate:emblem": "node scripts/generate-emblem.mjs",
     "generate:favicon": "node scripts/generate-favicon.mjs",
     "verify:pages": "node scripts/verify-pages.mjs",
+    "verify:links": "node scripts/verify-links.mjs --strict",
     "deploy:pages": "wrangler pages deploy dist",
-    "validate": "npm run check && npm run lint && npm run format:check && npm run test && npm run build && npm run verify:pages"
+    "validate": "npm run check && npm run lint && npm run format:check && npm run test && npm run build && npm run verify:pages && npm run verify:links && npm run test:browser"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.2.5",
+    "@astrojs/markdown-satteri": "0.3.8",
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/archivo": "^5.3.0",
     "@fontsource-variable/instrument-sans": "^5.3.0",
@@ -42,13 +48,19 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "1.62.1",
+    "@types/hast": "3.0.5",
     "@types/node": "^26.4.0",
+    "ajv": "6.15.0",
+    "axe-core": "4.13.0",
     "eslint": "^10.9.1",
     "eslint-plugin-astro": "^3.1.0",
     "globals": "^17.11.0",
+    "parse5": "8.0.1",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "satteri": "0.10.5",
     "sharp": "^0.35.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.68.0",

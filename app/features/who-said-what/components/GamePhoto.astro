@@ -1,0 +1,29 @@
+---
+import ResponsiveImage from "~/components/ui/ResponsiveImage.astro";
+import type { GamePhotoView } from "~/features/who-said-what/presenters";
+
+interface Props {
+  photo: GamePhotoView;
+  sizes: string;
+  loading?: "eager" | "lazy";
+}
+
+const { photo, sizes, loading = "lazy" } = Astro.props;
+---
+
+<figure>
+  <div class="overflow-hidden rounded-sm bg-ambedkar-200">
+    <ResponsiveImage
+      src={photo.src}
+      alt={photo.alt}
+      sizes={sizes}
+      loading={loading}
+      class="h-auto w-full mix-blend-multiply duotone-light"
+    />
+  </div>
+  <figcaption class="mt-3 font-sans text-sm leading-relaxed text-ambedkar-800">
+    Photo by <a class="link-underline" href={photo.credit.profile}>
+      {photo.credit.name}
+    </a> on <a class="link-underline" href={photo.credit.source}>Unsplash</a>
+  </figcaption>
+</figure>

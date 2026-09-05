@@ -9,6 +9,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
 import { isPublished } from "~/lib/collections";
+import { resolvePublishedReferences } from "~/lib/references";
 
 export type Author = CollectionEntry<"authors">;
 
@@ -43,18 +44,15 @@ export async function resolveBookAuthors<Book extends AuthoredEntry>(
   const authorsOfBook = new Map<string, Author[]>();
 
   for (const book of books) {
-    const resolved: Author[] = [];
-
-    for (const slug of book.data.authors) {
-      if (!known.has(slug)) {
-        throw new Error(
+    const resolved = resolvePublishedReferences(
+      book.data.authors,
+      known,
+      published,
+      (slug) =>
+        new Error(
           `Book "${book.id}" references author "${slug}", which has no entry in cms/content/authors.`,
-        );
-      }
-
-      const author = published.get(slug);
-      if (author) resolved.push(author);
-    }
+        ),
+    );
 
     authorsOfBook.set(book.id, resolved);
   }

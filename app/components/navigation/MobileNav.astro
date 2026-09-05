@@ -54,11 +54,12 @@ const { currentPath } = Astro.props;
   </summary>
 
   <div
-    class="absolute inset-x-0 top-full max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain border-b border-rule bg-mist shadow-soft"
+    class="absolute inset-x-0 top-full overflow-y-auto overscroll-contain border-b border-rule bg-mist shadow-soft"
+    data-mobile-nav-sheet
   >
     <div class="mx-auto w-full max-w-6xl px-5 py-6 sm:px-6">
       <nav aria-label="Mobile navigation">
-        <ul class="grid sm:grid-cols-2 sm:gap-x-8">
+        <ul class="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-8">
           {
             [...primaryNavigation, ...secondaryNavigation].map((item) =>
               isNavigationGroup(item) ? (
@@ -122,6 +123,19 @@ const { currentPath } = Astro.props;
   </div>
 </details>
 
+<style>
+  /*
+   * Without enhancement the header and full sheet scroll with the document.
+   * A sticky header would pin an unmeasured menu and strand its last links.
+   * Keep this consistent before opening, so a scrolled header cannot jump away.
+   */
+  @media (width < 64rem) {
+    :global(header:has([data-mobile-nav]:not([data-disclosure-ready]))) {
+      position: relative;
+    }
+  }
+</style>
+
 <script>
   import { enhanceDisclosures } from "./nav-disclosure";
 
@@ -129,5 +143,7 @@ const { currentPath } = Astro.props;
   enhanceDisclosures("[data-mobile-nav]", {
     lockScroll: true,
     labels: { closed: "Open menu", open: "Close menu" },
+    closeAt: "(min-width: 64rem)",
+    viewportPanel: "[data-mobile-nav-sheet]",
   });
 </script>

@@ -2,6 +2,9 @@
 
 Work that is agreed but not yet done. Delete a row once it ships.
 
+Pre-launch remediation is tracked in [QUALITY-GATE.md](QUALITY-GATE.md), with
+priorities, ordered subprojects, and release acceptance criteria.
+
 ## System pages
 
 The site falls through to Astro's and Cloudflare's own error pages for
@@ -12,20 +15,6 @@ a page that does not look like AKSC and offers them nowhere to go.
 - [ ] **500 — Something went wrong.** Only reachable once a page renders on
       the server, which the site does not do yet. Add it with the first D1
       backed route, not before.
-
-## Temporary links
-
-- [ ] **Home hero: Annual Conference 2026.** The hero's secondary action in
-      `app/content/pages/home/index.md` points off-site to
-      `https://akscusa.squarespace.com/conf-26` for the duration of the
-      migration, rather than at the migrated on-site route
-      `/conferences/aksc-7th-annual-conference-2026/`. Point it back at the
-      on-site route once the migration is complete, and delete this row. The
-      spotlight band lower down the same page already links to the on-site
-      conference, so the two disagree until this is undone.
-      `MIGRATION-TRACKER.md` records the same dependency against `/conf-26`;
-      neither that file nor the Squarespace site can be retired while this
-      link is live.
 
 ## Notes
 
@@ -42,7 +31,6 @@ a page that does not look like AKSC and offers them nowhere to go.
   reopened every time someone notices there is no offline page.
 - **No redirects for the retired WordPress and Squarespace URLs.** Decided
   against: it is one rule per old path, in both trailing-slash spellings,
-  kept in step with `MIGRATION-TRACKER.md` by hand forever, to serve traffic
-  that decays to nothing. The 404 page is the answer for those URLs. Reopen
-  only if the logs show real people arriving on old paths in numbers worth the
-  weight.
+  maintained by hand to serve traffic that decays to nothing. The 404 page is
+  the answer for those URLs. Reopen only if the logs show real people arriving
+  on old paths in numbers worth the weight.

@@ -27,11 +27,11 @@ export function sessionLabel(
 ): string | undefined {
   const trimmed = title.trim();
 
-  if (!bookTitle) {
+  const prefix = bookTitle?.trim();
+  if (!prefix) {
     return trimmed || undefined;
   }
 
-  const prefix = bookTitle.trim();
   // Case-insensitively, because "Why were Women enslaved?" is the same session
   // title as the book's "Why Were Women Enslaved?" as far as a reader is
   // concerned, and an editor should not have to match capitals to be understood.
@@ -42,7 +42,14 @@ export function sessionLabel(
     return trimmed || undefined;
   }
 
-  const rest = trimmed.slice(prefix.length).replace(LEADING_SEPARATORS, "");
+  const remainder = trimmed.slice(prefix.length);
+  // A matching string is not necessarily a whole title: "Ambedkarism" must
+  // not lose "Ambedkar" just because both start with the same letters.
+  if (remainder && !LEADING_SEPARATORS.test(remainder)) {
+    return trimmed;
+  }
+
+  const rest = remainder.replace(LEADING_SEPARATORS, "");
 
   if (!rest) {
     return undefined;

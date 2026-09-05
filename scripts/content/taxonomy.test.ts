@@ -1,8 +1,10 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { parse } from "yaml";
+import { z } from "astro/zod";
 import { describe, expect, it } from "vitest";
+
+import { readContentCollection } from "./collection";
 
 /**
  * Topics and categories are entries an editor maintains, so nothing in the Zod
@@ -19,35 +21,23 @@ import { describe, expect, it } from "vitest";
 const projectRoot = fileURLToPath(new URL("../..", import.meta.url));
 const contentRoot = `${projectRoot}cms/content`;
 
-const termIds = (vocabulary: string) =>
-  new Set(
-    readdirSync(`${contentRoot}/${vocabulary}`)
-      .filter((name) => name.endsWith(".md"))
-      .map((name) => name.replace(/\.md$/, "")),
-  );
-
-interface Frontmatter {
-  topics?: unknown;
-  category?: unknown;
-}
+const frontmatterFields = z.object({
+  topics: z.unknown().optional(),
+  category: z.unknown().optional(),
+  label: z.unknown().optional(),
+});
 
 /** Every entry in the CMS content tree, with its frontmatter parsed. */
 const entries = readdirSync(contentRoot, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .flatMap((collection) =>
-    readdirSync(`${contentRoot}/${collection.name}`)
-      .filter((name) => name.endsWith(".md"))
-      .map((name) => {
-        const path = `${contentRoot}/${collection.name}/${name}`;
-        const source = readFileSync(path, "utf8");
-        const match = /^---\n([\s\S]*?)\n---/.exec(source);
-
-        return {
-          path: `cms/content/${collection.name}/${name}`,
-          data: (match ? (parse(match[1]) as Frontmatter) : {}) ?? {},
-        };
-      }),
+    readContentCollection(collection.name, frontmatterFields),
   );
+
+const vocabularyEntries = (name: string) =>
+  entries.filter((entry) => entry.path.startsWith(`cms/content/${name}/`));
+const termIds = (name: string) =>
+  new Set(vocabularyEntries(name).map((entry) => entry.id));
 
 describe("Editor-maintained vocabularies", () => {
   const topics = termIds("topics");
@@ -60,15 +50,8 @@ describe("Editor-maintained vocabularies", () => {
 
   it("gives every term a label", () => {
     for (const vocabulary of ["topics", "categories"]) {
-      for (const id of termIds(vocabulary)) {
-        const source = readFileSync(
-          `${contentRoot}/${vocabulary}/${id}.md`,
-          "utf8",
-        );
-        const match = /^---\n([\s\S]*?)\n---/.exec(source);
-        const data = parse(match?.[1] ?? "") as { label?: unknown };
-
-        expect(data.label, `${vocabulary}/${id} has no label`).toBeTruthy();
+      for (const entry of vocabularyEntries(vocabulary)) {
+        expect(entry.data.label, `${entry.path} has no label`).toBeTruthy();
       }
     }
   });

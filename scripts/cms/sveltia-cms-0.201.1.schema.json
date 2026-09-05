@@ -1,0 +1,4719 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/CmsConfig",
+  "definitions": {
+    "CmsConfig": {
+      "type": "object",
+      "properties": {
+        "load_config_file": {
+          "type": "boolean"
+        },
+        "backend": {
+          "$ref": "#/definitions/Backend"
+        },
+        "publish_mode": {
+          "type": "string",
+          "enum": ["", "simple", "editorial_workflow"]
+        },
+        "media_folder": {
+          "type": "string"
+        },
+        "public_folder": {
+          "type": "string"
+        },
+        "media_library": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "config": {
+                  "$ref": "#/definitions/DefaultMediaLibraryConfig"
+                }
+              },
+              "required": ["name"]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "output_filename_only": {
+                  "type": "boolean"
+                },
+                "use_transformations": {
+                  "type": "boolean"
+                },
+                "config": {
+                  "type": "object"
+                }
+              },
+              "required": ["name"]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "config": {
+                  "type": "object"
+                },
+                "settings": {
+                  "$ref": "#/definitions/UploadcareMediaLibrarySettings"
+                }
+              },
+              "required": ["name"]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "access_key_id": {
+                  "type": "string"
+                },
+                "bucket": {
+                  "type": "string"
+                },
+                "region": {
+                  "type": "string"
+                },
+                "account_id": {
+                  "type": "string"
+                },
+                "jurisdiction": {
+                  "type": "string",
+                  "enum": ["default", "eu", "fedramp"]
+                },
+                "project_id": {
+                  "type": "string"
+                },
+                "endpoint": {
+                  "type": "string"
+                },
+                "prefix": {
+                  "type": "string"
+                },
+                "force_path_style": {
+                  "type": "boolean"
+                },
+                "public_url": {
+                  "type": "string"
+                }
+              },
+              "required": ["access_key_id", "bucket", "name"]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "providers": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/StockAssetProviderName"
+                  }
+                }
+              },
+              "required": ["name"]
+            }
+          ]
+        },
+        "media_libraries": {
+          "$ref": "#/definitions/MediaLibraries"
+        },
+        "app_title": {
+          "type": "string"
+        },
+        "site_url": {
+          "type": "string"
+        },
+        "display_url": {
+          "type": "string"
+        },
+        "logo_url": {
+          "type": "string",
+          "deprecated": true,
+          "deprecationMessage": "This option is superseded by the new `logo.src` option. See the documentation https://sveltiacms.app/en/docs/customization#custom-logo for details."
+        },
+        "logo": {
+          "$ref": "#/definitions/LogoOptions"
+        },
+        "logout_redirect_url": {
+          "type": "string"
+        },
+        "issue_reports": {
+          "$ref": "#/definitions/IssueReports"
+        },
+        "show_preview_links": {
+          "type": "boolean"
+        },
+        "slug": {
+          "$ref": "#/definitions/SlugOptions"
+        },
+        "collections": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/Collection"
+              },
+              {
+                "$ref": "#/definitions/CollectionDivider"
+              }
+            ]
+          }
+        },
+        "singletons": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/CollectionFile"
+              },
+              {
+                "$ref": "#/definitions/CollectionDivider"
+              }
+            ]
+          }
+        },
+        "asset_collections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AssetCollection"
+          }
+        },
+        "i18n": {
+          "$ref": "#/definitions/I18nOptions"
+        },
+        "editor": {
+          "$ref": "#/definitions/EditorOptions"
+        },
+        "output": {
+          "$ref": "#/definitions/OutputOptions"
+        },
+        "field_defaults": {
+          "$ref": "#/definitions/FieldDefaults"
+        },
+        "$schema": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": ["backend"],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "required": ["collections"]
+        },
+        {
+          "required": ["singletons"]
+        }
+      ]
+    },
+    "Backend": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/GitBackend"
+        },
+        {
+          "$ref": "#/definitions/TestBackend"
+        }
+      ]
+    },
+    "GitBackend": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/GitHubBackend"
+        },
+        {
+          "$ref": "#/definitions/GitLabBackend"
+        },
+        {
+          "$ref": "#/definitions/GiteaBackend"
+        }
+      ]
+    },
+    "GitHubBackend": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "const": "github"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "api_root": {
+          "type": "string"
+        },
+        "graphql_api_root": {
+          "type": "string"
+        },
+        "base_url": {
+          "type": "string"
+        },
+        "auth_type": {
+          "type": "string",
+          "const": ""
+        },
+        "auth_endpoint": {
+          "type": "string"
+        },
+        "app_id": {
+          "type": "string"
+        },
+        "cms_label_prefix": {
+          "type": "string"
+        },
+        "squash_merges": {
+          "type": "boolean"
+        },
+        "preview_context": {
+          "type": "string"
+        },
+        "open_authoring": {
+          "type": "boolean"
+        },
+        "auth_scope": {
+          "type": "string",
+          "enum": ["repo", "public_repo"]
+        },
+        "branch": {
+          "type": "string"
+        },
+        "site_domain": {
+          "type": "string"
+        },
+        "commit_messages": {
+          "$ref": "#/definitions/CommitMessages"
+        },
+        "automatic_deployments": {
+          "type": "boolean",
+          "deprecated": true,
+          "deprecationMessage": "Use the new `skip_ci` option instead, which is more intuitive. `automatic_deployments: false` is equivalent to `skip_ci: true`, and `automatic_deployments: true` is equivalent to `skip_ci: false`. See the documentation https://sveltiacms.app/en/docs/deployments#disabling-automatic-deployments for details."
+        },
+        "skip_ci": {
+          "type": "boolean"
+        },
+        "auth_methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AuthMethodName"
+          }
+        },
+        "include_credentials": {
+          "type": "boolean"
+        }
+      },
+      "required": ["name", "repo"]
+    },
+    "CommitMessages": {
+      "type": "object",
+      "properties": {
+        "create": {
+          "type": "string"
+        },
+        "update": {
+          "type": "string"
+        },
+        "delete": {
+          "type": "string"
+        },
+        "uploadMedia": {
+          "type": "string"
+        },
+        "deleteMedia": {
+          "type": "string"
+        },
+        "openAuthoring": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AuthMethodName": {
+      "type": "string",
+      "enum": ["oauth", "token"]
+    },
+    "GitLabBackend": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "const": "gitlab"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "api_root": {
+          "type": "string"
+        },
+        "graphql_api_root": {
+          "type": "string"
+        },
+        "base_url": {
+          "type": "string"
+        },
+        "auth_type": {
+          "type": "string",
+          "enum": ["", "pkce"]
+        },
+        "auth_endpoint": {
+          "type": "string"
+        },
+        "app_id": {
+          "type": "string"
+        },
+        "cms_label_prefix": {
+          "type": "string"
+        },
+        "squash_merges": {
+          "type": "boolean"
+        },
+        "preview_context": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "site_domain": {
+          "type": "string"
+        },
+        "commit_messages": {
+          "$ref": "#/definitions/CommitMessages"
+        },
+        "automatic_deployments": {
+          "type": "boolean",
+          "deprecated": true,
+          "deprecationMessage": "Use the new `skip_ci` option instead, which is more intuitive. `automatic_deployments: false` is equivalent to `skip_ci: true`, and `automatic_deployments: true` is equivalent to `skip_ci: false`. See the documentation https://sveltiacms.app/en/docs/deployments#disabling-automatic-deployments for details."
+        },
+        "skip_ci": {
+          "type": "boolean"
+        },
+        "auth_methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AuthMethodName"
+          }
+        },
+        "include_credentials": {
+          "type": "boolean"
+        }
+      },
+      "required": ["name", "repo"]
+    },
+    "GiteaBackend": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "const": "gitea"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "api_root": {
+          "type": "string"
+        },
+        "base_url": {
+          "type": "string"
+        },
+        "auth_endpoint": {
+          "type": "string"
+        },
+        "app_id": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "site_domain": {
+          "type": "string"
+        },
+        "commit_messages": {
+          "$ref": "#/definitions/CommitMessages"
+        },
+        "automatic_deployments": {
+          "type": "boolean",
+          "deprecated": true,
+          "deprecationMessage": "Use the new `skip_ci` option instead, which is more intuitive. `automatic_deployments: false` is equivalent to `skip_ci: true`, and `automatic_deployments: true` is equivalent to `skip_ci: false`. See the documentation https://sveltiacms.app/en/docs/deployments#disabling-automatic-deployments for details."
+        },
+        "skip_ci": {
+          "type": "boolean"
+        },
+        "auth_methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AuthMethodName"
+          }
+        },
+        "include_credentials": {
+          "type": "boolean"
+        }
+      },
+      "required": ["app_id", "name", "repo"]
+    },
+    "TestBackend": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "const": "test-repo"
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    },
+    "MediaLibraryName": {
+      "anyOf": [
+        {
+          "type": "string",
+          "const": "default"
+        },
+        {
+          "$ref": "#/definitions/CloudMediaLibraryName"
+        },
+        {
+          "type": "string",
+          "const": "stock_assets"
+        }
+      ]
+    },
+    "CloudMediaLibraryName": {
+      "type": "string",
+      "enum": [
+        "cloudinary",
+        "uploadcare",
+        "aws_s3",
+        "backblaze_b2",
+        "cloudflare_r2",
+        "digitalocean_spaces",
+        "scaleway_object_storage",
+        "supabase_storage"
+      ]
+    },
+    "DefaultMediaLibraryConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "multiple": {
+          "type": "boolean"
+        },
+        "max_file_size": {
+          "type": "number"
+        },
+        "slugify_filename": {
+          "type": "boolean"
+        },
+        "transformations": {
+          "$ref": "#/definitions/ImageTransformations"
+        }
+      }
+    },
+    "ImageTransformations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "svg": {
+          "$ref": "#/definitions/VectorImageTransformationOptions"
+        },
+        "raster_image": {
+          "$ref": "#/definitions/RasterImageTransformationOptions"
+        },
+        "avif": {
+          "$ref": "#/definitions/RasterImageTransformationOptions"
+        },
+        "gif": {
+          "$ref": "#/definitions/RasterImageTransformationOptions"
+        },
+        "jpeg": {
+          "$ref": "#/definitions/RasterImageTransformationOptions"
+        },
+        "png": {
+          "$ref": "#/definitions/RasterImageTransformationOptions"
+        },
+        "webp": {
+          "$ref": "#/definitions/RasterImageTransformationOptions"
+        }
+      }
+    },
+    "VectorImageTransformationOptions": {
+      "type": "object",
+      "properties": {
+        "optimize": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "RasterImageTransformationOptions": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "const": "webp"
+        },
+        "quality": {
+          "type": "number"
+        },
+        "width": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "UploadcareMediaLibrarySettings": {
+      "type": "object",
+      "properties": {
+        "autoFilename": {
+          "type": "boolean"
+        },
+        "defaultOperations": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "StockAssetProviderName": {
+      "type": "string",
+      "enum": ["pexels", "picsum", "pixabay", "unsplash"]
+    },
+    "MediaLibraries": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "$ref": "#/definitions/SharedMediaLibraryOptions"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "boolean",
+              "const": false
+            },
+            {
+              "$ref": "#/definitions/DefaultMediaLibrary"
+            }
+          ]
+        },
+        "cloudinary": {
+          "anyOf": [
+            {
+              "type": "boolean",
+              "const": false
+            },
+            {
+              "$ref": "#/definitions/CloudinaryMediaLibrary"
+            }
+          ]
+        },
+        "uploadcare": {
+          "anyOf": [
+            {
+              "type": "boolean",
+              "const": false
+            },
+            {
+              "$ref": "#/definitions/UploadcareMediaLibrary"
+            }
+          ]
+        },
+        "aws_s3": {
+          "anyOf": [
+            {
+              "type": "boolean",
+              "const": false
+            },
+            {
+              "$ref": "#/definitions/S3MediaLibrary"
+            }
+          ]
+        },
+        "cloudflare_r2": {
+          "anyOf": [
+            {
+              "type": "boolean",
+              "const": false
+            },
+            {
+              "$ref": "#/definitions/S3MediaLibrary"
+            }
+          ]
+        },
+        "digitalocean_spaces": {
+          "anyOf": [
+            {
+              "type": "boolean",
+              "const": false
+            },
+            {
+              "$ref": "#/definitions/S3MediaLibrary"
+            }
+          ]
+        },
+        "backblaze_b2": {
+          "anyOf": [
+            {
+              "type": "boolean",
+              "const": false
+            },
+            {
+              "$ref": "#/definitions/S3MediaLibrary"
+            }
+          ]
+        },
+        "scaleway_object_storage": {
+          "anyOf": [
+            {
+              "type": "boolean",
+              "const": false
+            },
+            {
+              "$ref": "#/definitions/S3MediaLibrary"
+            }
+          ]
+        },
+        "supabase_storage": {
+          "anyOf": [
+            {
+              "type": "boolean",
+              "const": false
+            },
+            {
+              "$ref": "#/definitions/S3MediaLibrary"
+            }
+          ]
+        },
+        "stock_assets": {
+          "anyOf": [
+            {
+              "type": "boolean",
+              "const": false
+            },
+            {
+              "$ref": "#/definitions/StockMediaLibrary"
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "SharedMediaLibraryOptions": {
+      "type": "object",
+      "properties": {
+        "max_file_size": {
+          "type": "number"
+        },
+        "slugify_filename": {
+          "type": "boolean"
+        },
+        "transformations": {
+          "$ref": "#/definitions/ImageTransformations"
+        }
+      },
+      "additionalProperties": false
+    },
+    "DefaultMediaLibrary": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/definitions/DefaultMediaLibraryConfig"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CloudinaryMediaLibrary": {
+      "type": "object",
+      "properties": {
+        "output_filename_only": {
+          "type": "boolean"
+        },
+        "use_transformations": {
+          "type": "boolean"
+        },
+        "config": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    "UploadcareMediaLibrary": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "type": "object"
+        },
+        "settings": {
+          "$ref": "#/definitions/UploadcareMediaLibrarySettings"
+        }
+      },
+      "additionalProperties": false
+    },
+    "S3MediaLibrary": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "access_key_id": {
+          "type": "string"
+        },
+        "bucket": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "account_id": {
+          "type": "string"
+        },
+        "jurisdiction": {
+          "type": "string",
+          "enum": ["default", "eu", "fedramp"]
+        },
+        "project_id": {
+          "type": "string"
+        },
+        "endpoint": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "force_path_style": {
+          "type": "boolean"
+        },
+        "public_url": {
+          "type": "string"
+        }
+      },
+      "required": ["access_key_id", "bucket"],
+      "additionalProperties": false
+    },
+    "StockMediaLibrary": {
+      "type": "object",
+      "properties": {
+        "providers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StockAssetProviderName"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "LogoOptions": {
+      "type": "object",
+      "properties": {
+        "src": {
+          "type": "string"
+        },
+        "show_in_header": {
+          "type": "boolean"
+        }
+      },
+      "required": ["src"],
+      "additionalProperties": false
+    },
+    "IssueReports": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        }
+      },
+      "required": ["url"],
+      "additionalProperties": false
+    },
+    "SlugOptions": {
+      "type": "object",
+      "properties": {
+        "encoding": {
+          "type": "string",
+          "enum": ["unicode", "ascii"]
+        },
+        "clean_accents": {
+          "type": "boolean"
+        },
+        "sanitize_replacement": {
+          "type": "string"
+        },
+        "maxlength": {
+          "type": "number"
+        },
+        "trim": {
+          "type": "boolean"
+        },
+        "lowercase": {
+          "type": "boolean"
+        },
+        "timezone": {
+          "type": "string",
+          "enum": ["local", "utc"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "Collection": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/EntryCollection"
+        },
+        {
+          "$ref": "#/definitions/FileCollection"
+        }
+      ]
+    },
+    "EntryCollection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "folder": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Field"
+          }
+        },
+        "path": {
+          "type": "string"
+        },
+        "filter": {
+          "$ref": "#/definitions/CollectionFilter"
+        },
+        "create": {
+          "type": "boolean"
+        },
+        "delete": {
+          "type": "boolean"
+        },
+        "duplicate": {
+          "type": "boolean"
+        },
+        "reorder": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/ReorderOptions"
+            }
+          ]
+        },
+        "extension": {
+          "type": "string"
+        },
+        "identifier_field": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "slug_length": {
+          "type": "number",
+          "deprecated": true,
+          "deprecationMessage": "Use the global `slug.maxlength` option instead."
+        },
+        "summary": {
+          "type": "string"
+        },
+        "sortable_fields": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "#/definitions/SortableFields"
+            }
+          ]
+        },
+        "view_filters": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ViewFilters"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ViewFilter"
+              }
+            }
+          ]
+        },
+        "view_groups": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ViewGroups"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ViewGroup"
+              }
+            }
+          ]
+        },
+        "nested": {
+          "$ref": "#/definitions/NestedCollectionOptions"
+        },
+        "meta": {
+          "$ref": "#/definitions/CollectionMetaData"
+        },
+        "index_file": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/CollectionIndexFile"
+            }
+          ]
+        },
+        "thumbnail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "limit": {
+          "type": "number"
+        },
+        "aliases_field": {
+          "type": ["string", "boolean"]
+        },
+        "label_singular": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "media_folder": {
+          "type": "string"
+        },
+        "public_folder": {
+          "type": "string"
+        },
+        "hide": {
+          "type": "boolean"
+        },
+        "publish": {
+          "type": "boolean"
+        },
+        "format": {
+          "type": "string"
+        },
+        "frontmatter_delimiter": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "body_field": {
+          "$ref": "#/definitions/BodyFieldOptions"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/I18nOptions"
+            }
+          ]
+        },
+        "preview_path": {
+          "type": "string"
+        },
+        "preview_path_date_field": {
+          "type": "string"
+        },
+        "editor": {
+          "$ref": "#/definitions/EditorOptions"
+        },
+        "yaml_quote": {
+          "type": "boolean",
+          "deprecated": true,
+          "deprecationMessage": "Use the global YAML format options. `yaml_quote: true` is equivalent to `quote: double`. See the documentation https://sveltiacms.app/en/docs/data-output#controlling-data-output for details."
+        },
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        }
+      },
+      "required": ["fields", "folder", "name"]
+    },
+    "Field": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/StandardField"
+        },
+        {
+          "$ref": "#/definitions/CustomField"
+        }
+      ]
+    },
+    "StandardField": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/VisibleField"
+        },
+        {
+          "$ref": "#/definitions/HiddenField"
+        }
+      ]
+    },
+    "VisibleField": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/BooleanField"
+        },
+        {
+          "$ref": "#/definitions/CodeField"
+        },
+        {
+          "$ref": "#/definitions/ColorField"
+        },
+        {
+          "$ref": "#/definitions/ComputeField"
+        },
+        {
+          "$ref": "#/definitions/DateTimeField"
+        },
+        {
+          "$ref": "#/definitions/FileField"
+        },
+        {
+          "$ref": "#/definitions/ImageField"
+        },
+        {
+          "$ref": "#/definitions/KeyValueField"
+        },
+        {
+          "$ref": "#/definitions/ListField"
+        },
+        {
+          "$ref": "#/definitions/MapField"
+        },
+        {
+          "$ref": "#/definitions/MarkdownField"
+        },
+        {
+          "$ref": "#/definitions/NumberField"
+        },
+        {
+          "$ref": "#/definitions/ObjectField"
+        },
+        {
+          "$ref": "#/definitions/RelationField"
+        },
+        {
+          "$ref": "#/definitions/RichTextField"
+        },
+        {
+          "$ref": "#/definitions/SelectField"
+        },
+        {
+          "$ref": "#/definitions/StringField"
+        },
+        {
+          "$ref": "#/definitions/TextField"
+        },
+        {
+          "$ref": "#/definitions/UuidField"
+        }
+      ]
+    },
+    "BooleanField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "before_input": {
+          "type": "string"
+        },
+        "after_input": {
+          "type": "string"
+        },
+        "widget": {
+          "type": "string",
+          "const": "boolean"
+        },
+        "default": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "CodeField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "code"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "default_language": {
+          "type": "string"
+        },
+        "allow_language_selection": {
+          "type": "boolean"
+        },
+        "output_code_only": {
+          "type": "boolean"
+        },
+        "keys": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "lang": {
+              "type": "string"
+            }
+          },
+          "required": ["code", "lang"],
+          "additionalProperties": false
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "ColorField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "color"
+        },
+        "default": {
+          "type": "string"
+        },
+        "allowInput": {
+          "type": "boolean"
+        },
+        "enableAlpha": {
+          "type": "boolean"
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "ComputeField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "compute"
+        },
+        "value": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "value", "widget"]
+    },
+    "DateTimeField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "datetime"
+        },
+        "default": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/DateTimeInputType"
+        },
+        "min": {
+          "type": "string"
+        },
+        "max": {
+          "type": "string"
+        },
+        "step": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "const": "any"
+            }
+          ]
+        },
+        "format": {
+          "type": "string"
+        },
+        "date_format": {
+          "type": ["string", "boolean"]
+        },
+        "time_format": {
+          "type": ["string", "boolean"]
+        },
+        "picker_utc": {
+          "type": "boolean"
+        },
+        "input_timezone": {
+          "type": "string"
+        },
+        "output_utc": {
+          "type": "boolean"
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "DateTimeInputType": {
+      "type": "string",
+      "enum": ["datetime-local", "date", "time"]
+    },
+    "FileField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "file"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "multiple": {
+          "type": "boolean"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "accept": {
+          "type": "string"
+        },
+        "choose_url": {
+          "type": "boolean"
+        },
+        "media_folder": {
+          "type": "string"
+        },
+        "public_folder": {
+          "type": "string"
+        },
+        "media_library": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "config": {
+                  "$ref": "#/definitions/DefaultMediaLibraryConfig"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "output_filename_only": {
+                  "type": "boolean"
+                },
+                "use_transformations": {
+                  "type": "boolean"
+                },
+                "config": {
+                  "type": "object"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "config": {
+                  "type": "object"
+                },
+                "settings": {
+                  "$ref": "#/definitions/UploadcareMediaLibrarySettings"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "access_key_id": {
+                  "type": "string"
+                },
+                "bucket": {
+                  "type": "string"
+                },
+                "region": {
+                  "type": "string"
+                },
+                "account_id": {
+                  "type": "string"
+                },
+                "jurisdiction": {
+                  "type": "string",
+                  "enum": ["default", "eu", "fedramp"]
+                },
+                "project_id": {
+                  "type": "string"
+                },
+                "endpoint": {
+                  "type": "string"
+                },
+                "prefix": {
+                  "type": "string"
+                },
+                "force_path_style": {
+                  "type": "boolean"
+                },
+                "public_url": {
+                  "type": "string"
+                }
+              },
+              "required": ["access_key_id", "bucket"]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "providers": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/StockAssetProviderName"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "media_libraries": {
+          "$ref": "#/definitions/MediaLibraries"
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "ImageField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "image"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "multiple": {
+          "type": "boolean"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "accept": {
+          "type": "string"
+        },
+        "choose_url": {
+          "type": "boolean"
+        },
+        "media_folder": {
+          "type": "string"
+        },
+        "public_folder": {
+          "type": "string"
+        },
+        "media_library": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "config": {
+                  "$ref": "#/definitions/DefaultMediaLibraryConfig"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "output_filename_only": {
+                  "type": "boolean"
+                },
+                "use_transformations": {
+                  "type": "boolean"
+                },
+                "config": {
+                  "type": "object"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "config": {
+                  "type": "object"
+                },
+                "settings": {
+                  "$ref": "#/definitions/UploadcareMediaLibrarySettings"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "access_key_id": {
+                  "type": "string"
+                },
+                "bucket": {
+                  "type": "string"
+                },
+                "region": {
+                  "type": "string"
+                },
+                "account_id": {
+                  "type": "string"
+                },
+                "jurisdiction": {
+                  "type": "string",
+                  "enum": ["default", "eu", "fedramp"]
+                },
+                "project_id": {
+                  "type": "string"
+                },
+                "endpoint": {
+                  "type": "string"
+                },
+                "prefix": {
+                  "type": "string"
+                },
+                "force_path_style": {
+                  "type": "boolean"
+                },
+                "public_url": {
+                  "type": "string"
+                }
+              },
+              "required": ["access_key_id", "bucket"]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "$ref": "#/definitions/MediaLibraryName"
+                },
+                "providers": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/StockAssetProviderName"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "media_libraries": {
+          "$ref": "#/definitions/MediaLibraries"
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "KeyValueField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "widget": {
+          "type": "string",
+          "const": "keyvalue"
+        },
+        "default": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "key_label": {
+          "type": "string"
+        },
+        "value_label": {
+          "type": "string"
+        },
+        "root": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "ListField": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/SimpleListField"
+        },
+        {
+          "$ref": "#/definitions/ListFieldWithSubField"
+        },
+        {
+          "$ref": "#/definitions/ListFieldWithSubFields"
+        },
+        {
+          "$ref": "#/definitions/ListFieldWithTypes"
+        }
+      ]
+    },
+    "SimpleListField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "widget": {
+          "type": "string",
+          "const": "list"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "object"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          ]
+        },
+        "label_singular": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "ListFieldWithSubField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "$ref": "#/definitions/Field"
+        },
+        "allow_add": {
+          "type": "boolean"
+        },
+        "allow_remove": {
+          "type": "boolean"
+        },
+        "allow_duplicate": {
+          "type": "boolean"
+        },
+        "allow_reorder": {
+          "type": "boolean"
+        },
+        "add_to_top": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "thumbnail": {
+          "type": "string"
+        },
+        "collapsed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "auto"
+            }
+          ]
+        },
+        "minimize_collapsed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "auto"
+            }
+          ]
+        },
+        "root": {
+          "type": "boolean"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "widget": {
+          "type": "string",
+          "const": "list"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "object"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          ]
+        },
+        "label_singular": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["field", "name", "widget"]
+    },
+    "ListFieldWithSubFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Field"
+          }
+        },
+        "allow_add": {
+          "type": "boolean"
+        },
+        "allow_remove": {
+          "type": "boolean"
+        },
+        "allow_duplicate": {
+          "type": "boolean"
+        },
+        "allow_reorder": {
+          "type": "boolean"
+        },
+        "add_to_top": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "thumbnail": {
+          "type": "string"
+        },
+        "collapsed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "auto"
+            }
+          ]
+        },
+        "minimize_collapsed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "auto"
+            }
+          ]
+        },
+        "root": {
+          "type": "boolean"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "widget": {
+          "type": "string",
+          "const": "list"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "object"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          ]
+        },
+        "label_singular": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["fields", "name", "widget"]
+    },
+    "ListFieldWithTypes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VariableFieldType"
+          }
+        },
+        "typeKey": {
+          "type": "string"
+        },
+        "allow_add": {
+          "type": "boolean"
+        },
+        "allow_remove": {
+          "type": "boolean"
+        },
+        "allow_duplicate": {
+          "type": "boolean"
+        },
+        "allow_reorder": {
+          "type": "boolean"
+        },
+        "add_to_top": {
+          "type": "boolean"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "thumbnail": {
+          "type": "string"
+        },
+        "collapsed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "auto"
+            }
+          ]
+        },
+        "minimize_collapsed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "auto"
+            }
+          ]
+        },
+        "root": {
+          "type": "boolean"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "widget": {
+          "type": "string",
+          "const": "list"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "object"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          ]
+        },
+        "label_singular": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "types", "widget"]
+    },
+    "VariableFieldType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "widget": {
+          "type": "string",
+          "const": "object"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Field"
+          }
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    },
+    "MapField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "map"
+        },
+        "default": {
+          "type": "string"
+        },
+        "decimals": {
+          "type": "number"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["Point", "LineString", "Polygon"]
+        },
+        "center": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "zoom": {
+          "type": "number"
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "MarkdownField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "markdown"
+        },
+        "default": {
+          "type": "string"
+        },
+        "minimal": {
+          "type": "boolean"
+        },
+        "buttons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RichTextEditorButtonName"
+          }
+        },
+        "editor_components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allow_nested_components": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "exclude_self"
+            }
+          ]
+        },
+        "modes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RichTextEditorMode"
+          }
+        },
+        "sanitize_preview": {
+          "type": "boolean"
+        },
+        "linked_images": {
+          "type": "boolean"
+        },
+        "use_emoji_autocomplete": {
+          "type": "boolean"
+        },
+        "use_markdown_shortcuts": {
+          "type": "boolean"
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "RichTextEditorButtonName": {
+      "type": "string",
+      "enum": [
+        "bold",
+        "italic",
+        "strikethrough",
+        "code",
+        "link",
+        "heading-one",
+        "heading-two",
+        "heading-three",
+        "heading-four",
+        "heading-five",
+        "heading-six",
+        "quote",
+        "bulleted-list",
+        "numbered-list"
+      ]
+    },
+    "RichTextEditorMode": {
+      "type": "string",
+      "enum": ["rich_text", "raw"]
+    },
+    "NumberField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "before_input": {
+          "type": "string"
+        },
+        "after_input": {
+          "type": "string"
+        },
+        "widget": {
+          "type": "string",
+          "const": "number"
+        },
+        "default": {
+          "type": ["string", "number"]
+        },
+        "value_type": {
+          "type": "string",
+          "enum": ["float", "int", "int/string", "float/string"]
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "step": {
+          "type": "number"
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "ObjectField": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/ObjectFieldWithSubFields"
+        },
+        {
+          "$ref": "#/definitions/ObjectFieldWithTypes"
+        }
+      ]
+    },
+    "ObjectFieldWithSubFields": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Field"
+          }
+        },
+        "widget": {
+          "type": "string",
+          "const": "object"
+        },
+        "default": {
+          "type": "object"
+        },
+        "collapsed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "auto"
+            }
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["fields", "name", "widget"]
+    },
+    "ObjectFieldWithTypes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VariableFieldType"
+          }
+        },
+        "typeKey": {
+          "type": "string"
+        },
+        "widget": {
+          "type": "string",
+          "const": "object"
+        },
+        "default": {
+          "type": "object"
+        },
+        "collapsed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "auto"
+            }
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "types", "widget"]
+    },
+    "RelationField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "multiple": {
+          "type": "boolean"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "dropdown_threshold": {
+          "type": "number"
+        },
+        "widget": {
+          "type": "string",
+          "const": "relation"
+        },
+        "default": {
+          "anyOf": [
+            {},
+            {
+              "type": "array",
+              "items": {}
+            }
+          ]
+        },
+        "collection": {
+          "type": "string"
+        },
+        "file": {
+          "type": "string"
+        },
+        "value_field": {
+          "type": "string"
+        },
+        "display_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "search_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RelationFieldFilterOptions"
+          }
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["collection", "name", "widget"]
+    },
+    "RelationFieldFilterOptions": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "$ref": "#/definitions/FieldKeyPath"
+        },
+        "values": {
+          "type": "array",
+          "items": {}
+        },
+        "exclude": {
+          "type": "boolean"
+        }
+      },
+      "required": ["field", "values"],
+      "additionalProperties": false
+    },
+    "FieldKeyPath": {
+      "type": "string"
+    },
+    "RichTextField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "richtext"
+        },
+        "default": {
+          "type": "string"
+        },
+        "minimal": {
+          "type": "boolean"
+        },
+        "buttons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RichTextEditorButtonName"
+          }
+        },
+        "editor_components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allow_nested_components": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "exclude_self"
+            }
+          ]
+        },
+        "modes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RichTextEditorMode"
+          }
+        },
+        "sanitize_preview": {
+          "type": "boolean"
+        },
+        "linked_images": {
+          "type": "boolean"
+        },
+        "use_emoji_autocomplete": {
+          "type": "boolean"
+        },
+        "use_markdown_shortcuts": {
+          "type": "boolean"
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "SelectField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "multiple": {
+          "type": "boolean"
+        },
+        "min": {
+          "type": "number"
+        },
+        "max": {
+          "type": "number"
+        },
+        "dropdown_threshold": {
+          "type": "number"
+        },
+        "widget": {
+          "type": "string",
+          "const": "select"
+        },
+        "default": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SelectFieldValue"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SelectFieldValue"
+              }
+            }
+          ]
+        },
+        "options": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SelectFieldValue"
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "$ref": "#/definitions/SelectFieldValue"
+                  }
+                },
+                "required": ["label", "value"],
+                "additionalProperties": false
+              }
+            }
+          ]
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "options", "widget"]
+    },
+    "SelectFieldValue": {
+      "type": ["string", "number", "null"]
+    },
+    "StringField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "minlength": {
+          "type": "number"
+        },
+        "maxlength": {
+          "type": "number"
+        },
+        "before_input": {
+          "type": "string"
+        },
+        "after_input": {
+          "type": "string"
+        },
+        "widget": {
+          "type": "string",
+          "const": "string"
+        },
+        "default": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["url", "text", "email"]
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "suffix": {
+          "type": "string"
+        },
+        "use_emoji_autocomplete": {
+          "type": "boolean"
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name"]
+    },
+    "TextField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "minlength": {
+          "type": "number"
+        },
+        "maxlength": {
+          "type": "number"
+        },
+        "widget": {
+          "type": "string",
+          "const": "text"
+        },
+        "default": {
+          "type": "string"
+        },
+        "use_emoji_autocomplete": {
+          "type": "boolean"
+        },
+        "pattern": {
+          "type": "array",
+          "minItems": 2,
+          "items": [
+            {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "string",
+                  "format": "regex"
+                }
+              ]
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "maxItems": 2
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "UuidField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "uuid"
+        },
+        "default": {
+          "type": "string"
+        },
+        "prefix": {
+          "type": "string"
+        },
+        "use_b32_encoding": {
+          "type": "boolean"
+        },
+        "read_only": {
+          "type": "boolean",
+          "deprecated": true,
+          "deprecationMessage": "Use the `readonly` common field option instead, which defaults to `true` for the UUID field type."
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "HiddenField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "hidden"
+        },
+        "default": {},
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "CustomField": {
+      "type": "object",
+      "properties": {
+        "widget": {
+          "type": "string",
+          "minLength": 1,
+          "not": {
+            "enum": [
+              "boolean",
+              "code",
+              "color",
+              "compute",
+              "datetime",
+              "file",
+              "hidden",
+              "image",
+              "keyvalue",
+              "list",
+              "map",
+              "markdown",
+              "number",
+              "object",
+              "relation",
+              "richtext",
+              "select",
+              "string",
+              "text",
+              "uuid"
+            ]
+          }
+        },
+        "label": {
+          "type": "string"
+        },
+        "comment": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "preview": {
+          "type": "boolean"
+        },
+        "required": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "readonly": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "translate"
+            },
+            {
+              "type": "string",
+              "const": "duplicate"
+            }
+          ]
+        }
+      },
+      "required": ["name", "widget"]
+    },
+    "CollectionFilter": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "$ref": "#/definitions/FieldKeyPath"
+        },
+        "value": {
+          "anyOf": [
+            {},
+            {
+              "type": "array",
+              "items": {}
+            }
+          ]
+        },
+        "pattern": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "regex"
+            }
+          ]
+        }
+      },
+      "required": ["field"],
+      "additionalProperties": false
+    },
+    "ReorderOptions": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SortableFields": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FieldKeyPath"
+          }
+        },
+        "default": {
+          "$ref": "#/definitions/SortableFieldsDefaultOptions"
+        }
+      },
+      "required": ["fields"],
+      "additionalProperties": false
+    },
+    "SortableFieldsDefaultOptions": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "$ref": "#/definitions/FieldKeyPath"
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["ascending", "descending", "Ascending", "Descending", "None"]
+        }
+      },
+      "required": ["field"],
+      "additionalProperties": false
+    },
+    "ViewFilters": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ViewFilter"
+          }
+        },
+        "default": {
+          "type": "string"
+        }
+      },
+      "required": ["filters"],
+      "additionalProperties": false
+    },
+    "ViewFilter": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "field": {
+          "$ref": "#/definitions/FieldKeyPath"
+        },
+        "pattern": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "string",
+              "format": "regex"
+            },
+            {
+              "type": "boolean"
+            }
+          ]
+        }
+      },
+      "required": ["label", "field", "pattern"],
+      "additionalProperties": false
+    },
+    "ViewGroups": {
+      "type": "object",
+      "properties": {
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ViewGroup"
+          }
+        },
+        "default": {
+          "type": "string"
+        }
+      },
+      "required": ["groups"],
+      "additionalProperties": false
+    },
+    "ViewGroup": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "field": {
+          "$ref": "#/definitions/FieldKeyPath"
+        },
+        "pattern": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "format": "regex"
+            }
+          ]
+        }
+      },
+      "required": ["label", "field"],
+      "additionalProperties": false
+    },
+    "NestedCollectionOptions": {
+      "type": "object",
+      "properties": {
+        "depth": {
+          "type": "number"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "subfolders": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CollectionMetaData": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "$ref": "#/definitions/CollectionMetaDataPath"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CollectionMetaDataPath": {
+      "type": "object",
+      "properties": {
+        "widget": {
+          "type": "string",
+          "const": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "index_file": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "CollectionIndexFile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Field"
+          }
+        },
+        "editor": {
+          "$ref": "#/definitions/EditorOptions"
+        }
+      },
+      "additionalProperties": false
+    },
+    "EditorOptions": {
+      "type": "object",
+      "properties": {
+        "preview": {
+          "type": "boolean"
+        }
+      },
+      "required": ["preview"],
+      "additionalProperties": false
+    },
+    "BodyFieldOptions": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "inline": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "I18nOptions": {
+      "type": "object",
+      "properties": {
+        "structure": {
+          "$ref": "#/definitions/I18nFileStructure"
+        },
+        "locales": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "default_locale": {
+          "type": "string"
+        },
+        "initial_locales": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "string",
+              "const": "default"
+            },
+            {
+              "type": "string",
+              "const": "all"
+            }
+          ]
+        },
+        "save_all_locales": {
+          "type": "boolean",
+          "deprecated": true,
+          "deprecationMessage": "Use the `initial_locales` option instead, which provides more flexibility. `save_all_locales: false` is equivalent to `initial_locales: all`. See the documentation https://sveltiacms.app/en/docs/i18n#disabling-non-default-locale-content for details."
+        },
+        "canonical_slug": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        "omit_default_locale_from_filename": {
+          "type": "boolean",
+          "deprecated": true,
+          "deprecationMessage": "Use the `omit_default_locale_from_file_path` option instead."
+        },
+        "omit_default_locale_from_file_path": {
+          "type": "boolean"
+        },
+        "omit_default_locale_from_preview_path": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "I18nFileStructure": {
+      "type": "string",
+      "enum": [
+        "single_file",
+        "single_file_default_root",
+        "multiple_files",
+        "multiple_folders",
+        "multiple_folders_i18n_root",
+        "multiple_root_folders"
+      ]
+    },
+    "FileCollection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CollectionFile"
+          }
+        },
+        "label_singular": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "media_folder": {
+          "type": "string"
+        },
+        "public_folder": {
+          "type": "string"
+        },
+        "hide": {
+          "type": "boolean"
+        },
+        "publish": {
+          "type": "boolean"
+        },
+        "format": {
+          "type": "string"
+        },
+        "frontmatter_delimiter": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "body_field": {
+          "$ref": "#/definitions/BodyFieldOptions"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/I18nOptions"
+            }
+          ]
+        },
+        "preview_path": {
+          "type": "string"
+        },
+        "preview_path_date_field": {
+          "type": "string"
+        },
+        "editor": {
+          "$ref": "#/definitions/EditorOptions"
+        },
+        "yaml_quote": {
+          "type": "boolean",
+          "deprecated": true,
+          "deprecationMessage": "Use the global YAML format options. `yaml_quote: true` is equivalent to `quote: double`. See the documentation https://sveltiacms.app/en/docs/data-output#controlling-data-output for details."
+        },
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        }
+      },
+      "required": ["files", "name"]
+    },
+    "CollectionFile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "file": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Field"
+          }
+        },
+        "media_folder": {
+          "type": "string"
+        },
+        "public_folder": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string"
+        },
+        "frontmatter_delimiter": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "body_field": {
+          "$ref": "#/definitions/BodyFieldOptions"
+        },
+        "i18n": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/I18nOptions"
+            }
+          ]
+        },
+        "preview_path": {
+          "type": "string"
+        },
+        "preview_path_date_field": {
+          "type": "string"
+        },
+        "editor": {
+          "$ref": "#/definitions/EditorOptions"
+        }
+      },
+      "required": ["name", "file", "fields"],
+      "additionalProperties": false
+    },
+    "CollectionDivider": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "divider": {
+          "type": "boolean"
+        }
+      },
+      "required": ["divider"],
+      "additionalProperties": false
+    },
+    "AssetCollection": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "media_folder": {
+          "type": "string"
+        },
+        "public_folder": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        }
+      },
+      "required": ["media_folder", "name"]
+    },
+    "OutputOptions": {
+      "type": "object",
+      "properties": {
+        "omit_empty_optional_fields": {
+          "type": "boolean"
+        },
+        "encode_file_path": {
+          "type": "boolean"
+        },
+        "json": {
+          "$ref": "#/definitions/JsonFormatOptions"
+        },
+        "yaml": {
+          "$ref": "#/definitions/YamlFormatOptions"
+        }
+      },
+      "additionalProperties": false
+    },
+    "JsonFormatOptions": {
+      "type": "object",
+      "properties": {
+        "indent_style": {
+          "type": "string",
+          "enum": ["space", "tab"]
+        },
+        "indent_size": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
+    "YamlFormatOptions": {
+      "type": "object",
+      "properties": {
+        "indent_size": {
+          "type": "number"
+        },
+        "indent_sequences": {
+          "type": "boolean"
+        },
+        "quote": {
+          "type": "string",
+          "enum": ["none", "double", "single"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "FieldDefaults": {
+      "type": "object",
+      "properties": {
+        "richtext": {
+          "$ref": "#/definitions/RichTextFieldBaseProps"
+        }
+      },
+      "additionalProperties": false
+    },
+    "RichTextFieldBaseProps": {
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "string"
+        },
+        "minimal": {
+          "type": "boolean"
+        },
+        "buttons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RichTextEditorButtonName"
+          }
+        },
+        "editor_components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allow_nested_components": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string",
+              "const": "exclude_self"
+            }
+          ]
+        },
+        "modes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RichTextEditorMode"
+          }
+        },
+        "sanitize_preview": {
+          "type": "boolean"
+        },
+        "linked_images": {
+          "type": "boolean"
+        },
+        "use_emoji_autocomplete": {
+          "type": "boolean"
+        },
+        "use_markdown_shortcuts": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "title": "Sveltia CMS Configuration"
+}

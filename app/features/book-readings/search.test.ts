@@ -18,7 +18,13 @@ const entry = (
   authors: { slug: string; name: string }[],
   years: number[],
   readsArticles = false,
-): FilterableEntry => ({ key, title, authors, years, readsArticles });
+): FilterableEntry => ({
+  key,
+  title,
+  authors,
+  years,
+  bookState: readsArticles ? "none" : "published",
+});
 
 describe("searchTerms", () => {
   it("splits on whitespace and lowercases", () => {
@@ -139,6 +145,21 @@ describe("logFacets", () => {
 
   it("offers nothing for an empty log", () => {
     expect(logFacets([])).toEqual({ books: [], authors: [], years: [] });
+  });
+
+  it("does not offer an unpublished book or its credited authors as facets", () => {
+    const unpublished: FilterableEntry = {
+      key: "unpublished-session",
+      title: "An announced session",
+      authors: [author("withheld-author", "Withheld author")],
+      years: [2026],
+      bookState: "unpublished",
+    };
+    expect(logFacets([unpublished])).toEqual({
+      books: [],
+      authors: [],
+      years: [{ value: "2026", label: "2026" }],
+    });
   });
 });
 

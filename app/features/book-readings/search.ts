@@ -8,6 +8,9 @@
  * not match.
  */
 
+import type { ReadingEntry } from "./presenters";
+import { byId } from "~/lib/collection-policy";
+
 /**
  * Splits a query into the terms a row must all match. Each term becomes a list
  * of alternatives, so an ISBN copied off the back of a book with its hyphens
@@ -63,14 +66,13 @@ export function logStatusLabel(visible: number, total: number): string {
 /**
  * The parts of a log entry the filters read.
  *
- * Declared structurally rather than imported from the presenters, which pull
- * in `astro:content` and so cannot be loaded in a test. A `ReadingEntry`
- * satisfies this shape without being told to.
+ * The browser needs identity and classification, not the rest of the
+ * presentation. The type-only import adds no presenter code to its bundle.
  */
 export interface FilterableEntry {
   key: string;
   title: string;
-  readsArticles: boolean;
+  bookState: ReadingEntry["bookState"];
   authors: readonly { slug: string; name: string }[];
   years: readonly number[];
 }
@@ -96,8 +98,8 @@ const byLabel = new Intl.Collator("en", { sensitivity: "base" });
  * Books are listed by title and authors alphabetically, because that is how a
  * reader looking for one scans a list. Years run newest first, matching the
  * order of the log itself. An entry that read articles rather than a book is
- * left out of the book list — it has no book to name — but it is still in the
- * log and still reachable by year or by the search box.
+ * left out of the book list, as is a session whose book is unpublished. Both
+ * remain reachable by year or by the search box.
  *
  * An author is keyed by their slug rather than by the name printed beside it.
  * Filtering on the name was the thing that broke the first time a catalogue
@@ -106,13 +108,19 @@ const byLabel = new Intl.Collator("en", { sensitivity: "base" });
  * their own books.
  */
 export function logFacets(entries: readonly FilterableEntry[]): LogFacets {
-  const books = entries
-    .filter((entry) => !entry.readsArticles)
+  const publishedBooks = entries.filter(
+    (entry) => entry.bookState === "published",
+  );
+  const books = publishedBooks
     .map((entry) => ({ value: entry.key, label: entry.title }))
-    .sort((a, b) => byLabel.compare(a.label, b.label));
+    .sort(
+      (a, b) =>
+        byLabel.compare(a.label, b.label) ||
+        byId({ id: a.value }, { id: b.value }),
+    );
 
   const names = new Map<string, string>();
-  for (const entry of entries) {
+  for (const entry of publishedBooks) {
     for (const author of entry.authors) {
       // First name seen wins, which is the one nearest the top of the log.
       // Every entry resolves its authors through the authors collection, so
@@ -124,7 +132,11 @@ export function logFacets(entries: readonly FilterableEntry[]): LogFacets {
 
   const authors = [...names]
     .map(([value, label]) => ({ value, label }))
-    .sort((a, b) => byLabel.compare(a.label, b.label));
+    .sort(
+      (a, b) =>
+        byLabel.compare(a.label, b.label) ||
+        byId({ id: a.value }, { id: b.value }),
+    );
 
   const years = [...new Set(entries.flatMap((entry) => entry.years))]
     .sort((a, b) => b - a)

@@ -68,6 +68,13 @@ const pacificYearFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Los_Angeles",
 });
 
+const pacificCalendarFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  timeZone: "America/Los_Angeles",
+});
+
 export const formatPacificDate = (date: Date): string =>
   pacificDayFormatter.format(date);
 export const formatPacificTime = (date: Date): string =>
@@ -80,7 +87,7 @@ export const formatPacificShortDate = (date: Date): string =>
 /**
  * The calendar year a session fell in where the circle meets. Taken from the
  * Pacific zone rather than from `getFullYear`, which answers in whatever zone
- * the build happened to run in: a session at 3 PM on 31 December in California
+ * the build happened to run in: a session at 8 PM on 31 December in California
  * is already the next year in UTC, and the entry would be filed under a year
  * the circle never met in.
  */
@@ -110,6 +117,20 @@ export function formatPacificMonthRange(start: Date, end: Date): string {
 
 /** ISO date without the time part, for a `<time datetime>` attribute. */
 export const isoDate = (date: Date): string => date.toISOString().slice(0, 10);
+
+/**
+ * A reading's Pacific calendar day, not the UTC date of its timestamp. Parts
+ * are assembled explicitly so locale punctuation cannot affect comparisons.
+ */
+export function isoPacificDate(date: Date): string {
+  const parts = { year: "", month: "", day: "" };
+  for (const { type, value } of pacificCalendarFormatter.formatToParts(date)) {
+    if (type === "year" || type === "month" || type === "day") {
+      parts[type] = value;
+    }
+  }
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
 
 export function formatDateRange(start: Date, end?: Date): string {
   if (!end || isoDate(end) === isoDate(start)) {
